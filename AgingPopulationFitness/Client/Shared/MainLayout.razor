@@ -1,0 +1,106 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+@inject HttpClient HttpClient
+@inject UserClient UserClient
+@inject IJSRuntime JSRuntime
+@inject UserState UserState;
+
+<head>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Quicksand">
+</head>
+
+
+<div class="top-bar">
+    <a class="logo" href="">
+        <text>LOGO</text>
+    </a>
+    @if (UserState.isLoggedIn)
+    {
+        <NavLink href="" class="nav-tab" Match="NavLinkMatch.All">
+            <div>Home</div>
+        </NavLink>
+
+
+        <NavLink href="injuries" class="nav-tab">
+            <div>My</div>
+            <div>Injuries</div>
+        </NavLink>
+
+        <NavLink href="login" class="nav-tab" @onclick="Logout">
+            <div>Logout</div>
+        </NavLink>
+    }
+    @if (!(UserState.isLoggedIn))
+    {
+        <NavLink href="login" class="nav-tab">
+            <div>Login</div>
+        </NavLink>
+    }
+
+
+</div>
+
+<div class="content">
+    <CascadingValue Value=UpdateMenu>
+        @Body
+    </CascadingValue>
+</div>
+
+@code {
+    EventCallback UpdateMenu => EventCallback.Factory.Create(this, UpdateAlertMenu);
+
+    public void UpdateAlertMenu()
+    {
+        Console.WriteLine("In updateAlertmenu: " + UserState.isLoggedIn);
+        IsLoggedInHelper();
+        Console.WriteLine("In updateAlertmenu: " + UserState.isLoggedIn);
+        if (UserState.isLoggedIn)
+        {
+            Console.WriteLine("In updateAlertmenu: " + UserState.isLoggedIn);
+            StateHasChanged();
+        }
+        else
+        {
+            StateHasChanged();
+        }
+    }
+
+    public async void LoggedInCheck()
+    {
+        if (UserState.userProfile == null)
+        {
+            UserState.isLoggedIn = false;
+            return;
+        }
+        if (UserState.userProfile.UserId == null)
+        {
+            UserState.isLoggedIn = false;
+            return;
+        }
+        UserState.isLoggedIn = await UserClient.IsLoggedIn(UserState.userProfile);
+        Console.WriteLine("In LoggedInCheck: " + UserState.isLoggedIn);
+        StateHasChanged();
+
+    }
+
+    public void IsLoggedInHelper()
+    {
+        LoggedInCheck();
+
+    }
+
+    public void Logout()
+    {
+        if (UserState.userProfile != null)
+        {
+            UserState.userProfile.UserId = null;
+            UserState.userProfile.Username = null;
+        }
+        Console.WriteLine("Logout:");
+        UserState.userProfile.PrintUserProfile();
+        IsLoggedInHelper();
+
+    }
+
+}

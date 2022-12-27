@@ -1,0 +1,121 @@
+﻿@page "/register"
+@inject NavigationManager Navigation
+@inject HttpClient HttpClient
+@inject UserClient UserClient
+@inject IJSRuntime JSRuntime
+@inject UserState UserState;
+
+
+<div>
+    <h1>Register</h1>
+    <div class="register-form">
+        <div class="username-section">
+            <text>Username</text>
+            <input @bind="userProfile.Username" class="username">
+        </div>
+        @if (userExists)
+        {
+            <div>
+                <text>A User with that Username already exists.</text>
+            </div>
+        }
+        <div class="password-section">
+            <text>password</text>
+            <input type="password" @bind="@passwordOne" class="password">
+        </div>
+        <div class="password-section">
+            <text>password</text>
+            <input type="password" @bind="@passwordTwo" @oninput="@((e) => { passwordTwo=(string?)e.Value; PasswordMatchCheck(); })" class="password">
+        </div>
+        @if (passwordsNotEqual)
+        {
+            <div>
+                <text>Passwords do not match.</text>
+            </div>
+        }
+        <div class="login-form-btns">
+            <button class="btn secondary" @onclick="BeginRegister">Register</button>
+        </div>
+        <div>
+            <button class="btn" @onclick="GoToLogin">Log in</button>
+        </div>
+        @if (userFailedToAdd)
+        {
+            <div>
+                <text>Failed to create user account. Please try again.</text>
+            </div>
+        }
+        @if (passwordTooShort)
+        {
+            <div>
+                <text>Password must be at least 5 characters and at most 50</text>
+            </div>
+        }
+    </div>
+</div>
+@code {
+    UserProfile userProfile = new UserProfile();
+    bool userExists = false;
+    string? passwordOne;
+    string? passwordTwo;
+    bool passwordsNotEqual = false;
+    bool userFailedToAdd = false;
+    bool passwordTooShort = false;
+
+    async Task BeginRegister()
+    {
+
+        try
+        {
+            userExists = await UserClient.UserExistsCheck(userProfile);
+            PasswordMatchCheck();
+
+
+            if ((!passwordsNotEqual) && (!userExists))
+            {
+                bool userAdded = false;
+                userProfile.Password = passwordOne;
+                passwordTooShort = !(userProfile.PasswordLengthCheck());
+                if (userProfile.PasswordLengthCheck())
+                {
+                    userAdded = await UserClient.AddUser(userProfile);
+                    Console.WriteLine("Password length check: " + userProfile.PasswordLengthCheck());
+                    if (!userAdded)
+                    {
+                        userFailedToAdd = true;
+                    }
+                    else
+                    {
+                        GoToLogin();
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+
+    }
+
+    public void PasswordMatchCheck()
+    {
+
+        if (passwordOne == passwordTwo)
+        {
+            passwordsNotEqual = false;
+        }
+        else
+        {
+            passwordsNotEqual = true;
+        }
+        Console.WriteLine("Checking passwords " + passwordsNotEqual);
+        Console.WriteLine(passwordOne);
+        Console.WriteLine(passwordTwo);
+    }
+
+    void GoToLogin()
+    {
+        Navigation.NavigateTo("/login");
+    }
+}

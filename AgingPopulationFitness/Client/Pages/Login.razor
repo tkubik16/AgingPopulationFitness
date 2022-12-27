@@ -1,0 +1,83 @@
+﻿@page "/login"
+@inject NavigationManager Navigation;
+@inject HttpClient HttpClient
+@inject UserClient UserClient
+@inject IJSRuntime JSRuntime
+@inject UserState UserState;
+
+<div>
+    <h1>Login</h1>
+    <div class="login-form">
+        <div class="username-section">
+            <text>Username</text>
+            <input @bind="userProfile.Username" class="username">
+        </div>
+        <div class="password-section">
+            <text>password</text>
+            <input type="password" @bind="userProfile.Password" class="password">
+        </div>
+        <div class="login-form-btns">
+            <button class="btn" @onclick="BeginLogin">Log in</button>
+        </div>
+        <div>
+            <button class="btn secondary" @onclick="BeginRegister">Register</button>
+        </div>
+        @if (UserDoesNotExist)
+        {
+            <div>
+                <text>Username or password is incorrect</text>
+            </div>
+        }
+    </div>
+</div>
+@code {
+    [CascadingParameter]
+    public EventCallback UpdateMenu { get; set; }
+
+    UserProfile userProfile = new UserProfile();
+    bool UserDoesNotExist = false;
+
+    void BeginRegister()
+    {
+        Navigation.NavigateTo("/register");
+    }
+
+    void TestDataBinding()
+    {
+        Console.WriteLine(userProfile.Username);
+        Console.WriteLine(userProfile.Password);
+    }
+
+    async Task BeginLogin()
+    {
+        UserProfile fullUserProfile = new UserProfile();
+        try
+        {
+            fullUserProfile = await UserClient.VerifyUser(userProfile);
+            if (fullUserProfile.UserId == null)
+            {
+                UserDoesNotExist = true;
+            }
+            else
+            {
+                UserDoesNotExist = false;
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+        fullUserProfile.PrintUserProfile();
+        UserState.userProfile = fullUserProfile;
+        await UpdateMenu.InvokeAsync();
+        GoToHome();
+
+    }
+
+    void GoToHome()
+    {
+        Navigation.NavigateTo("");
+    }
+
+}

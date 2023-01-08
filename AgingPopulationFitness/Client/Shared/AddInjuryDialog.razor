@@ -1,0 +1,47 @@
+﻿<div class="dialog-container">
+    <div class="dialog">
+        <div class="dialog-title">
+            <lable>New Injury</lable>
+            <button class="cancel-button" @onclick="OnCancel" >x</button>
+            <div>
+            Add a new injury to help find exercises that are ideal for you.
+            </div>
+        </div>
+        <form class="dialog-body">
+            <div>
+                <label>Name:</label>
+                <div>
+                    <input type="text" />
+                </div>
+            </div>
+            <div>
+                <label>Description:</label>
+                <div>
+                    <textarea/>
+                </div>
+            </div>
+            <div>
+                <label>Severity:</label>
+                <input type="range" min="1" max="10" step="1" />
+            </div>
+            <div>
+                <label>Date:</label>
+                <input type="date" />
+            </div>
+        </form>
+        <div>
+            <button @onclick="OnConfirm">Add Injury</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+@code {
+
+    
+    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] public EventCallback OnConfirm { get; set; }
+
+}

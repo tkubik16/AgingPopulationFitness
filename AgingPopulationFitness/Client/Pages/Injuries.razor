@@ -1,8 +1,21 @@
 ﻿@page "/injuries"
+@inject HttpClient HttpClient
+@inject InjuryState InjuryState
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
 
 <h3>Injuries</h3>
+<button @onclick="@(() => InjuryState.ShowConfigureUserInjuryDialog())">Add Injury</button>
+@if (InjuryState.ShowingConfigureDialog)
+{
+    <AddInjuryDialog  
+        OnCancel="InjuryState.CancelConfigureUserInjuryDialog"
+        OnConfirm="InjuryState.ConfirmConfigureUserInjuryDialog"/>
+}
 <Counter></Counter>
 
 @code {
+
+    
 
 }

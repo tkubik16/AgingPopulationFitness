@@ -55,15 +55,19 @@
         Console.WriteLine("In updateAlertmenu: " + UserState.isLoggedIn);
         IsLoggedInHelper();
         Console.WriteLine("In updateAlertmenu: " + UserState.isLoggedIn);
+        /*
         if (UserState.isLoggedIn)
         {
             Console.WriteLine("In updateAlertmenu: " + UserState.isLoggedIn);
+            Navigation.NavigateTo("");
             StateHasChanged();
         }
         else
         {
+            Console.WriteLine(UserState.isLoggedIn);
             StateHasChanged();
         }
+        */
     }
 
     public async void LoggedInCheck()
@@ -80,6 +84,7 @@
         }
         UserState.isLoggedIn = await UserClient.IsLoggedIn(UserState.userProfile);
         Console.WriteLine("In LoggedInCheck: " + UserState.isLoggedIn);
+        Navigation.NavigateTo("");
         StateHasChanged();
 
     }

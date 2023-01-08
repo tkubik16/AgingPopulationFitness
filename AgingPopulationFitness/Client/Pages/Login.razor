@@ -57,6 +57,7 @@
             if (fullUserProfile.UserId == null)
             {
                 UserDoesNotExist = true;
+
             }
             else
             {
@@ -71,7 +72,12 @@
         fullUserProfile.PrintUserProfile();
         UserState.userProfile = fullUserProfile;
         await UpdateMenu.InvokeAsync();
-        GoToHome();
+        if (UserState.isLoggedIn)
+        {
+            Console.WriteLine("GotoHome");
+            GoToHome();
+        }
+
 
     }
 

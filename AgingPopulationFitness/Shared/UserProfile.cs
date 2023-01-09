@@ -1,8 +1,10 @@
 ﻿using AgingPopulationFitness;
+using AgingPopulationFitness.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
@@ -41,4 +43,5 @@ namespace AgingPopulationFitness
 
 [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Default, PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 [JsonSerializable(typeof(UserProfile))]
+[JsonSerializable(typeof(UserInjury))]
 public partial class UserProfileContext : JsonSerializerContext { }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AgingPopulationFitness.Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -19,9 +20,25 @@ namespace AgingPopulationFitness.Client
         public async Task<UserProfile> GetUser(UserProfile userProfile) =>
             await httpClient.GetFromJsonAsync($"user/{userProfile}", UserProfileContext.Default.UserProfile);
         */
+        public async Task<List<InjuryLocation>> GetInjuries()
+        {
+            var injuryLocations = await httpClient.GetFromJsonAsync("injuries", InjuryLocationContext.Default.ListInjuryLocation);
+            for (int i = 0; i < injuryLocations.Count; i++)
+            {
+                Console.WriteLine(injuryLocations[i].BodyPart);
+
+            }
+            return injuryLocations;
+        }
+
+        public async void GetInjuriesString()
+        {
+            var injuryLocations = await httpClient.GetStringAsync("injuries/string" );
+            Console.WriteLine(injuryLocations);
+        }
+
         public async Task<UserProfile> VerifyUser(UserProfile userProfile)
         {
-
 
             var response = await httpClient.PostAsJsonAsync($"user", userProfile, UserProfileContext.Default.UserProfile);
             response.EnsureSuccessStatusCode();

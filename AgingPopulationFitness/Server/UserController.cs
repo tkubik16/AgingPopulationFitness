@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AgingPopulationFitness;
+using AgingPopulationFitness.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
@@ -37,6 +38,8 @@ namespace AgingPopulationFitness.Server
             Console.WriteLine("Username");
             Console.WriteLine("Password");
         }
+
+
 
         [HttpPost]
         public async Task<ActionResult<UserProfile>> VerifyUser(UserProfile userProfile)

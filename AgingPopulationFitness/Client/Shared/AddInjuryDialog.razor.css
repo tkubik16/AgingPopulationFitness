@@ -63,3 +63,24 @@
         background-color: rgba(255, 36, 36, 0.8);
     }
 
+.dialog-body {
+    flex-grow: 1;
+    padding: 0.5rem 3rem 1rem 0;
+}
+
+.dialog .injuries {
+    text-align: center;
+    display: block;
+    padding-left: 4rem;
+}
+
+.dialog .injury {
+    display: inline-block;
+    background-color: #a04343;
+    color: white;
+    padding: 0.2rem 1rem;
+    border-radius: 2rem;
+    margin: 0.4rem 0.3rem;
+    font-weight: 700;
+}
+

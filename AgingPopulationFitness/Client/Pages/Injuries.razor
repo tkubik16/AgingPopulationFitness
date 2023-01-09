@@ -3,12 +3,14 @@
 @inject InjuryState InjuryState
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
+@inject InjuryState InjuryState
 
 <h3>Injuries</h3>
 <button @onclick="@(() => InjuryState.ShowConfigureUserInjuryDialog())">Add Injury</button>
 @if (InjuryState.ShowingConfigureDialog)
 {
     <AddInjuryDialog  
+        userInjury="InjuryState.ConfiguringUserInjury"
         OnCancel="InjuryState.CancelConfigureUserInjuryDialog"
         OnConfirm="InjuryState.ConfirmConfigureUserInjuryDialog"/>
 }

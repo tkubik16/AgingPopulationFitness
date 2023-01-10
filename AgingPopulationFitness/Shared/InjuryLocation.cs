@@ -29,5 +29,6 @@ namespace AgingPopulationFitness
 
 [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Default, PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 [JsonSerializable(typeof(InjuryLocation))]
+[JsonSerializable(typeof(UserInjury))]
 [JsonSerializable(typeof(List<InjuryLocation>))]
 public partial class InjuryLocationContext : JsonSerializerContext { }

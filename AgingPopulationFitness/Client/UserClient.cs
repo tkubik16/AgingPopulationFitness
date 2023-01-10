@@ -31,6 +31,14 @@ namespace AgingPopulationFitness.Client
             return injuryLocations;
         }
 
+        public async Task<bool> PostUserInjury( UserInjury userInjury)
+        {
+            var response = await httpClient.PostAsJsonAsync($"injuries", userInjury, InjuryLocationContext.Default.UserInjury);
+            response.EnsureSuccessStatusCode();
+            var success = await response.Content.ReadFromJsonAsync<bool>();
+            return success;
+        }
+
         public async void GetInjuriesString()
         {
             var injuryLocations = await httpClient.GetStringAsync("injuries/string" );

@@ -1,9 +1,11 @@
 ﻿@page "/injuries"
 @inject HttpClient HttpClient
+@inject UserClient UserClient
 @inject InjuryState InjuryState
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 @inject InjuryState InjuryState
+@inject UserState UserState
 
 <h3>Injuries</h3>
 <button @onclick="@(() => InjuryState.ShowConfigureUserInjuryDialog())">Add Injury</button>
@@ -14,10 +16,29 @@
         OnCancel="InjuryState.CancelConfigureUserInjuryDialog"
         OnConfirm="InjuryState.ConfirmConfigureUserInjuryDialog"/>
 }
-<Counter></Counter>
+@if( userInjuries.Count == 0)
+{
+    <div class="spinner"></div>
+}
 
 @code {
+    public List<UserInjury> userInjuries = new List<UserInjury>();
 
-    
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserState.userProfile.UserId != null)
+        {
+            try
+            {
+                Console.WriteLine("Injuries razor " + UserState.userProfile.UserId);
+                UserClient.GetUsersInjuries(UserState.userProfile.UserId);
+                //userInjuries = await UserClient.GetUsersInjuries(UserState.userProfile.UserId);
+            }
+            catch( Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+    }
 
 }

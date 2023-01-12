@@ -29,10 +29,15 @@
             </div>
         }
     </div>
+    @if (showSpinner)
+    {
+        <div class="spinner"></div>
+    }
 </div>
 @code {
     [CascadingParameter]
     public EventCallback UpdateMenu { get; set; }
+    bool showSpinner = false;
 
     UserProfile userProfile = new UserProfile();
     bool UserDoesNotExist = false;
@@ -51,6 +56,10 @@
     async Task BeginLogin()
     {
         UserProfile fullUserProfile = new UserProfile();
+        showSpinner = true;
+        StateHasChanged();
+
+
         try
         {
             fullUserProfile = await UserClient.VerifyUser(userProfile);
@@ -75,7 +84,14 @@
         if (UserState.isLoggedIn)
         {
             Console.WriteLine("GotoHome");
+            showSpinner = false;
+            StateHasChanged();
             GoToHome();
+        }
+        else
+        {
+            showSpinner = false;
+            StateHasChanged();
         }
 
 

@@ -11,6 +11,7 @@ namespace AgingPopulationFitness
 {
     public class UserInjury
     {
+        
         public UserInjury()
         {
             InjuryName = "";
@@ -31,6 +32,8 @@ namespace AgingPopulationFitness
 
         public void PrintUserInjury()
         {
+            Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            Console.WriteLine(InjuryId);
             Console.WriteLine(UserId);
             Console.WriteLine(InjuryName);
             Console.WriteLine(InjuryDescription);
@@ -41,6 +44,7 @@ namespace AgingPopulationFitness
             {
                 Console.WriteLine(InjuryLocations[i].InjuryLocationId + " " + InjuryLocations[i].BodyPart);
             }
+            Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         }
     }
 }

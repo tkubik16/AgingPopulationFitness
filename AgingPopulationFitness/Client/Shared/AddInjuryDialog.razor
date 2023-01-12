@@ -96,6 +96,7 @@
     protected override async Task OnInitializedAsync()
     {
         injuryLocations = await UserClient.GetInjuries();
+        
         /*
         UserClient.GetInjuriesString();
 

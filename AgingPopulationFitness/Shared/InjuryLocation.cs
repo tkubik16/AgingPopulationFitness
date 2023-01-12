@@ -31,4 +31,5 @@ namespace AgingPopulationFitness
 [JsonSerializable(typeof(InjuryLocation))]
 [JsonSerializable(typeof(UserInjury))]
 [JsonSerializable(typeof(List<InjuryLocation>))]
+[JsonSerializable(typeof(List<UserInjury>))]
 public partial class InjuryLocationContext : JsonSerializerContext { }

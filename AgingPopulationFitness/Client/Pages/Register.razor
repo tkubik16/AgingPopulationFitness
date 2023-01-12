@@ -52,6 +52,10 @@
             </div>
         }
     </div>
+    @if (showSpinner)
+    {
+        <div class="spinner"></div>
+    }
 </div>
 @code {
     UserProfile userProfile = new UserProfile();
@@ -61,18 +65,25 @@
     bool passwordsNotEqual = false;
     bool userFailedToAdd = false;
     bool passwordTooShort = false;
+    bool showSpinner = false;
 
     async Task BeginRegister()
     {
 
         try
         {
+            showSpinner = true;
+            StateHasChanged();
             userExists = await UserClient.UserExistsCheck(userProfile);
+            showSpinner = false;
+            StateHasChanged();
             PasswordMatchCheck();
 
 
             if ((!passwordsNotEqual) && (!userExists))
             {
+                showSpinner = true;
+                StateHasChanged();
                 bool userAdded = false;
                 userProfile.Password = passwordOne;
                 passwordTooShort = !(userProfile.PasswordLengthCheck());
@@ -89,6 +100,8 @@
                         GoToLogin();
                     }
                 }
+                showSpinner = false;
+                StateHasChanged();
             }
         }
         catch (Exception ex)

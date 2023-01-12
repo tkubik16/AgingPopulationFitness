@@ -34,6 +34,106 @@ namespace AgingPopulationFitness.Server
             return responseInjuryLocations;
         }
 
+        [HttpGet("{userUid}")]
+        public async void GetUsersInjuries(Guid userUid)
+        {
+            List<UserInjury> responseUserInjuries = new List<UserInjury>();
+            Console.WriteLine("In GetUsersInjuries in InjuriesController");
+            responseUserInjuries = await Task.Run(() => GetUsersInjuriesCall( userUid));
+            //await Task.Run(() => GetUsersInjuriesCall(userUid));
+
+
+            if (responseUserInjuries != null)
+            {
+                for (int i = 0; i < responseUserInjuries.Count; i++)
+                {
+                    responseUserInjuries[i].PrintUserInjury();
+
+                }
+            }
+            //return responseUserInjuries;
+            
+        }
+
+        public List<UserInjury> GetUsersInjuriesCall( Guid userUid)
+        {
+            List<UserInjury> userInjuries = new List<UserInjury>();
+
+            var cs = "host=" + DatabaseCredentials.Host + ";" +
+                "Username=" + DatabaseCredentials.Username + ";" +
+                "Password=" + DatabaseCredentials.Password + ";" +
+                "Database=" + DatabaseCredentials.Database + "";
+
+            using var con = new NpgsqlConnection(cs);
+            con.Open();
+
+            var sql = "SELECT user_injury.user_injury_id, user_uid, user_injury_name, user_injury_description, user_injury_severity, user_injury_date, injury_location.injury_location_id, body_part " +
+                "FROM user_injury " +
+                "INNER JOIN user_injury_injury_location ON user_injury.user_injury_id = user_injury_injury_location.user_injury_id " +
+                "INNER JOIN injury_location ON user_injury_injury_location.injury_location_id = injury_location.injury_location_id " +
+                "WHERE user_injury.user_uid = @UserUid " +
+                "ORDER BY user_injury.user_injury_id, user_injury_date, injury_location.injury_location_id";
+
+            using var cmd = new NpgsqlCommand(sql, con);
+
+            cmd.Parameters.AddWithValue("UserUid", userUid);
+
+
+
+            try
+            {
+                using NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+                
+                int currentUserInjury = 0;
+                while (rdr.Read())
+                {
+                    //Console.WriteLine(rdr.GetInt32(0) + " " + rdr.GetGuid(1) + " " + rdr.GetString(2) + " " + rdr.GetString(3) + " " + rdr.GetInt32(4) + " " + rdr.GetDateTime(5) + " " + rdr.GetInt32(6) + " " + rdr.GetString(7));
+                    if (userInjuries.Count == 0)
+                    {
+                        userInjuries.Add(new UserInjury());
+                        userInjuries[currentUserInjury].InjuryId = rdr.GetInt32(0);
+                        userInjuries[currentUserInjury].UserId = rdr.GetGuid(1);
+                        userInjuries[currentUserInjury].InjuryName = rdr.GetString(2);
+                        userInjuries[currentUserInjury].InjuryDescription = rdr.GetString(3);
+                        userInjuries[currentUserInjury].InjurySeverity = rdr.GetInt32(4);
+                        userInjuries[currentUserInjury].InjuryDate = DateOnly.FromDateTime(rdr.GetDateTime(5));
+
+                        userInjuries[currentUserInjury].InjuryLocations.Add(new InjuryLocation(rdr.GetInt32(6), rdr.GetString(7)));
+
+                    }
+                    else if ( rdr.GetInt32(0) != userInjuries[currentUserInjury].InjuryId)
+                    {
+                        currentUserInjury++;
+
+                        userInjuries.Add(new UserInjury());
+                        userInjuries[currentUserInjury].InjuryId = rdr.GetInt32(0);
+                        userInjuries[currentUserInjury].UserId = rdr.GetGuid(1);
+                        userInjuries[currentUserInjury].InjuryName = rdr.GetString(2);
+                        userInjuries[currentUserInjury].InjuryDescription = rdr.GetString(3);
+                        userInjuries[currentUserInjury].InjurySeverity = rdr.GetInt32(4);
+                        userInjuries[currentUserInjury].InjuryDate = DateOnly.FromDateTime(rdr.GetDateTime(5));
+
+                        userInjuries[currentUserInjury].InjuryLocations.Add(new InjuryLocation(rdr.GetInt32(6), rdr.GetString(7)));
+
+                    }
+                    else
+                    {
+                        userInjuries[currentUserInjury].InjuryLocations.Add(new InjuryLocation(rdr.GetInt32(6), rdr.GetString(7)));
+                    }
+                }
+
+                
+                
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            return userInjuries;
+
+        }
+
         [HttpGet("string")]
         public async Task<string> GetInjuriesString()
         {

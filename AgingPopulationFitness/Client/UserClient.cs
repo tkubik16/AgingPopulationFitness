@@ -31,13 +31,13 @@ namespace AgingPopulationFitness.Client
             return injuryLocations;
         }
 
-        public async void GetUsersInjuries( Guid? userUid)
+        public async Task<List<UserInjury>> GetUsersInjuries( Guid? userUid)
         {
 
-            //var userInjuries = await httpClient.GetFromJsonAsync("injuries/{userUid}", InjuryLocationContext.Default.ListUserInjury);
-            //return userInjuries;
-            Console.WriteLine(userUid);
-            await httpClient.GetAsync($"injuries/{userUid}");
+            var userInjuries = await httpClient.GetFromJsonAsync($"injuries/{userUid}", InjuryLocationContext.Default.ListUserInjury);
+            return userInjuries;
+            //Console.WriteLine(userUid);
+            //await httpClient.GetAsync($"injuries/{userUid}");
             
 
         }

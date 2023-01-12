@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -35,7 +36,7 @@ namespace AgingPopulationFitness.Server
         }
 
         [HttpGet("{userUid}")]
-        public async void GetUsersInjuries(Guid userUid)
+        public async Task<List<UserInjury>> GetUsersInjuries(Guid userUid)
         {
             List<UserInjury> responseUserInjuries = new List<UserInjury>();
             Console.WriteLine("In GetUsersInjuries in InjuriesController");
@@ -51,7 +52,7 @@ namespace AgingPopulationFitness.Server
 
                 }
             }
-            //return responseUserInjuries;
+            return responseUserInjuries;
             
         }
 

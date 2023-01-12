@@ -30,9 +30,14 @@
         {
             try
             {
-                Console.WriteLine("Injuries razor " + UserState.userProfile.UserId);
-                UserClient.GetUsersInjuries(UserState.userProfile.UserId);
-                //userInjuries = await UserClient.GetUsersInjuries(UserState.userProfile.UserId);
+                //Console.WriteLine("Injuries razor " + UserState.userProfile.UserId);
+                //UserClient.GetUsersInjuries(UserState.userProfile.UserId);
+                userInjuries = await UserClient.GetUsersInjuries(UserState.userProfile.UserId);
+                for (int i = 0; i < userInjuries.Count; i++)
+                {
+                    userInjuries[i].PrintUserInjury();
+
+                }
             }
             catch( Exception e)
             {

@@ -20,6 +20,35 @@
 {
     <div class="spinner"></div>
 }
+<div class="main">
+    <ul class="user-injury-cards">
+        @if (userInjuries != null)
+        {
+            @foreach (var userInjury in userInjuries)
+            {
+                <li >
+                    <div class="user-injury-info">
+                        <span class="title">@userInjury.InjuryName</span>
+                        <span class="title">Severity: @userInjury.InjurySeverity</span>
+                        <span class="title">Date: @userInjury.InjuryDate</span>
+                        <span class="title">Description:</span>
+                        <span class="title">@userInjury.InjuryDescription</span>
+
+                        <div class="injuries">
+                            @foreach (var injuryLocation in userInjury.InjuryLocations)
+                            {
+                                <div class="injury">
+                                    @injuryLocation.BodyPart
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </li>
+                
+            }
+        }
+    </ul>
+</div>
 
 @code {
     public List<UserInjury> userInjuries = new List<UserInjury>();

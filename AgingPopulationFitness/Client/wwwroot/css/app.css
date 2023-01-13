@@ -1,14 +1,16 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
 body, html {
-    height: 100%;
+    height: 100vh;
+    background-color: ghostwhite;
+    
 }
 
 body {
     padding-top: 5rem;
     flex-direction: column;
     font-family: 'quicksand';
-    overflow-y: hidden;
+    overflow: auto;
 }
 
 .top-bar {
@@ -194,29 +196,32 @@ body {
 }
 
 .main {
-    flex-grow: 1;
-    overflow-y: auto;
-    background: linear-gradient(rgba(0,0,0,0) 40%, rgba(0,0,0,0.4) 80%);
-    padding: 1.5rem !important;
+    height: 20%;
+    width: 100%;
+    background-color: lightblue;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: auto;
 }
 
 .user-injury-cards {
     display: flex;
-    grid-template-columns: repeat(auto-fill, 20rem);
-    grid-gap: 2rem;
-    justify-content: center;
-    padding-left: 0;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background-color: lightgray;
+    margin: 1rem;
+    padding: 0;
+    list-style: none;
+    justify-content:center;
+    
 }
 
     .user-injury-cards > li {
-        display: inline-block;
-        height: 11rem;
-        position: relative;
-        background-size: cover;
-        border-radius: 0.5rem;
-        list-style-type: none;
-        box-shadow: 0 3px 4px rgba(0,0,0,0.4);
-        transition: 0.1s ease-out;
+        background-color: lightcoral;
+        width: 20rem;
+        padding: 1rem;
+        gap: 1rem;
+        border-radius: 1rem;
     }
 
         .user-injury-cards > li:hover {
@@ -224,28 +229,12 @@ body {
         }
 
 .user-injury-info {
-    display: inline-block;
-    border-radius: 0.5rem;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    position: absolute;
-    background: linear-gradient(rgba(0,0,0,0.7) 30%, rgba(0,0,0,0) 80%);
-    padding: 1rem 1rem;
-    color: #fff2cc;
-    cursor: pointer;
-    text-shadow: 0 2px 2px rgba(0,0,0,0.5);
-    line-height: 1.25rem;
+    display: flex;
+    flex-direction: column;
 }
 
     .user-injury-info .title {
-        color: white;
-        font-size: 1.4rem;
-        display: block;
-        margin: 0.2rem 0 0.4rem 0;
-        font-family: 'Bahnschrift', Arial, Helvetica, sans-serif;
-        text-transform: uppercase;
+        font-weight: 500;
     }
 
 .injuries {

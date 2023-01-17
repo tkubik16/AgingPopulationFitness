@@ -1,0 +1,107 @@
+﻿@page "/injuries/{injuryId:int}"
+@using AgingPopulationFitness.Shared;
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@inject UserClient UserClient;
+@inject HttpClient HttpClient;
+@inject UserState UserState;
+
+<h3>ViewUserInjury</h3>
+
+<form class="dialog-body">
+    <div>
+        <label>Name:</label>
+        <div>
+            <input type="text" @bind="userInjury.InjuryName" />
+        </div>
+    </div>
+    <div>
+        <label>Description:</label>
+        <div>
+            <textarea @bind="userInjury.InjuryDescription" />
+        </div>
+    </div>
+    <div>
+        <label>Severity:</label>
+        <input type="range" min="1" max="10" step="1" @bind="userInjury.InjurySeverity" @bind:event="oninput" />
+        <label>@userInjury.InjurySeverity</label>
+    </div>
+    <div>
+        <label>Date:</label>
+        <input type="date" @bind="userInjury.InjuryDate" />
+    </div>
+    <div>
+        <label>Add Injuries:</label>
+        @if (injuryLocations == null)
+        {
+            <select class="custom-select" disabled>
+                <option>(loading...)</option>
+            </select>
+        }
+        else
+        {
+            <select class="custom-select" @onchange="InjuryLocationSelected">
+                <option value="-1" disabled selected>(select)</option>
+                @for (var i = 0; i < injuryLocations.Count; i++)
+                {
+
+                    <option value="@i">@i @injuryLocations[i].InjuryLocationId @injuryLocations[i].BodyPart </option>
+                }
+            </select>
+        }
+    </div>
+
+    <div class="injuries">
+        @foreach (var injuryLocation in userInjury.InjuryLocations)
+        {
+            <div class="injury">
+                @injuryLocation.BodyPart
+                <button type="button" class="delete-injury" @onclick="@(() => RemoveInjuryLocation(injuryLocation))">x</button>
+            </div>
+        }
+    </div>
+
+</form>
+
+@code {
+    [Parameter] public int injuryId { get; set; }
+
+    public UserInjury userInjury = new UserInjury();
+    public List<InjuryLocation> injuryLocations = new List<InjuryLocation>();
+    public InjuryLocation injuryLocation = new InjuryLocation();
+
+    protected override async Task OnInitializedAsync()
+    {
+        injuryLocations = await UserClient.GetInjuries();
+
+        for( int i = 0; i < UserState.userInjuries.Count; i++)
+        {
+            if( UserState.userInjuries[i].InjuryId == injuryId)
+            {
+                userInjury = UserState.userInjuries[i];
+            }
+        }
+
+    }
+
+    void InjuryLocationSelected(ChangeEventArgs e)
+    {
+        if (int.TryParse((string)e.Value, out var index) && index >= 0)
+        {
+            AddInjuryLocation(injuryLocations[index]);
+        }
+    }
+
+    void AddInjuryLocation(InjuryLocation injuryLocation)
+    {
+        if (userInjury.InjuryLocations.Find(pt => pt.BodyPart == injuryLocation.BodyPart) == null)
+        {
+            userInjury.InjuryLocations.Add(new InjuryLocation(injuryLocation.InjuryLocationId, injuryLocation.BodyPart));
+        }
+    }
+
+    void RemoveInjuryLocation(InjuryLocation injuryLocation)
+    {
+        userInjury.InjuryLocations.RemoveAll(pt => pt.BodyPart == injuryLocation.BodyPart);
+    }
+}

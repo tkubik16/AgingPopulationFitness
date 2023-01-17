@@ -5,22 +5,26 @@
 @inject IJSRuntime JSRuntime
 @inject UserState UserState;
 
-<div>
-    <h1>Login</h1>
+<div class="login-page">
     <div class="login-form">
-        <div class="username-section">
-            <text>Username</text>
-            <input @bind="userProfile.Username" class="username">
-        </div>
-        <div class="password-section">
-            <text>password</text>
-            <input type="password" @bind="userProfile.Password" class="password">
+        <h1 class="login-title">
+            Login
+        </h1>
+        <div class="username-password-fields">
+            <div class="username-section">
+
+                <input @bind="userProfile.Username" class="username" placeholder="Username">
+            </div>
+            <div class="password-section">
+
+                <input type="password" @bind="userProfile.Password" class="password" placeholder="Password">
+            </div>
         </div>
         <div class="login-form-btns">
-            <button class="btn" @onclick="BeginLogin">Log in</button>
+            <button class="login-button" @onclick="BeginLogin">Log in</button>
         </div>
-        <div>
-            <button class="btn secondary" @onclick="BeginRegister">Register</button>
+        <div class="login-form-btns">
+            <button class="btn-subtle" @onclick="BeginRegister">Register</button>
         </div>
         @if (UserDoesNotExist)
         {

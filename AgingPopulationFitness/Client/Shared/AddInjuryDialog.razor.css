@@ -8,6 +8,9 @@
     z-index: 2000;
     display: flex;
     animation: dialog-container-entry 0.2s;
+
+    border-style: dashed;
+    border-color: black;
 }
 
 @keyframes dialog-container-entry {
@@ -27,12 +30,19 @@
     flex-direction: column;
     z-index: 2000;
     align-self: center;
+    border-radius: 1rem; 
     margin: auto;
     padding: 1rem;
-    width: 700px;
-    max-height: calc(100% - 3rem);
+    min-width: 75%;
+    min-height: 50%;
     animation: dialog-entry 0.4s;
     animation-timing-function: cubic-bezier(0.075, 0.820, 0.165, 1.000);
+}
+
+@media screen and (max-width: 480px) {
+    #injury-description {
+        width: 15em;
+    }
 }
 
 @keyframes dialog-entry {
@@ -43,6 +53,17 @@
     100% {
         transform: translateX(0px) scale(1.0);
     }
+}
+
+.dialog-top-bar {
+    display: flex;
+    justify-content: end;
+}
+
+.dialog-title {
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 600;
 }
 
 .cancel-button {
@@ -63,10 +84,22 @@
         background-color: rgba(255, 36, 36, 0.8);
     }
 
+.add-injury-instructions {
+    text-align: center;
+}
+
 .dialog-body {
+    display: flex;
+    flex-direction: column;
     flex-grow: 1;
+    margin-left: 2rem;
     padding: 0.5rem 3rem 1rem 0;
 }
+
+.dialog-body-input {
+    margin-bottom: 0.5rem;
+}
+
 
 .dialog .injuries {
     text-align: center;
@@ -84,3 +117,26 @@
     font-weight: 700;
 }
 
+.add-injury {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+}
+
+.add-button {
+    background-color: rgba(129, 251, 129, 0.8);
+    border-radius: .25rem;
+    border-width: 0;
+    box-sizing: border-box;
+    text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    text-align: center;
+    justify-content: center;
+    transition: transform .2s;
+}
+
+    .add-button:hover {
+        text-shadow: rgba(0, 0, 0, .8) 2px 2px 2px;
+        transform: scale(1.1);
+    }

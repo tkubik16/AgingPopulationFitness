@@ -5,46 +5,54 @@
 @inject IJSRuntime JSRuntime
 @inject UserState UserState;
 
+
 <head>
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Quicksand">
 </head>
 
-
-<div class="top-bar">
-    <a class="logo" href="">
-        <text>LOGO</text>
-    </a>
-    @if (UserState.isLoggedIn)
-    {
-        <NavLink href="" class="nav-tab" Match="NavLinkMatch.All">
-            <div>Home</div>
-        </NavLink>
-
-
-        <NavLink href="injuries" class="nav-tab">
-            <div>My</div>
-            <div>Injuries</div>
-        </NavLink>
-
-        <NavLink href="login" class="nav-tab" @onclick="Logout">
-            <div>Logout</div>
-        </NavLink>
-    }
-    @if (!(UserState.isLoggedIn))
-    {
-        <NavLink href="login" class="nav-tab">
-            <div>Login</div>
-        </NavLink>
-    }
+<div class="whole">
+    <div class="top-bar" id="nav-bar">
+        <div class="logo-close-button">
+            <a class="logo" href="">
+                <text>LOGO</text>
+            </a>
+            <button @onclick="CloseNav">X</button>
+        </div>
+        @if (UserState.isLoggedIn)
+        {
+            <NavLink href="" class="nav-tab" Match="NavLinkMatch.All">
+                <div>Home</div>
+            </NavLink>
 
 
-</div>
+            <NavLink href="injuries" class="nav-tab">
+                <div>My</div>
+                <div>Injuries</div>
+            </NavLink>
 
-<div class="content">
-    <CascadingValue Value=UpdateMenu>
-        @Body
-    </CascadingValue>
+            <NavLink href="login" class="nav-tab" @onclick="Logout">
+                <div>Logout</div>
+            </NavLink>
+        }
+        @if (!(UserState.isLoggedIn))
+        {
+            <NavLink href="login" class="nav-tab">
+                <div>Login</div>
+            </NavLink>
+        }
+
+
+    </div>
+    <div class="open-nav" id="open-nav-button">
+        <button @onclick="OpenNav"><img src="Images/menu.svg"/></button>
+    </div>
+
+    <div class="content" id="main-body">
+        <CascadingValue Value=UpdateMenu>
+            @Body
+        </CascadingValue>
+    </div>
 </div>
 
 @code {
@@ -55,19 +63,19 @@
         Console.WriteLine("In updateAlertmenu: " + UserState.isLoggedIn);
         IsLoggedInHelper();
         Console.WriteLine("In updateAlertmenu: " + UserState.isLoggedIn);
-        /*
-        if (UserState.isLoggedIn)
-        {
+            /*
+            if (UserState.isLoggedIn)
+            {
             Console.WriteLine("In updateAlertmenu: " + UserState.isLoggedIn);
-            Navigation.NavigateTo("");
-            StateHasChanged();
-        }
-        else
-        {
+        Navigation.NavigateTo("");
+        StateHasChanged();
+            }
+            else
+            {
             Console.WriteLine(UserState.isLoggedIn);
             StateHasChanged();
-        }
-        */
+    }
+    */
     }
 
     public async void LoggedInCheck()
@@ -106,6 +114,16 @@
         UserState.userProfile.PrintUserProfile();
         IsLoggedInHelper();
 
+    }
+
+    public async void OpenNav()
+    {
+        await JSRuntime.InvokeVoidAsync("openNav");
+    }
+
+    public async void CloseNav()
+    {
+        await JSRuntime.InvokeVoidAsync("closeNav");
     }
 
 }

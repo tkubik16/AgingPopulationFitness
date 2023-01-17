@@ -7,37 +7,40 @@
 
 
 <div>
-    <h1>Register</h1>
     <div class="register-form">
-        <div class="username-section">
-            <text>Username</text>
-            <input @bind="userProfile.Username" class="username">
-        </div>
-        @if (userExists)
-        {
-            <div>
-                <text>A User with that Username already exists.</text>
+        <h1 class="title">
+            Register
+        </h1>
+        <div class="username-password-section">
+            <div class="username-section">
+                <input @bind="userProfile.Username" class="username" placeholder="Username">
             </div>
-        }
-        <div class="password-section">
-            <text>password</text>
-            <input type="password" @bind="@passwordOne" class="password">
-        </div>
-        <div class="password-section">
-            <text>password</text>
-            <input type="password" @bind="@passwordTwo" @oninput="@((e) => { passwordTwo=(string?)e.Value; PasswordMatchCheck(); })" class="password">
-        </div>
-        @if (passwordsNotEqual)
-        {
-            <div>
-                <text>Passwords do not match.</text>
+            @if (userExists)
+            {
+                <div>
+                    <text>A User with that Username already exists.</text>
+                </div>
+            }
+            <div class="password-section">
+                <input type="password" @bind="@passwordOne" class="password" placeholder="Password">
             </div>
-        }
-        <div class="login-form-btns">
-            <button class="btn secondary" @onclick="BeginRegister">Register</button>
+            <div class="password-section">
+                <input type="password" @bind="@passwordTwo" @oninput="@((e) => { passwordTwo=(string?)e.Value; PasswordMatchCheck(); })" class="password" placeholder="Retype Password">
+            </div>
+            @if (passwordsNotEqual)
+            {
+                <div>
+                    <text>Passwords do not match.</text>
+                </div>
+            }
         </div>
-        <div>
-            <button class="btn" @onclick="GoToLogin">Log in</button>
+        <div class="button-set">
+            <div class="login-form-btns">
+                <button class="register-button" @onclick="BeginRegister">Register</button>
+            </div>
+            <div>
+                <button class="button-subtle" @onclick="GoToLogin">Log in</button>
+            </div>
         </div>
         @if (userFailedToAdd)
         {

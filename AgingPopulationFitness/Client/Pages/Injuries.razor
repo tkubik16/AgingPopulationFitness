@@ -7,8 +7,7 @@
 @inject InjuryState InjuryState
 @inject UserState UserState
 
-<h3>Injuries</h3>
-<button @onclick="@(() => InjuryState.ShowConfigureUserInjuryDialog())">Add Injury</button>
+
 @if (InjuryState.ShowingConfigureDialog)
 {
     <AddInjuryDialog  
@@ -21,12 +20,16 @@
     <div class="spinner"></div>
 }
 <div class="main">
+    <div class="add-injury-button-div">
+        <button  class="add-injury-button" @onclick="@(() => InjuryState.ShowConfigureUserInjuryDialog())">Add Injury</button>
+    </div>
+    
     <ul class="user-injury-cards">
         @if (userInjuries != null)
         {
             @foreach (var userInjury in userInjuries)
             {
-                <li >
+                <li  >
                     <div class="user-injury-info">
                         <h3 class="title">@userInjury.InjuryName</h3>
                         <text class="title">Severity: @userInjury.InjurySeverity</text>
@@ -39,6 +42,11 @@
                                     @injuryLocation.BodyPart
                                 </div>
                             }
+                        </div>
+                        <div>
+                            <a href="injuries/@userInjury.InjuryId">
+                                View
+                            </a>
                         </div>
                     </div>
                 </li>
@@ -60,6 +68,7 @@
                 //Console.WriteLine("Injuries razor " + UserState.userProfile.UserId);
                 //UserClient.GetUsersInjuries(UserState.userProfile.UserId);
                 userInjuries = await UserClient.GetUsersInjuries(UserState.userProfile.UserId);
+                UserState.userInjuries = userInjuries;
                 for (int i = 0; i < userInjuries.Count; i++)
                 {
                     userInjuries[i].PrintUserInjury();
@@ -72,5 +81,7 @@
             }
         }
     }
+
+    
 
 }

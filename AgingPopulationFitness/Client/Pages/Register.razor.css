@@ -1,0 +1,71 @@
+﻿.register-form {
+    height: fit-content;
+    width: fit-content;
+    margin: auto;
+    margin-top: 4rem;
+    align-items: center;
+
+
+}
+
+.title {
+    width: fit-content;
+    margin: auto;
+}
+
+.username-password-section {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    margin: auto;
+
+
+}
+
+.username-section {
+    margin: 0.25rem;
+}
+
+.password-section {
+    margin: 0.25rem;
+}
+
+.button-set {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    margin: auto;
+    align-items: center;
+
+
+}
+
+.register-button {
+    background-color: rgba(129, 251, 129, 0.8);
+    border-radius: .25rem;
+    border-width: 0;
+    box-sizing: border-box;
+    text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    text-align: center;
+    justify-content: center;
+    transition: transform .2s;
+}
+
+    .register-button:hover {
+        text-shadow: rgba(0, 0, 0, .8) 2px 2px 2px;
+        transform: scale(1.1);
+    }
+
+
+.button-subtle {
+    font-size: 0.90rem;
+    border: none;
+    background: none;
+
+}
+
+    .button-subtle:hover {
+        font-weight: 600;
+    }

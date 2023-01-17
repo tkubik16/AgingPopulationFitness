@@ -5,6 +5,9 @@ namespace AgingPopulationFitness.Client
     {
         public UserProfile? userProfile { get; set; }
         public bool isLoggedIn { get; set; }
+
+        public List<UserInjury> userInjuries { get; set; }
+
         public UserState()
         {
             isLoggedIn = false;

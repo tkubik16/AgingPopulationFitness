@@ -7,37 +7,39 @@
 
 <div class="dialog-container">
     <div class="dialog">
+        <div class="dialog-top-bar">
+            <button class="cancel-button" @onclick="OnCancel">x</button>
+        </div>
         <div class="dialog-title">
             <lable>New Injury</lable>
-            <button class="cancel-button" @onclick="OnCancel" >x</button>
-            <div>
+        </div>
+        <div class="add-injury-instructions">
             Add a new injury to help find exercises that are ideal for you.
-            </div>
         </div>
         <form class="dialog-body">
-            <div>
+            <div class="dialog-body-input">
                 <label>Name:</label>
                 <div>
                     <input type="text" @bind="userInjury.InjuryName"/>
                 </div>
             </div>
-            <div>
+            <div class="dialog-body-input">
                 <label>Description:</label>
                 <div>
-                    <textarea @bind="userInjury.InjuryDescription" />
+                    <textarea id="injury-description" rows="5" cols="45" @bind="userInjury.InjuryDescription" />
                 </div>
             </div>
-            <div>
+            <div class="dialog-body-input">
                 <label>Severity:</label>
                 <input type="range" min="1" max="10" step="1" @bind="userInjury.InjurySeverity" @bind:event="oninput"/>
                 <label>@userInjury.InjurySeverity</label>
             </div>
-            <div>
+            <div class="dialog-body-input">
                 <label>Date:</label>
                 <input type="date" @bind="userInjury.InjuryDate" />
             </div>
-            <div>
-                <label>Add Injuries:</label>
+            <div class="dialog-body-input">
+                <label>Add Injuries: </label>
                 @if (injuryLocations == null)
                 {
                     <select class="custom-select" disabled>
@@ -68,15 +70,17 @@
             </div>
 
         </form>
-        <div>
-            <button @onclick="PostUserInjury">Add Injury</button>
-        </div>
-        @if(successfullyAdded)
-        {
-            <div>
-                <text >SUCCESS</text>
+        <div class="add-injury">
+            <div >
+                <button class="add-button"  @onclick="PostUserInjury">Add Injury</button>
             </div>
-        }
+            @if(successfullyAdded)
+            {
+                <div>
+                    <text >SUCCESS</text>
+                </div>
+            }
+        </div>
     </div>
 </div>
 

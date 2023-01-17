@@ -1,0 +1,74 @@
+﻿.login-form {
+    
+    height: fit-content;
+    width: fit-content;
+    margin: auto;
+    margin-top: 4rem;
+    border-style: solid;
+    border-color: black;
+}
+
+.login-title {
+    width: fit-content;
+    margin: auto;
+
+}
+
+.username-password-fields {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    margin: 1rem;
+
+}
+
+
+.username-section {
+    margin-bottom: 0.5rem;
+
+}
+
+.password-section {
+
+    
+
+}
+
+.login-form-btns {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    margin: auto;
+
+    
+}
+
+.login-button {
+    background-color: rgba(129, 251, 129, 0.8);
+    border-radius: .25rem;
+    border-width: 0;
+    box-sizing: border-box;
+    text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    text-align: center;
+    justify-content: center;
+    transition: transform .2s;
+}
+
+    .login-button:hover {
+        text-shadow: rgba(0, 0, 0, .8) 2px 2px 2px;
+        transform: scale(1.1);
+    }
+
+.btn-subtle {
+    font-size: 0.90rem;
+    border: none;
+    background: none;
+
+}
+
+.btn-subtle:hover {
+    font-weight: 600;
+
+}

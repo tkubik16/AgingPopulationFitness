@@ -5,32 +5,34 @@
 @inject UserClient UserClient;
 @inject HttpClient HttpClient;
 @inject UserState UserState;
+@inject NavigationManager NavigationManager
 
-<h3>ViewUserInjury</h3>
+
 
 <form class="dialog-body">
-    <div>
+    <h3>@userInjury.InjuryName</h3>
+    <div class="user-injury-form-field">
         <label>Name:</label>
         <div>
             <input type="text" @bind="userInjury.InjuryName" />
         </div>
     </div>
-    <div>
+    <div class="user-injury-form-field">
         <label>Description:</label>
-        <div>
-            <textarea @bind="userInjury.InjuryDescription" />
+        <div class="injury-description-div">
+            <textarea id="injury-description" rows="4" cols="15" @bind="userInjury.InjuryDescription" />
         </div>
     </div>
-    <div>
+    <div class="user-injury-form-field">
         <label>Severity:</label>
         <input type="range" min="1" max="10" step="1" @bind="userInjury.InjurySeverity" @bind:event="oninput" />
         <label>@userInjury.InjurySeverity</label>
     </div>
-    <div>
+    <div class="user-injury-form-field">
         <label>Date:</label>
         <input type="date" @bind="userInjury.InjuryDate" />
     </div>
-    <div>
+    <div class="user-injury-form-field">
         <label>Add Injuries:</label>
         @if (injuryLocations == null)
         {
@@ -60,6 +62,10 @@
             </div>
         }
     </div>
+    <div class="update-delete-injury">
+        <button>Update Injury</button>
+        <button  @onclick="DeleteUserInjury">Delete Injury</button>s
+    </div>
 
 </form>
 
@@ -70,10 +76,21 @@
     public List<InjuryLocation> injuryLocations = new List<InjuryLocation>();
     public InjuryLocation injuryLocation = new InjuryLocation();
 
+    bool successfullyDeleted = false;
+
     protected override async Task OnInitializedAsync()
     {
         injuryLocations = await UserClient.GetInjuries();
 
+        for( int i = 0; i < UserState.userInjuries.Count; i++)
+        {
+            //UserState.userInjuries[i].PrintUserInjury();
+            if( UserState.userInjuries[i].InjuryId == injuryId)
+            {
+                //userInjury = UserState.userInjuries[i];
+
+            }
+        }
         for( int i = 0; i < UserState.userInjuries.Count; i++)
         {
             if( UserState.userInjuries[i].InjuryId == injuryId)
@@ -81,6 +98,7 @@
                 userInjury = UserState.userInjuries[i];
             }
         }
+        
 
     }
 
@@ -103,5 +121,17 @@
     void RemoveInjuryLocation(InjuryLocation injuryLocation)
     {
         userInjury.InjuryLocations.RemoveAll(pt => pt.BodyPart == injuryLocation.BodyPart);
+    }
+
+    async void DeleteUserInjury()
+    {
+        //userInjury.PrintUserInjury();
+        /*
+        successfullyDeleted = await UserClient.PostUserInjury(userInjury);
+        if (successfullyDeleted)
+        {
+            NavigationManager.NavigateTo("/injuries");
+        }
+        */
     }
 }

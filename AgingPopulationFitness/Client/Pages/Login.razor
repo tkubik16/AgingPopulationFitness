@@ -4,6 +4,7 @@
 @inject UserClient UserClient
 @inject IJSRuntime JSRuntime
 @inject UserState UserState;
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 
 <div class="login-page">
     <div class="login-form">
@@ -39,8 +40,8 @@
     }
 </div>
 @code {
-    [CascadingParameter]
-    public EventCallback UpdateMenu { get; set; }
+    [CascadingParameter(Name = "UpdateMenuOnLogIn")] public EventCallback UpdateMenuOnLogIn { get; set; }
+    [CascadingParameter(Name = "UpdateMenuOnRefresh")] public EventCallback UpdateMenuOnRefresh { get; set; }
     bool showSpinner = false;
 
     UserProfile userProfile = new UserProfile();
@@ -84,7 +85,13 @@
         }
         fullUserProfile.PrintUserProfile();
         UserState.userProfile = fullUserProfile;
-        await UpdateMenu.InvokeAsync();
+
+        await sessionStorage.SetItemAsync("UserId", fullUserProfile.UserId);
+        await sessionStorage.SetItemAsync("Username", fullUserProfile.Username);
+        await sessionStorage.SetItemAsync("Password", fullUserProfile.Password);
+        await sessionStorage.SetItemAsync("IsLoggedIn", true);
+
+        await UpdateMenuOnLogIn.InvokeAsync();
         if (UserState.isLoggedIn)
         {
             Console.WriteLine("GotoHome");

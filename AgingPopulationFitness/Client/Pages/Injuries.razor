@@ -6,6 +6,7 @@
 @inject IJSRuntime JS
 @inject InjuryState InjuryState
 @inject UserState UserState
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 
 
 @if (InjuryState.ShowingConfigureDialog)
@@ -44,9 +45,9 @@
                             }
                         </div>
                         <div>
-                            <a href="injuries/@userInjury.InjuryId">
+                            <button @onclick="@(() => NavigationManager.NavigateTo($"injuries/" + @userInjury.InjuryId ) )">
                                 View
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </li>
@@ -57,10 +58,39 @@
 </div>
 
 @code {
+    [CascadingParameter(Name = "UpdateMenuOnLogIn")] public EventCallback UpdateMenuOnLogIn { get; set; }
+    [CascadingParameter(Name = "UpdateMenuOnRefresh")] public EventCallback UpdateMenuOnRefresh { get; set; }
+
     public List<UserInjury> userInjuries = new List<UserInjury>();
 
     protected override async Task OnInitializedAsync()
     {
+        if( UserState == null)
+        {
+            Console.WriteLine("user state is null");
+        }
+        else
+        {
+
+            if( UserState.userProfile == null)
+            {
+                Console.WriteLine("user profile: null");
+            }
+            else
+            {
+                Console.WriteLine("user profile:");
+                UserState.userProfile.PrintUserProfile();
+
+            }
+
+        }
+        if (await sessionStorage.ContainKeyAsync("UserId") )
+        {
+            
+            await UserState.Refresh( sessionStorage);
+            await UpdateMenuOnRefresh.InvokeAsync();
+        } 
+        /*
         if (UserState.userProfile.UserId != null)
         {
             try
@@ -80,6 +110,7 @@
                 Console.WriteLine(e);
             }
         }
+        */
     }
 
     

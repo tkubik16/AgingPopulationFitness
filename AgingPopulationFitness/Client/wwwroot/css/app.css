@@ -1,12 +1,6 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
-body {
-    padding-top: 5rem;
-    flex-direction: column;
-    font-family: 'quicksand';
-    background-color: ghostwhite;
-    overflow: auto;
-}
+
 
 .whole {
     display: flex;
@@ -20,48 +14,80 @@ body {
     border-color: black;
 }
 
+.content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: auto;
+    font-family: 'quicksand';
+    background-color: ghostwhite;
+    padding-top: 5rem;
+    border-style: solid;
+    border-color: black;
+}
 
+.top-bar-mobile {
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    
+}
 
-
+.open-nav-mobile {
+    width: 0;
+    height: 0;
+    overflow: hidden;
+}
 
 .top-bar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
     height: 5rem;
-    width: fit-content;
+    width: 100%;
     background-color: rgba(239, 222, 205, 0.20);
     background-image: linear-gradient(rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.25) 25%, rgba(0,0,0,0) 70%);
     display: flex;
     flex-direction: row;
-    align-items: stretch;
     border-bottom-left-radius: 1.5rem;
     border-bottom-right-radius: 1.5rem;
     color: white;
     -webkit-box-shadow: inset 0px 0px 13px 4px rgba(0,0,0,0.37);
     box-shadow: inset 0px 0px 13px 4px rgba(0,0,0,0.37);
-    padding: 0 3rem;
     z-index: 1030;
     font-family: 'Quicksand', serif;
-
-
     border-style: solid;
     border-color: green;
 }
 
+
 .open-nav {
     display: none;
     z-index: 1;
+    width: 0rem;
+    overflow: hidden;
 }
 
 .logo-close-button {
-    display: none;
-    
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    border-style: solid;
+    border-color: yellow;
 }
 
 
 .logo {
     display: flex;
     flex-shrink: 4;
-    margin-right: 3rem;
-    width: fit-content;
+    margin: 1rem;
+    
     align-items: center;
     justify-content: center;
 }
@@ -330,21 +356,28 @@ body {
         flex-direction: row;
         height: 100%;
         border-style: solid;
-        border-color: red;
+        border-color: pink;
     }
 
     .content {
-        margin-top: 2rem;
-        margin-left: auto;
-        margin-right: auto;
+        padding: 2rem;
     }
 
-    
     .top-bar {
+        height: 0;
+        width: 0;
+        overflow: hidden;
+        
+    }
+    
+    .top-bar-mobile {
+        display: flex;
+        flex-direction: row;
         height: 100%;
         width: 0rem;
         background-color: rgba(239, 222, 205, 0.20);
         background-image: linear-gradient(rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.25) 25%, rgba(0,0,0,0) 70%);
+        backdrop-filter: blur(4px);
         display: flex;
         flex-direction: column;
         overflow-x: hidden;
@@ -354,17 +387,30 @@ body {
         padding: 0;
         z-index: 1030;
         font-family: 'Quicksand', serif;
-        border-style: solid;
-        border-color: black;
+        border-style: dotted;
+        border-color: red;
         transition: 0.5s;
     }
 
-    .open-nav {
-        display: block;
-        width: 0;
+    .open-nav-mobile {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        min-width: 3rem;
+        min-height: 3rem;
+        z-index: 1000;
+        border-style: dotted;
+        border-color: pink;
+        transition: 0.5s;
     }
 
-    .logo-close-button {
+    #open-nav-button-mobile {
+        width: 0rem;
+        transition-delay: 3s;
+    }
+
+    .logo-close-button-mobile {
         display: flex;
         flex-direction: row;
         flex-shrink: 1;
@@ -372,9 +418,10 @@ body {
         justify-content: center;
         border-style: solid;
         border-color: black;
+        transition: all 3s ease-in 3s;
     }
 
-    .logo {
+    .logo-mobile {
         display: flex;
         flex-shrink: 4;
         margin-right: 0.5rem;
@@ -383,7 +430,7 @@ body {
         justify-content: center;
     }
 
-    .nav-tab {
+    .nav-tab-mobile {
         margin: 0;
         display: inline-block;
         background-color: rgba(0,0,0,0.1);
@@ -402,3 +449,4 @@ body {
         border-color: black;
     }
 }
+

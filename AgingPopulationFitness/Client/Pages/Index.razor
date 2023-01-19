@@ -1,5 +1,11 @@
 ﻿@page "/"
 @inject UserState UserState;
+@inject NavigationManager Navigation;
+@inject HttpClient HttpClient
+@inject UserClient UserClient
+@inject IJSRuntime JSRuntime
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
+
 
 <PageTitle>Index</PageTitle>
 
@@ -12,4 +18,40 @@ of this project as well as disclaimers
 @if (UserState.userProfile != null)
 {
     <h2>@UserState.userProfile.UserId</h2>
+}
+
+
+@code{
+    [CascadingParameter(Name = "UpdateMenuOnLogIn")] public EventCallback UpdateMenuOnLogIn { get; set; }
+    [CascadingParameter(Name = "UpdateMenuOnRefresh")] public EventCallback UpdateMenuOnRefresh { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if( UserState == null)
+        {
+            Console.WriteLine("user state is null");
+        }
+        else
+        {
+
+            if( UserState.userProfile == null)
+            {
+                Console.WriteLine("user profile: null");
+            }
+            else
+            {
+                Console.WriteLine("user profile:");
+                UserState.userProfile.PrintUserProfile();
+
+            }
+
+        }
+        if (await sessionStorage.GetItemAsStringAsync("UserId") != null)
+        {
+            
+            await UserState.Refresh( sessionStorage);
+            await UpdateMenuOnRefresh.InvokeAsync();
+        }
+
+    }
 }

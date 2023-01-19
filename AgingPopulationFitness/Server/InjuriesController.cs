@@ -161,6 +161,62 @@ namespace AgingPopulationFitness.Server
             return success;
         }
 
+        [HttpPost("delete")]
+        public async Task<ActionResult<bool>> DeleteUserInjury(UserInjury userInjury)
+        {
+            bool success = false;
+
+            userInjury.PrintUserInjury();
+            //success = await Task.Run(() => DeleteUserInjuryHelper(userInjury));
+            return success;
+        }
+
+        public bool DeleteUserInjuryHelper(UserInjury userInjury)
+        {
+            if (userInjury == null)
+            {
+                return false;
+            }
+            if (userInjury.InjuryId == null)
+            {
+                return false;
+            }
+            if (userInjury.UserId == null)
+            {
+                return false;
+            }
+
+            var cs = "host=" + DatabaseCredentials.Host + ";" +
+                "Username=" + DatabaseCredentials.Username + ";" +
+                "Password=" + DatabaseCredentials.Password + ";" +
+                "Database=" + DatabaseCredentials.Database + "";
+
+            using var con = new NpgsqlConnection(cs);
+            con.Open();
+
+            var sql = "DELETE FROM user_injury" +
+                "WHERE user_uid = @user_uid AND user_injury_id = @injury_id";
+
+
+            using var cmd = new NpgsqlCommand(sql, con);
+
+            cmd.Parameters.AddWithValue("injury_id", userInjury.InjuryId);
+            cmd.Parameters.AddWithValue("user_uid", userInjury.UserId);
+            cmd.Prepare();
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            return false;
+
+        }
+
         public bool PostUserInjuryHelper(UserInjury userInjury)
         {
             var cs = "host=" + DatabaseCredentials.Host + ";" +

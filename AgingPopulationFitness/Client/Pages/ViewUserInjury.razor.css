@@ -1,0 +1,47 @@
+﻿.dialog-body {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    padding-top: 5rem;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-style: groove;
+    border-color: red;
+    overflow-y: scroll;
+}
+
+.user-injury-form-field {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 75%;
+    margin-bottom: 1rem;
+    border-style: groove;
+    border-color: red;
+}
+
+.injury-description-div {
+    display: flex;
+    flex-direction: column;
+    width: 75%;
+    margin: auto;
+    border-style: groove;
+    border-color: black;
+}
+
+.injuries {
+
+    border-style: groove;
+    border-color: black;
+}
+
+@media screen and (max-width: 480px) {
+    .dialog-body {
+        padding-top: 0rem;
+    }
+}

@@ -4,6 +4,7 @@
 @inject UserClient UserClient
 @inject IJSRuntime JSRuntime
 @inject UserState UserState;
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 
 
 <head>
@@ -17,18 +18,21 @@
             <a class="logo" href="">
                 <text>LOGO</text>
             </a>
-            <button @onclick="CloseNav">X</button>
         </div>
         @if (UserState.isLoggedIn)
         {
             <NavLink href="" class="nav-tab" Match="NavLinkMatch.All">
-                <div>Home</div>
+                <div  >Home</div>
             </NavLink>
 
 
             <NavLink href="injuries" class="nav-tab">
                 <div>My</div>
                 <div>Injuries</div>
+            </NavLink>
+
+            <NavLink href="counter" class="nav-tab">
+                <div>Counter</div>
             </NavLink>
 
             <NavLink href="login" class="nav-tab" @onclick="Logout">
@@ -44,38 +48,63 @@
 
 
     </div>
-    <div class="open-nav" id="open-nav-button">
-        <button @onclick="OpenNav"><img src="Images/menu.svg"/></button>
+    
+
+    <div class="top-bar-mobile" id="nav-bar-mobile">
+        <div class="logo-close-button-mobile">
+            <a class="logo-mobile" href="">
+                <text>LOGO</text>
+            </a>
+            <button @onclick="CloseNav">X</button>
+        </div>
+        @if (UserState.isLoggedIn)
+        {
+            <NavLink href="" @onclick="CloseNav"  class="nav-tab-mobile" Match="NavLinkMatch.All">
+                <div>Home</div>
+            </NavLink>
+
+
+            <NavLink href="injuries" @onclick="CloseNav" class="nav-tab-mobile">
+                <div>My</div>
+                <div>Injuries</div>
+            </NavLink>
+
+            <NavLink href="login"  class="nav-tab-mobile" @onclick="Logout">
+                <div @onclick="CloseNav">Logout</div>
+            </NavLink>
+        }
+        @if (!(UserState.isLoggedIn))
+        {
+            <NavLink href="login" @onclick="CloseNav" class="nav-tab-mobile">
+                <div>Login</div>
+            </NavLink>
+        }
+
+
+    </div>
+    <div class="open-nav-mobile" id="open-nav-button-mobile">
+        <button @onclick="OpenNav"><img src="Images/menu.svg" /></button>
     </div>
 
     <div class="content" id="main-body">
-        <CascadingValue Value=UpdateMenu>
-            @Body
+        <CascadingValue Value=@UpdateMenuOnLogIn Name="UpdateMenuOnLogIn">
+            <CascadingValue Value=@UpdateMenuOnRefresh Name="UpdateMenuOnRefresh">
+                @Body
+        </CascadingValue>
         </CascadingValue>
     </div>
 </div>
 
 @code {
-    EventCallback UpdateMenu => EventCallback.Factory.Create(this, UpdateAlertMenu);
+    EventCallback UpdateMenuOnLogIn => EventCallback.Factory.Create(this, UpdateAlertMenuOnLogIn);
+    EventCallback UpdateMenuOnRefresh => EventCallback.Factory.Create(this, UpdateAlertMenuOnRefresh);
 
-    public void UpdateAlertMenu()
+    public void UpdateAlertMenuOnLogIn()
     {
         Console.WriteLine("In updateAlertmenu: " + UserState.isLoggedIn);
         IsLoggedInHelper();
         Console.WriteLine("In updateAlertmenu: " + UserState.isLoggedIn);
-            /*
-            if (UserState.isLoggedIn)
-            {
-            Console.WriteLine("In updateAlertmenu: " + UserState.isLoggedIn);
-        Navigation.NavigateTo("");
-        StateHasChanged();
-            }
-            else
-            {
-            Console.WriteLine(UserState.isLoggedIn);
-            StateHasChanged();
-    }
-    */
+        
     }
 
     public async void LoggedInCheck()
@@ -83,11 +112,13 @@
         if (UserState.userProfile == null)
         {
             UserState.isLoggedIn = false;
+            StateHasChanged();
             return;
         }
         if (UserState.userProfile.UserId == null)
         {
             UserState.isLoggedIn = false;
+            StateHasChanged();
             return;
         }
         UserState.isLoggedIn = await UserClient.IsLoggedIn(UserState.userProfile);
@@ -103,7 +134,42 @@
 
     }
 
-    public void Logout()
+    public void UpdateAlertMenuOnRefresh()
+    {
+        Console.WriteLine("In updateAlertmenu: " + UserState.isLoggedIn);
+        RefreshHelper();
+        Console.WriteLine("In updateAlertmenu: " + UserState.isLoggedIn);
+
+    }
+
+    public async void RefreshPage()
+    {
+        if (UserState.userProfile == null)
+        {
+            UserState.isLoggedIn = false;
+            StateHasChanged();
+            return;
+        }
+        if (UserState.userProfile.UserId == null)
+        {
+            UserState.isLoggedIn = false;
+            StateHasChanged();
+            return;
+        }
+        UserState.isLoggedIn = await UserClient.IsLoggedIn(UserState.userProfile);
+        Console.WriteLine("In LoggedInCheck: " + UserState.isLoggedIn);
+        //Navigation.NavigateTo("");
+        StateHasChanged();
+
+    }
+
+    public void RefreshHelper()
+    {
+        RefreshPage();
+
+    }
+
+    public async void Logout()
     {
         if (UserState.userProfile != null)
         {
@@ -112,6 +178,7 @@
         }
         Console.WriteLine("Logout:");
         UserState.userProfile.PrintUserProfile();
+        await sessionStorage.ClearAsync();
         IsLoggedInHelper();
 
     }

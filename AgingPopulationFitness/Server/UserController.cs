@@ -222,6 +222,7 @@ namespace AgingPopulationFitness.Server
                 UserProfile newUserProfile = new UserProfile();
                 newUserProfile.UserId = rdr.GetGuid(0);
                 newUserProfile.Username = rdr.GetString(1);
+                newUserProfile.Password = rdr.GetString(2);
                 newUserProfile.PrintUserProfile();
                 userProfileList.Add(newUserProfile);
             }

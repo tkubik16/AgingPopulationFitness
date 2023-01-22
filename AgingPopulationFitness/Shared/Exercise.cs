@@ -26,12 +26,12 @@ namespace AgingPopulationFitness
         public Exercise()
         {
             this.ExerciseId = -1;
-            this.ExerciseName = "ExerciseName";
-            this.ExerciseDescription = "ExerciseDescription";
-            this.ExerciseLink = "google.com";
+            this.ExerciseName = "";
+            this.ExerciseDescription = "";
+            this.ExerciseLink = "";
             this.ExerciseMainImage = new byte[64];
-            this.ExerciseType = "Cardio";
-            this.ExerciseInstructions = "ExerciseInstructions";
+            this.ExerciseType = "";
+            this.ExerciseInstructions = "";
             this.Benefits = new List<Benefit>();
             this.InjuryLocations = new List<InjuryLocation>();
         }

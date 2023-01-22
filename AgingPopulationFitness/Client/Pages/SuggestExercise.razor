@@ -1,4 +1,6 @@
 ﻿@page "/suggest-exercise-page"
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Collections.Generic
 @inject HttpClient HttpClient
 @inject UserClient UserClient
 @inject InjuryState InjuryState
@@ -9,7 +11,52 @@
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 
 
-<form>
+
+
+<form class="suggest-exercise-form">
+    <div class="dialog-body-input">
+        <label>Exercise Name:</label>
+        <div>
+            <input type="text" @bind="suggestedExercise.Exercise.ExerciseName" />
+        </div>
+    </div>
+    <div class="dialog-body-input">
+        <label>Exercise Description:</label>
+        <div>
+            <input type="text" @bind="suggestedExercise.Exercise.ExerciseDescription" />
+        </div>
+    </div>
+    <div class="dialog-body-input">
+        <label>Exercise Instructions:</label>
+        <div>
+            <input type="text" @bind="suggestedExercise.Exercise.ExerciseInstructions" />
+        </div>
+    </div>
+    <div class="dialog-body-input">
+        <label>Exercise Internet Link:</label>
+        <div>
+            <input type="text" @bind="suggestedExercise.Exercise.ExerciseLink" />
+        </div>
+    </div>
+    <div class="dialog-body-input">
+        <label>Exercise Main Image:</label>
+        <div>
+            <InputFile accept="file/jpeg" OnChange="@RunFileConversion"/>
+        </div>
+    </div>
+    <div class="dialog-body-input">
+        <label>Exercise Type:</label>
+        <div>
+            <select class="custom-select" @onchange="ExerciseTypeSelected">
+                <option value="-1" disabled selected>(select)</option>
+                @for (var i = 0; i < ExerciseTypes.Count; i++)
+                {
+
+                    <option value="@i">@i @ExerciseTypes[i] </option>
+                }
+            </select>
+        </div>
+    </div>
     <div class="dialog-body-input">
         <label>Add Injury Location it would aggravate: </label>
         @if (injuryLocations == null)
@@ -32,7 +79,7 @@
     </div>
 
     <div class="injuries">
-        @foreach (var injuryLocation in exerciseInjuryLocations)
+        @foreach (var injuryLocation in suggestedExercise.Exercise.InjuryLocations)
         {
             <div class="injury">
                 @injuryLocation.BodyPart
@@ -41,16 +88,44 @@
         }
     </div>
 </form>
+@if (Image != string.Empty)
+{
+    <div class="image-preview">
+        <img class="suggested-exercise-main-img" src="@Image" alt="default" />
+    </div>
+}
 
 @code {
-
+    public string Image = string.Empty;
     public List<InjuryLocation> injuryLocations = new List<InjuryLocation>();
-    public List<InjuryLocation> exerciseInjuryLocations = new List<InjuryLocation>();
+    public SuggestedExercise suggestedExercise = new SuggestedExercise();
+    public List<string> ExerciseTypes = new List<string>()
+    {
+        "Cardio",
+        "Free Weight",
+        "Body Weight",
+        "Cable",
+        "Machine"
+    };
 
     protected override async Task OnInitializedAsync()
     {
         injuryLocations = await UserClient.GetInjuries();
+        if (UserState.userProfile != null)
+        {
+            if (UserState.userProfile.UserId != null)
+            {
+                suggestedExercise.UserId = UserState.userProfile.UserId;
+            }
+        }
+    }
 
+    void ExerciseTypeSelected(ChangeEventArgs e)
+    {
+        if (int.TryParse((string)e.Value, out var index) && index >= 0)
+        {
+            suggestedExercise.Exercise.ExerciseType = ExerciseTypes[index];
+        }
     }
 
     void InjuryLocationSelected(ChangeEventArgs e)
@@ -63,15 +138,36 @@
 
     void AddInjuryLocation(InjuryLocation injuryLocation)
     {
-        if (exerciseInjuryLocations.Find(pt => pt.BodyPart == injuryLocation.BodyPart) == null)
+        if (suggestedExercise.Exercise.InjuryLocations.Find(pt => pt.BodyPart == injuryLocation.BodyPart) == null)
         {
-            exerciseInjuryLocations.Add(new InjuryLocation(injuryLocation.InjuryLocationId, injuryLocation.BodyPart));
+            suggestedExercise.Exercise.InjuryLocations.Add(new InjuryLocation(injuryLocation.InjuryLocationId, injuryLocation.BodyPart));
         }
     }
 
     void RemoveInjuryLocation(InjuryLocation injuryLocation)
     {
-        exerciseInjuryLocations.RemoveAll(pt => pt.BodyPart == injuryLocation.BodyPart);
+        suggestedExercise.Exercise.InjuryLocations.RemoveAll(pt => pt.BodyPart == injuryLocation.BodyPart);
+    }
+
+
+    private async Task RunFileConversion(InputFileChangeEventArgs e)
+    {
+        IBrowserFile imgFile = e.File;
+        var buffers = new byte[imgFile.Size];
+        await imgFile.OpenReadStream(imgFile.Size).ReadAsync(buffers);
+        string imageType = imgFile.ContentType;
+        suggestedExercise.Exercise.ExerciseMainImage = buffers;
+        Image = $"data:{imageType};base64,{Convert.ToBase64String(suggestedExercise.Exercise.ExerciseMainImage)}";
+
+    }
+
+    public void ConvertToImages()
+    {
+
+        Console.WriteLine(Convert.ToBase64String(suggestedExercise.Exercise.ExerciseMainImage));
+        Image = string.Format("data:image/jpeg;base64,{0}", Convert.ToBase64String(suggestedExercise.Exercise.ExerciseMainImage));
+        StateHasChanged();
+
     }
 
 }

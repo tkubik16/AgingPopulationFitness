@@ -64,6 +64,18 @@
         showSpinner = true;
         StateHasChanged();
 
+        if ((userProfile.Username == null) || (userProfile.Password == null))
+        {
+            showSpinner = false;
+            StateHasChanged();
+            return;
+        }
+        if ((userProfile.Username.Length <= 0) || (userProfile.Password.Length <= 0))
+        {
+            showSpinner = false;
+            StateHasChanged();
+            return;
+        }
 
         try
         {

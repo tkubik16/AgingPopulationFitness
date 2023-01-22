@@ -1,4 +1,4 @@
-﻿@page "/injuries"
+﻿@page "/injuries-page"
 @inject HttpClient HttpClient
 @inject UserClient UserClient
 @inject InjuryState InjuryState
@@ -11,26 +11,25 @@
 
 @if (InjuryState.ShowingConfigureDialog)
 {
-    <AddInjuryDialog  
-        userInjury="InjuryState.ConfiguringUserInjury"
-        OnCancel="InjuryState.CancelConfigureUserInjuryDialog"
-        OnConfirm="InjuryState.ConfirmConfigureUserInjuryDialog"/>
+    <AddInjuryDialog userInjury="InjuryState.ConfiguringUserInjury"
+                 OnCancel="InjuryState.CancelConfigureUserInjuryDialog"
+                 OnConfirm="InjuryState.ConfirmConfigureUserInjuryDialog" />
 }
-@if( userInjuries.Count == 0)
+@if (userInjuries.Count == 0)
 {
     <div class="spinner"></div>
 }
 <div class="main">
     <div class="add-injury-button-div">
-        <button  class="add-injury-button" @onclick="@(() => InjuryState.ShowConfigureUserInjuryDialog())">Add Injury</button>
+        <button class="add-injury-button" @onclick="@(() => InjuryState.ShowConfigureUserInjuryDialog())">Add Injury</button>
     </div>
-    
+
     <ul class="user-injury-cards">
         @if (userInjuries != null)
         {
             @foreach (var userInjury in userInjuries)
             {
-                <li  >
+                <li>
                     <div class="user-injury-info">
                         <h3 class="title">@userInjury.InjuryName</h3>
                         <text class="title">Severity: @userInjury.InjurySeverity</text>
@@ -45,13 +44,13 @@
                             }
                         </div>
                         <div>
-                            <button @onclick="@(() => NavigationManager.NavigateTo($"injuries/" + @userInjury.InjuryId ) )">
+                            <button @onclick="@(() => NavigationManager.NavigateTo($"injuries-page/" + @userInjury.InjuryId ) )">
                                 View
                             </button>
                         </div>
                     </div>
                 </li>
-                
+
             }
         }
     </ul>
@@ -65,14 +64,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if( UserState == null)
+        if (UserState == null)
         {
             Console.WriteLine("user state is null");
         }
         else
         {
 
-            if( UserState.userProfile == null)
+            if (UserState.userProfile == null)
             {
                 Console.WriteLine("user profile: null");
             }
@@ -84,13 +83,13 @@
             }
 
         }
-        if (await sessionStorage.ContainKeyAsync("UserId") )
+        if (await sessionStorage.ContainKeyAsync("UserId"))
         {
-            
-            await UserState.Refresh( sessionStorage);
+
+            await UserState.Refresh(sessionStorage);
             await UpdateMenuOnRefresh.InvokeAsync();
-        } 
-        /*
+        }
+        
         if (UserState.userProfile.UserId != null)
         {
             try
@@ -102,7 +101,6 @@
                 for (int i = 0; i < userInjuries.Count; i++)
                 {
                     userInjuries[i].PrintUserInjury();
-
                 }
             }
             catch( Exception e)
@@ -110,9 +108,9 @@
                 Console.WriteLine(e);
             }
         }
-        */
+        
     }
 
-    
+
 
 }

@@ -1,0 +1,96 @@
+﻿@page "/exercises-page"
+@inject HttpClient HttpClient
+@inject UserClient UserClient
+@inject ExerciseClient ExerciseClient
+@inject InjuryState InjuryState
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject InjuryState InjuryState
+@inject UserState UserState
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
+@using SixLabors.ImageSharp;
+
+<ul class="exercise-cards">
+    @for( int i = 0; i < allExercises.Count; i++)
+    {
+        <li>
+            <div class="exercise-info">
+                <h3>@allExercises[i].ExerciseName</h3>
+                <img class="exercise-main-img" src="@allExerciseImages[i]" alt="default" />
+            </div>
+        </li>    
+    }
+</ul>
+
+
+
+@code {
+
+    [CascadingParameter(Name = "UpdateMenuOnLogIn")] public EventCallback UpdateMenuOnLogIn { get; set; }
+    [CascadingParameter(Name = "UpdateMenuOnRefresh")] public EventCallback UpdateMenuOnRefresh { get; set; }
+
+    public List<Exercise> allExercises = new List<Exercise>();
+    public List<string> allExerciseImages = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserState == null)
+        {
+            Console.WriteLine("user state is null");
+        }
+        else
+        {
+
+            if (UserState.userProfile == null)
+            {
+                Console.WriteLine("user profile: null");
+            }
+            else
+            {
+                Console.WriteLine("user profile:");
+                UserState.userProfile.PrintUserProfile();
+
+            }
+
+        }
+        if (await sessionStorage.ContainKeyAsync("UserId"))
+        {
+
+            await UserState.Refresh(sessionStorage);
+            await UpdateMenuOnRefresh.InvokeAsync();
+        }
+
+        try
+        {
+
+            allExercises = await ExerciseClient.GetAllExercises();
+            await Task.Run(() => ConvertToImages());
+            for (int i = 0; i < allExercises.Count; i++)
+            {
+
+                Console.WriteLine(allExercises[i].ExerciseName);
+
+            }
+
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+
+
+    }
+
+    public void ConvertToImages()
+    {
+
+        for(int i = 0; i < allExercises.Count; i++)
+        {
+            allExerciseImages.Add(string.Format("data:image/jpeg;base64,{0}", Convert.ToBase64String( allExercises[i].ExerciseMainImage) ));
+            Console.WriteLine(allExerciseImages[i]);
+        }
+    }
+
+}

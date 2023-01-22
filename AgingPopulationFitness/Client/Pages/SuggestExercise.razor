@@ -1,0 +1,77 @@
+﻿@page "/suggest-exercise-page"
+@inject HttpClient HttpClient
+@inject UserClient UserClient
+@inject InjuryState InjuryState
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject InjuryState InjuryState
+@inject UserState UserState
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
+
+
+<form>
+    <div class="dialog-body-input">
+        <label>Add Injury Location it would aggravate: </label>
+        @if (injuryLocations == null)
+        {
+            <select class="custom-select" disabled>
+                <option>(loading...)</option>
+            </select>
+        }
+        else
+        {
+            <select class="custom-select" @onchange="InjuryLocationSelected">
+                <option value="-1" disabled selected>(select)</option>
+                @for (var i = 0; i < injuryLocations.Count; i++)
+                {
+
+                    <option value="@i">@i @injuryLocations[i].InjuryLocationId @injuryLocations[i].BodyPart </option>
+                }
+            </select>
+        }
+    </div>
+
+    <div class="injuries">
+        @foreach (var injuryLocation in exerciseInjuryLocations)
+        {
+            <div class="injury">
+                @injuryLocation.BodyPart
+                <button type="button" class="delete-injury" @onclick="@(() => RemoveInjuryLocation(injuryLocation))">x</button>
+            </div>
+        }
+    </div>
+</form>
+
+@code {
+
+    public List<InjuryLocation> injuryLocations = new List<InjuryLocation>();
+    public List<InjuryLocation> exerciseInjuryLocations = new List<InjuryLocation>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        injuryLocations = await UserClient.GetInjuries();
+
+    }
+
+    void InjuryLocationSelected(ChangeEventArgs e)
+    {
+        if (int.TryParse((string)e.Value, out var index) && index >= 0)
+        {
+            AddInjuryLocation(injuryLocations[index]);
+        }
+    }
+
+    void AddInjuryLocation(InjuryLocation injuryLocation)
+    {
+        if (exerciseInjuryLocations.Find(pt => pt.BodyPart == injuryLocation.BodyPart) == null)
+        {
+            exerciseInjuryLocations.Add(new InjuryLocation(injuryLocation.InjuryLocationId, injuryLocation.BodyPart));
+        }
+    }
+
+    void RemoveInjuryLocation(InjuryLocation injuryLocation)
+    {
+        exerciseInjuryLocations.RemoveAll(pt => pt.BodyPart == injuryLocation.BodyPart);
+    }
+
+}

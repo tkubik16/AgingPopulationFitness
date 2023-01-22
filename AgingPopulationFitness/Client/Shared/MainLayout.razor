@@ -22,17 +22,23 @@
         @if (UserState.isLoggedIn)
         {
             <NavLink href="" class="nav-tab" Match="NavLinkMatch.All">
-                <div  >Home</div>
+                <div>Home</div>
             </NavLink>
 
 
-            <NavLink href="injuries" class="nav-tab">
+            <NavLink href="injuries-page" class="nav-tab">
                 <div>My</div>
                 <div>Injuries</div>
             </NavLink>
 
-            <NavLink href="counter" class="nav-tab">
-                <div>Counter</div>
+            <NavLink href="exercises-page" class="nav-tab">
+                <div>Find</div>
+                <div>Exercises</div>
+            </NavLink>
+
+            <NavLink href="suggest-exercise-page" class="nav-tab">
+                <div>Suggest</div>
+                <div>Exercises</div>
             </NavLink>
 
             <NavLink href="login" class="nav-tab" @onclick="Logout">
@@ -64,9 +70,14 @@
             </NavLink>
 
 
-            <NavLink href="injuries" @onclick="CloseNav" class="nav-tab-mobile">
+            <NavLink href="injuries-page" @onclick="CloseNav" class="nav-tab-mobile">
                 <div>My</div>
                 <div>Injuries</div>
+            </NavLink>
+
+            <NavLink href="exercises-page" @onclick="CloseNav" class="nav-tab-mobile">
+                <div>Find</div>
+                <div>Exercises</div>
             </NavLink>
 
             <NavLink href="login"  class="nav-tab-mobile" @onclick="Logout">

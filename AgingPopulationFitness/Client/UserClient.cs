@@ -58,6 +58,14 @@ namespace AgingPopulationFitness.Client
             return success;
         }
 
+        public async Task<bool> UpdateUserInjury(UserInjury userInjury)
+        {
+            var response = await httpClient.PostAsJsonAsync($"injuries/update", userInjury, InjuryLocationContext.Default.UserInjury);
+            response.EnsureSuccessStatusCode();
+            var success = await response.Content.ReadFromJsonAsync<bool>();
+            return success;
+        }
+
         public async void GetInjuriesString()
         {
             var injuryLocations = await httpClient.GetStringAsync("injuries/string" );

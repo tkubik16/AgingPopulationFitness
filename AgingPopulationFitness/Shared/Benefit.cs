@@ -13,14 +13,14 @@ namespace AgingPopulationFitness
     public class Benefit
     {
         public int BenefitId { get; set; }
-        public string BodyPart { get; set; }
+        public string BenefitName { get; set; }
 
 
         public Benefit() { }
-        public Benefit(int BenefitId, string BodyPart)
+        public Benefit(int BenefitId, string BenefitName)
         {
             this.BenefitId = BenefitId;
-            this.BodyPart = BodyPart;
+            this.BenefitName = BenefitName;
 
         }
 

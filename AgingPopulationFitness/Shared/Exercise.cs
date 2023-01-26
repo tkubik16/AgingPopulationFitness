@@ -43,4 +43,5 @@ namespace AgingPopulationFitness
 [JsonSerializable(typeof(List<Exercise>))]
 [JsonSerializable(typeof(Benefit))]
 [JsonSerializable(typeof(List<Benefit>))]
+[JsonSerializable(typeof(SuggestedExercise))]
 public partial class ExerciseContext : JsonSerializerContext { }

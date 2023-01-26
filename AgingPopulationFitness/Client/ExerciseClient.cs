@@ -27,6 +27,21 @@ namespace AgingPopulationFitness.Client
 
         }
 
+        public async Task<List<Benefit>> GetBenefits()
+        {
+            var benefits = await httpClient.GetFromJsonAsync("exercise/benefits", ExerciseContext.Default.ListBenefit);
+            
+            return benefits;
+        }
+
+        public async Task<bool> PostSuggestedExercise(SuggestedExercise suggestedExercise)
+        {
+            var response = await httpClient.PostAsJsonAsync($"exercise/suggested", suggestedExercise, ExerciseContext.Default.SuggestedExercise);
+            response.EnsureSuccessStatusCode();
+            var success = await response.Content.ReadFromJsonAsync<bool>();
+            return success;
+        }
+
     }
 }
 

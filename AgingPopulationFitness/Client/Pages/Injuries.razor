@@ -15,22 +15,30 @@
                  OnCancel="InjuryState.CancelConfigureUserInjuryDialog"
                  OnConfirm="InjuryState.ConfirmConfigureUserInjuryDialog" />
 }
-@if (userInjuries.Count == 0)
+@if (userInjuries == null)
 {
     <div class="spinner"></div>
 }
-<div class="main">
-    <div class="add-injury-button-div">
-        <button class="add-injury-button" @onclick="@(() => InjuryState.ShowConfigureUserInjuryDialog())">Add Injury</button>
-    </div>
+@if (userInjuries != null)
+{
+    @if( userInjuries.Count == 0)
+    {
+        <h1 class="no-cards-message">No injuries have been added.</h1>
+    }
+}
+@if (userInjuries != null)
+{
+    <div class="main">
+        <div class="add-injury-button-div">
+            <button class="add-injury-button" @onclick="@(() => InjuryState.ShowConfigureUserInjuryDialog())">Add Injury</button>
+        </div>
 
-    <ul class="user-injury-cards">
-        @if (userInjuries != null)
-        {
-            @foreach (var userInjury in userInjuries)
+        <ul class="user-injury-cards">
+            @if (userInjuries != null)
             {
-                <li>
-                    <div class="user-injury-info">
+                @foreach (var userInjury in userInjuries)
+                {
+                    <li class="user-injury-info">
                         <h3 class="title">@userInjury.InjuryName</h3>
                         <text class="title">Severity: @userInjury.InjurySeverity</text>
                         <text class="title">Date: @userInjury.InjuryDate</text>
@@ -43,24 +51,24 @@
                                 </div>
                             }
                         </div>
-                        <div>
-                            <button @onclick="@(() => NavigationManager.NavigateTo($"injuries-page/" + @userInjury.InjuryId ) )">
+                        <div class="view-injury-button-div">
+                            <button class="view-injury-button" @onclick="@(() => NavigationManager.NavigateTo($"injuries-page/" + @userInjury.InjuryId ) )">
                                 View
                             </button>
                         </div>
-                    </div>
-                </li>
+                    </li>
+                }
 
             }
-        }
-    </ul>
-</div>
+        </ul>
+    </div>
+}
 
 @code {
     [CascadingParameter(Name = "UpdateMenuOnLogIn")] public EventCallback UpdateMenuOnLogIn { get; set; }
     [CascadingParameter(Name = "UpdateMenuOnRefresh")] public EventCallback UpdateMenuOnRefresh { get; set; }
 
-    public List<UserInjury> userInjuries = new List<UserInjury>();
+    public List<UserInjury> userInjuries;
 
     protected override async Task OnInitializedAsync()
     {

@@ -12,8 +12,7 @@
     width: fit-content;
     margin: auto;
     margin-top: 4rem;
-    border-style: solid;
-    border-color: black;
+
 }
 
 .login-title {
@@ -52,12 +51,13 @@
 }
 
 .login-button {
-    background-color: rgba(129, 251, 129, 0.8);
+    background-color: var(--clr-black);
     border-radius: .25rem;
     border-width: 0;
     box-sizing: border-box;
     text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
-    font-weight: 700;
+    color: var(--clr-white);
+    font-weight: 500;
     font-size: 1.2rem;
     text-align: center;
     justify-content: center;

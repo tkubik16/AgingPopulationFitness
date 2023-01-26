@@ -16,11 +16,11 @@
         <div class="add-injury-instructions">
             Add a new injury to help find exercises that are ideal for you.
         </div>
-        <form class="dialog-body">
+        <div class="dialog-body">
             <div class="dialog-body-input">
                 <label>Name:</label>
                 <div>
-                    <input type="text" @bind="userInjury.InjuryName"/>
+                    <input @bind="userInjury.InjuryName" />
                 </div>
             </div>
             <div class="dialog-body-input">
@@ -69,7 +69,7 @@
                 }
             </div>
 
-        </form>
+        </div>
         <div class="add-injury">
             <div >
                 <button class="add-button"  @onclick="PostUserInjury">Add Injury</button>

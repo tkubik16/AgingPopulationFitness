@@ -28,7 +28,7 @@ namespace AgingPopulationFitness.Server
             responseInjuryLocations = await Task.Run(() => GetInjuriesCall());
             for(int i = 0; i < responseInjuryLocations.Count; i++)
             {
-                Console.WriteLine(responseInjuryLocations[i].InjuryLocationId + responseInjuryLocations[i].BodyPart);
+                //Console.WriteLine(responseInjuryLocations[i].InjuryLocationId + responseInjuryLocations[i].BodyPart);
                 
             }
 
@@ -39,7 +39,7 @@ namespace AgingPopulationFitness.Server
         public async Task<List<UserInjury>> GetUsersInjuries(Guid userUid)
         {
             List<UserInjury> responseUserInjuries = new List<UserInjury>();
-            Console.WriteLine("In GetUsersInjuries in InjuriesController");
+            //Console.WriteLine("In GetUsersInjuries in InjuriesController");
             responseUserInjuries = await Task.Run(() => GetUsersInjuriesCall( userUid));
             //await Task.Run(() => GetUsersInjuriesCall(userUid));
 
@@ -48,7 +48,7 @@ namespace AgingPopulationFitness.Server
             {
                 for (int i = 0; i < responseUserInjuries.Count; i++)
                 {
-                    responseUserInjuries[i].PrintUserInjury();
+                    //responseUserInjuries[i].PrintUserInjury();
 
                 }
             }
@@ -70,10 +70,10 @@ namespace AgingPopulationFitness.Server
 
             var sql = "SELECT user_injury.user_injury_id, user_uid, user_injury_name, user_injury_description, user_injury_severity, user_injury_date, injury_location.injury_location_id, body_part " +
                 "FROM user_injury " +
-                "INNER JOIN user_injury_injury_location ON user_injury.user_injury_id = user_injury_injury_location.user_injury_id " +
-                "INNER JOIN injury_location ON user_injury_injury_location.injury_location_id = injury_location.injury_location_id " +
+                "FULL JOIN user_injury_injury_location ON user_injury.user_injury_id = user_injury_injury_location.user_injury_id " +
+                "FULL JOIN injury_location ON user_injury_injury_location.injury_location_id = injury_location.injury_location_id " +
                 "WHERE user_injury.user_uid = @UserUid " +
-                "ORDER BY user_injury.user_injury_id, user_injury_date, injury_location.injury_location_id";
+                "ORDER BY  user_injury_date, user_injury.user_injury_id, injury_location.injury_location_id";
 
             using var cmd = new NpgsqlCommand(sql, con);
 
@@ -99,8 +99,10 @@ namespace AgingPopulationFitness.Server
                         userInjuries[currentUserInjury].InjuryDescription = rdr.GetString(3);
                         userInjuries[currentUserInjury].InjurySeverity = rdr.GetInt32(4);
                         userInjuries[currentUserInjury].InjuryDate = DateOnly.FromDateTime(rdr.GetDateTime(5));
-
-                        userInjuries[currentUserInjury].InjuryLocations.Add(new InjuryLocation(rdr.GetInt32(6), rdr.GetString(7)));
+                        if ( !rdr.IsDBNull(6) && !rdr.IsDBNull(7))
+                        {
+                            userInjuries[currentUserInjury].InjuryLocations.Add(new InjuryLocation(rdr.GetInt32(6), rdr.GetString(7)));
+                        }
 
                     }
                     else if ( rdr.GetInt32(0) != userInjuries[currentUserInjury].InjuryId)
@@ -115,12 +117,18 @@ namespace AgingPopulationFitness.Server
                         userInjuries[currentUserInjury].InjurySeverity = rdr.GetInt32(4);
                         userInjuries[currentUserInjury].InjuryDate = DateOnly.FromDateTime(rdr.GetDateTime(5));
 
-                        userInjuries[currentUserInjury].InjuryLocations.Add(new InjuryLocation(rdr.GetInt32(6), rdr.GetString(7)));
+                        if (!rdr.IsDBNull(6) && !rdr.IsDBNull(7))
+                        {
+                            userInjuries[currentUserInjury].InjuryLocations.Add(new InjuryLocation(rdr.GetInt32(6), rdr.GetString(7)));
+                        }
 
                     }
                     else
                     {
-                        userInjuries[currentUserInjury].InjuryLocations.Add(new InjuryLocation(rdr.GetInt32(6), rdr.GetString(7)));
+                        if (!rdr.IsDBNull(6) && !rdr.IsDBNull(7))
+                        {
+                            userInjuries[currentUserInjury].InjuryLocations.Add(new InjuryLocation(rdr.GetInt32(6), rdr.GetString(7)));
+                        }
                     }
                 }
 
@@ -145,11 +153,11 @@ namespace AgingPopulationFitness.Server
             //responseInjuryLocations = GetInjuriesCall();
             for (int i = 0; i < responseInjuryLocations.Count; i++)
             {
-                Console.WriteLine(responseInjuryLocations[i].InjuryLocationId + responseInjuryLocations[i].BodyPart);
+                //Console.WriteLine(responseInjuryLocations[i].InjuryLocationId + responseInjuryLocations[i].BodyPart);
 
             }
             string jsonString = JsonSerializer.Serialize<List<InjuryLocation>>( responseInjuryLocations);
-            Console.WriteLine("json String: " + jsonString);
+            //Console.WriteLine("json String: " + jsonString);
             return jsonString;
         }
 
@@ -161,13 +169,27 @@ namespace AgingPopulationFitness.Server
             return success;
         }
 
+        [HttpPost("update")]
+        public async Task<ActionResult<bool>> UpdateUserInjury(UserInjury userInjury)
+        {
+            bool deleteSuccess = false;
+            bool updateSuccess = false;
+            deleteSuccess = await Task.Run(() => DeleteUserInjuryHelper(userInjury));
+            if (deleteSuccess)
+            {
+                updateSuccess = await Task.Run(() => PostUserInjuryHelper(userInjury));
+            }
+            return updateSuccess;
+        }
+
+
         [HttpPost("delete")]
         public async Task<ActionResult<bool>> DeleteUserInjury(UserInjury userInjury)
         {
-            bool success = false;
+            bool success = true;
 
             userInjury.PrintUserInjury();
-            //success = await Task.Run(() => DeleteUserInjuryHelper(userInjury));
+            success = await Task.Run(() => DeleteUserInjuryHelper(userInjury));
             return success;
         }
 
@@ -194,7 +216,7 @@ namespace AgingPopulationFitness.Server
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
-            var sql = "DELETE FROM user_injury" +
+            var sql = "DELETE FROM user_injury " +
                 "WHERE user_uid = @user_uid AND user_injury_id = @injury_id";
 
 
@@ -315,7 +337,7 @@ namespace AgingPopulationFitness.Server
 
             cmd.Parameters.AddWithValue("user_injury_id", userInjuryId);
             cmd.Parameters.AddWithValue("injury_location_id", injuryLocationId);
-            Console.WriteLine("adding injury loc: " + userInjuryId + " " + injuryLocationId);
+            //Console.WriteLine("adding injury loc: " + userInjuryId + " " + injuryLocationId);
 
             cmd.ExecuteNonQuery();
         }

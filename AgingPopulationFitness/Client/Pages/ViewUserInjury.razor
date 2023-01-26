@@ -6,10 +6,11 @@
 @inject HttpClient HttpClient;
 @inject UserState UserState;
 @inject NavigationManager NavigationManager
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 
 
 
-<form class="dialog-body">
+<div class="dialog-body">
     <h3>@userInjury.InjuryName</h3>
     <div class="user-injury-form-field">
         <label>Name:</label>
@@ -63,24 +64,52 @@
         }
     </div>
     <div class="update-delete-injury">
-        <button>Update Injury</button>
-        <button  @onclick="DeleteUserInjury">Delete Injury</button>s
+        <button @onclick="UpdateUserInjury">Update Injury</button>
+        <button  @onclick="DeleteUserInjury">Delete Injury</button>
     </div>
 
-</form>
+</div>
 
 @code {
     [Parameter] public int injuryId { get; set; }
+
+    [CascadingParameter(Name = "UpdateMenuOnLogIn")] public EventCallback UpdateMenuOnLogIn { get; set; }
+    [CascadingParameter(Name = "UpdateMenuOnRefresh")] public EventCallback UpdateMenuOnRefresh { get; set; }
 
     public UserInjury userInjury = new UserInjury();
     public List<InjuryLocation> injuryLocations = new List<InjuryLocation>();
     public InjuryLocation injuryLocation = new InjuryLocation();
 
     bool successfullyDeleted = false;
+    bool successfullyUpdated = false;
 
     protected override async Task OnInitializedAsync()
     {
         injuryLocations = await UserClient.GetInjuries();
+
+        if (await sessionStorage.ContainKeyAsync("UserId"))
+        {
+
+            await UserState.Refresh(sessionStorage);
+            await UpdateMenuOnRefresh.InvokeAsync();
+        }
+
+        //populate UserState with the users injuries
+        if (UserState.userProfile.UserId != null)
+        {
+            try
+            {
+                //Console.WriteLine("Injuries razor " + UserState.userProfile.UserId);
+                //UserClient.GetUsersInjuries(UserState.userProfile.UserId);
+                UserState.userInjuries = await UserClient.GetUsersInjuries(UserState.userProfile.UserId);
+
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
 
         for( int i = 0; i < UserState.userInjuries.Count; i++)
         {
@@ -98,7 +127,14 @@
                 userInjury = UserState.userInjuries[i];
             }
         }
-        
+
+        if (await sessionStorage.ContainKeyAsync("UserId"))
+        {
+
+            await UserState.Refresh(sessionStorage);
+            await UpdateMenuOnRefresh.InvokeAsync();
+        }
+
 
     }
 
@@ -126,12 +162,28 @@
     async void DeleteUserInjury()
     {
         //userInjury.PrintUserInjury();
-        /*
-        successfullyDeleted = await UserClient.PostUserInjury(userInjury);
+
+        successfullyDeleted = await UserClient.DeleteUserInjury(userInjury);
+        Console.Write("successfullyDelted: ");
+        Console.WriteLine(successfullyDeleted);
         if (successfullyDeleted)
         {
-            NavigationManager.NavigateTo("/injuries");
+            NavigationManager.NavigateTo("/injuries-page");
         }
-        */
+        
+    }
+
+    async void UpdateUserInjury()
+    {
+        //userInjury.PrintUserInjury();
+
+        successfullyUpdated = await UserClient.UpdateUserInjury(userInjury);
+        Console.Write("successfullyUpdated: ");
+        Console.WriteLine(successfullyDeleted);
+        if (successfullyUpdated)
+        {
+            NavigationManager.NavigateTo("/injuries-page");
+        }
+
     }
 }

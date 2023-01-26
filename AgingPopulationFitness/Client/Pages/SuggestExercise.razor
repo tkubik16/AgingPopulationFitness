@@ -3,6 +3,7 @@
 @using System.Collections.Generic
 @inject HttpClient HttpClient
 @inject UserClient UserClient
+@inject ExerciseClient ExerciseClient
 @inject InjuryState InjuryState
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
@@ -13,7 +14,7 @@
 
 
 
-<form class="suggest-exercise-form">
+<div class="suggest-exercise-form">
     <div class="dialog-body-input">
         <label>Exercise Name:</label>
         <div>
@@ -23,13 +24,13 @@
     <div class="dialog-body-input">
         <label>Exercise Description:</label>
         <div>
-            <input type="text" @bind="suggestedExercise.Exercise.ExerciseDescription" />
+            <textarea rows="5" cols="45" style="resize: none;" @bind="suggestedExercise.Exercise.ExerciseDescription" />
         </div>
     </div>
     <div class="dialog-body-input">
         <label>Exercise Instructions:</label>
         <div>
-            <input type="text" @bind="suggestedExercise.Exercise.ExerciseInstructions" />
+            <textarea rows="5" cols="45" style="resize: none;" @bind="suggestedExercise.Exercise.ExerciseInstructions" />
         </div>
     </div>
     <div class="dialog-body-input">
@@ -41,7 +42,7 @@
     <div class="dialog-body-input">
         <label>Exercise Main Image:</label>
         <div>
-            <InputFile accept="file/jpeg" OnChange="@RunFileConversion"/>
+            <InputFile accept=".JPG, .PNG" OnChange="@RunFileConversion"/>
         </div>
     </div>
     <div class="dialog-body-input">
@@ -56,6 +57,35 @@
                 }
             </select>
         </div>
+    </div>
+    <div class="dialog-body-input">
+        <label>Add Exercise Benefits: </label>
+        @if (benefits == null)
+        {
+            <select class="custom-select" disabled>
+                <option>(loading...)</option>
+            </select>
+        }
+        else
+        {
+            <select class="custom-select" @onchange="BenefitSelected">
+                <option value="-1" disabled selected>(select)</option>
+                @for (var i = 0; i < benefits.Count; i++)
+                {
+
+                    <option value="@i">@i @benefits[i].BenefitId @benefits[i].BenefitName </option>
+                }
+            </select>
+        }
+    </div>
+    <div class="injuries">
+        @foreach (var benefit in suggestedExercise.Exercise.Benefits)
+        {
+            <div class="injury">
+                @benefit.BenefitName
+                <button type="button" class="delete-injury" @onclick="@(() => RemoveBenefit(benefit))">x</button>
+            </div>
+        }
     </div>
     <div class="dialog-body-input">
         <label>Add Injury Location it would aggravate: </label>
@@ -87,7 +117,10 @@
             </div>
         }
     </div>
-</form>
+    <div>
+        <button @onclick="PrintExeciseSuggestion">Print Exercise</button>
+    </div>
+</div>
 @if (Image != string.Empty)
 {
     <div class="image-preview">
@@ -98,6 +131,7 @@
 @code {
     public string Image = string.Empty;
     public List<InjuryLocation> injuryLocations = new List<InjuryLocation>();
+    public List<Benefit> benefits = new List<Benefit>();
     public SuggestedExercise suggestedExercise = new SuggestedExercise();
     public List<string> ExerciseTypes = new List<string>()
     {
@@ -107,10 +141,12 @@
         "Cable",
         "Machine"
     };
+    public bool success = false;
 
     protected override async Task OnInitializedAsync()
     {
         injuryLocations = await UserClient.GetInjuries();
+        benefits = await ExerciseClient.GetBenefits();
         if (UserState.userProfile != null)
         {
             if (UserState.userProfile.UserId != null)
@@ -149,6 +185,27 @@
         suggestedExercise.Exercise.InjuryLocations.RemoveAll(pt => pt.BodyPart == injuryLocation.BodyPart);
     }
 
+    void BenefitSelected(ChangeEventArgs e)
+    {
+        if (int.TryParse((string)e.Value, out var index) && index >= 0)
+        {
+            AddBenefit(benefits[index]);
+        }
+    }
+
+    void AddBenefit(Benefit benefit)
+    {
+        if (suggestedExercise.Exercise.Benefits.Find(pt => pt.BenefitName == benefit.BenefitName) == null)
+        {
+            suggestedExercise.Exercise.Benefits.Add(new Benefit(benefit.BenefitId, benefit.BenefitName));
+        }
+    }
+
+    void RemoveBenefit(Benefit benefit)
+    {
+        suggestedExercise.Exercise.Benefits.RemoveAll(pt => pt.BenefitName == benefit.BenefitName);
+    }
+
 
     private async Task RunFileConversion(InputFileChangeEventArgs e)
     {
@@ -168,6 +225,20 @@
         Image = string.Format("data:image/jpeg;base64,{0}", Convert.ToBase64String(suggestedExercise.Exercise.ExerciseMainImage));
         StateHasChanged();
 
+    }
+
+    private async void PrintExeciseSuggestion()
+    {
+        /*
+        Console.WriteLine("~~~~~~~~~~~");
+        Console.WriteLine(suggestedExercise.UserId);
+        Console.WriteLine(suggestedExercise.Exercise.ExerciseName);
+        Console.WriteLine(suggestedExercise.Exercise.ExerciseDescription);
+        Console.WriteLine(suggestedExercise.Exercise.ExerciseInstructions);
+        Console.WriteLine(suggestedExercise.Exercise.ExerciseType);
+        Console.WriteLine(suggestedExercise.Exercise.ExerciseLink);
+        */
+        success = await ExerciseClient.PostSuggestedExercise(suggestedExercise);
     }
 
 }

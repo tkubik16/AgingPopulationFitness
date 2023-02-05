@@ -14,14 +14,19 @@ namespace AgingPopulationFitness
     {
         public int BenefitId { get; set; }
         public string BenefitName { get; set; }
+        public string BenefitSpecificity { get; set; }
 
 
-        public Benefit() { }
+        public Benefit() {
+            BenefitId = -1;
+            BenefitName = string.Empty;
+            BenefitSpecificity = string.Empty;
+        }
         public Benefit(int BenefitId, string BenefitName)
         {
             this.BenefitId = BenefitId;
             this.BenefitName = BenefitName;
-
+            this.BenefitSpecificity = string.Empty;
         }
 
     }

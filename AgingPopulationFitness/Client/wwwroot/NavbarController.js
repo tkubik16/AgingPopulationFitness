@@ -13,3 +13,13 @@ function closeNav() {
     document.getElementById("open-nav-button-mobile").style.display = "block";
     // test
 }
+
+function setBenefitSelectExerciseFilter( value) {
+    const $select = document.querySelector('#SelectBenefitExerciseFilter');
+    $select.value = value;
+}
+
+function setTypeSelectExerciseFilter(value) {
+    const $select = document.querySelector('#SelectTypeExerciseFilter');
+    $select.value = value;
+}

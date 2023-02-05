@@ -3,6 +3,7 @@
 @inject NavigationManager Navigation;
 @inject HttpClient HttpClient
 @inject UserClient UserClient
+@inject ExerciseFilterState ExerciseFilterState
 @inject IJSRuntime JSRuntime
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 
@@ -15,9 +16,17 @@ This section will eventually be used to describe the purpose
 of this project as well as disclaimers
 
 
-@if (UserState.userProfile != null)
+
+
+@if (UserState.userProfile.UserId.HasValue )
 {
-    <h2>@UserState.userProfile.UserId</h2>
+    <h2>Welcome,</h2>
+    <h2>@UserState.userProfile.Username</h2>
+    <InjuryLocations></InjuryLocations>
+    <label>Exercise Benefit:</label>
+    <div>@ExerciseFilterState.ExerciseFilter.benefit.BenefitName</div>
+    <div>@ExerciseFilterState.ExerciseFilter.ExcludeBasedOnInjuries</div>
+    <div>@ExerciseFilterState.benefitSelectValue</div>
 }
 
 
@@ -48,10 +57,15 @@ of this project as well as disclaimers
         }
         if (await sessionStorage.GetItemAsStringAsync("UserId") != null)
         {
-            
+
             await UserState.Refresh( sessionStorage);
             await UpdateMenuOnRefresh.InvokeAsync();
+            UserState.injuryLocations = await UserClient.GetUsersInjuryLocations(UserState.userProfile.UserId);
+            StateHasChanged();
+            Console.Write("injuryLcoations list length: ");
+            Console.WriteLine(UserState.injuryLocations.Count);
         }
+
 
     }
 }

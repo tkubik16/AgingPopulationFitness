@@ -53,7 +53,7 @@
                 @for (var i = 0; i < ExerciseTypes.Count; i++)
                 {
 
-                    <option value="@i">@i @ExerciseTypes[i] </option>
+                    <option value="@i">@i @ExerciseTypes[i].Type @ExerciseTypes[i].ExerciseTypeId</option>
                 }
             </select>
         </div>
@@ -73,7 +73,7 @@
                 @for (var i = 0; i < benefits.Count; i++)
                 {
 
-                    <option value="@i">@i @benefits[i].BenefitId @benefits[i].BenefitName </option>
+                    <option value="@i">@i @benefits[i].BenefitId @benefits[i].BenefitName @benefits[i].BenefitSpecificity</option>
                 }
             </select>
         }
@@ -133,20 +133,15 @@
     public List<InjuryLocation> injuryLocations = new List<InjuryLocation>();
     public List<Benefit> benefits = new List<Benefit>();
     public SuggestedExercise suggestedExercise = new SuggestedExercise();
-    public List<string> ExerciseTypes = new List<string>()
-    {
-        "Cardio",
-        "Free Weight",
-        "Body Weight",
-        "Cable",
-        "Machine"
-    };
+    public List<ExerciseType> ExerciseTypes = new List<ExerciseType>();
     public bool success = false;
 
     protected override async Task OnInitializedAsync()
     {
         injuryLocations = await UserClient.GetInjuries();
         benefits = await ExerciseClient.GetBenefits();
+        ExerciseTypes = await ExerciseClient.GetExerciseTypes();
+
         if (UserState.userProfile != null)
         {
             if (UserState.userProfile.UserId != null)
@@ -160,7 +155,7 @@
     {
         if (int.TryParse((string)e.Value, out var index) && index >= 0)
         {
-            suggestedExercise.Exercise.ExerciseType = ExerciseTypes[index];
+            suggestedExercise.Exercise.ExerciseType = ExerciseTypes[index].Type;
         }
     }
 
@@ -221,7 +216,7 @@
     public void ConvertToImages()
     {
 
-        Console.WriteLine(Convert.ToBase64String(suggestedExercise.Exercise.ExerciseMainImage));
+        //Console.WriteLine(Convert.ToBase64String(suggestedExercise.Exercise.ExerciseMainImage));
         Image = string.Format("data:image/jpeg;base64,{0}", Convert.ToBase64String(suggestedExercise.Exercise.ExerciseMainImage));
         StateHasChanged();
 
@@ -229,7 +224,7 @@
 
     private async void PrintExeciseSuggestion()
     {
-        /*
+        
         Console.WriteLine("~~~~~~~~~~~");
         Console.WriteLine(suggestedExercise.UserId);
         Console.WriteLine(suggestedExercise.Exercise.ExerciseName);
@@ -237,7 +232,9 @@
         Console.WriteLine(suggestedExercise.Exercise.ExerciseInstructions);
         Console.WriteLine(suggestedExercise.Exercise.ExerciseType);
         Console.WriteLine(suggestedExercise.Exercise.ExerciseLink);
-        */
+        Console.WriteLine(suggestedExercise.Exercise.Benefits.Count);
+        Console.WriteLine(suggestedExercise.Exercise.InjuryLocations.Count);
+        
         success = await ExerciseClient.PostSuggestedExercise(suggestedExercise);
     }
 

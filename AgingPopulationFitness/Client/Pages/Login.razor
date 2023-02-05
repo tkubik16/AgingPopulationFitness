@@ -102,6 +102,9 @@
         await sessionStorage.SetItemAsync("Username", fullUserProfile.Username);
         await sessionStorage.SetItemAsync("Password", fullUserProfile.Password);
         await sessionStorage.SetItemAsync("IsLoggedIn", true);
+        UserState.injuryLocations = await UserClient.GetUsersInjuryLocations(UserState.userProfile.UserId);
+        Console.Write("injuryLcoations list length: ");
+        Console.WriteLine(UserState.injuryLocations.Count);
 
         await UpdateMenuOnLogIn.InvokeAsync();
         if (UserState.isLoggedIn)

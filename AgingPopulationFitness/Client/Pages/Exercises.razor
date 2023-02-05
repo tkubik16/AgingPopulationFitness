@@ -10,17 +10,32 @@
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 @using SixLabors.ImageSharp;
 
-<ul class="exercise-cards">
-    @for( int i = 0; i < allExercises.Count; i++)
+<div>
+    <ExerciseFilterDialog></ExerciseFilterDialog>
+</div>
+
+@if (allExercises == null)
+{
+    <div class="spinner"></div>
+}
+@if (allExercises != null)
+{
+    @if (allExercises.Count == 0)
     {
-        <li>
-            <div class="exercise-info">
-                <h3>@allExercises[i].ExerciseName</h3>
-                <img class="exercise-main-img" src="@allExerciseImages[i]" alt="default" />
-            </div>
-        </li>    
+        <h1 class="no-cards-message">Database returned 0 exercises based on your search.</h1>
     }
-</ul>
+}
+@if (allExercises != null)
+{
+    <div class="exercise-cards">
+        @for (int i = 0; i < allExercises.Count; i++)
+        {
+            <div class="exercise-card-component">
+                <ExerciseCard exercise="allExercises[i]"></ExerciseCard>
+            </div>
+        }
+    </div>
+}
 
 
 
@@ -29,7 +44,7 @@
     [CascadingParameter(Name = "UpdateMenuOnLogIn")] public EventCallback UpdateMenuOnLogIn { get; set; }
     [CascadingParameter(Name = "UpdateMenuOnRefresh")] public EventCallback UpdateMenuOnRefresh { get; set; }
 
-    public List<Exercise> allExercises = new List<Exercise>();
+    public List<Exercise> allExercises;
     public List<string> allExerciseImages = new List<string>();
 
     protected override async Task OnInitializedAsync()

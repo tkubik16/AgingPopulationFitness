@@ -82,6 +82,64 @@ namespace AgingPopulationFitness.Server
             return responseBenefits;
         }
 
+        [HttpGet("benefits/general")]
+        public async Task<List<Benefit>> GetGeneralBenefits()
+        {
+            List<Benefit> responseBenefits = new List<Benefit>();
+
+            responseBenefits = await Task.Run(() => GetGeneralBenefitsCall());
+
+
+            return responseBenefits;
+        }
+
+        [HttpGet("types")]
+        public async Task<List<ExerciseType>> GetTypes()
+        {
+            List<ExerciseType> responseTypes = new List<ExerciseType>();
+
+            responseTypes = await Task.Run(() => GetTypesCall());
+
+
+            return responseTypes;
+        }
+
+        public List<ExerciseType> GetTypesCall()
+        {
+            List<ExerciseType> types = new List<ExerciseType>();
+
+
+
+
+            var cs = "host=" + DatabaseCredentials.Host + ";" +
+                "Username=" + DatabaseCredentials.Username + ";" +
+                "Password=" + DatabaseCredentials.Password + ";" +
+                "Database=" + DatabaseCredentials.Database + "";
+
+            using var con = new NpgsqlConnection(cs);
+            con.Open();
+
+            var sql = "SELECT * FROM exercise_type " +
+                "ORDER BY exercise_type ASC";
+
+
+            using var cmd = new NpgsqlCommand(sql, con);
+
+
+            using NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+            while (rdr.Read())
+            {
+                ExerciseType type = new ExerciseType();
+                type.ExerciseTypeId = rdr.GetInt32(0);
+                type.Type = rdr.GetString(1);
+                //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
+                types.Add(type);
+            }
+
+            return types;
+        }
+
         public List<Benefit> GetBenefitsCall()
         {
             List<Benefit> benefits = new List<Benefit>();
@@ -110,6 +168,44 @@ namespace AgingPopulationFitness.Server
                 Benefit benefit = new Benefit();
                 benefit.BenefitId = rdr.GetInt32(0);
                 benefit.BenefitName = rdr.GetString(1);
+                benefit.BenefitSpecificity = rdr.GetString(2);
+                //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
+                benefits.Add(benefit);
+            }
+
+            return benefits;
+        }
+
+        public List<Benefit> GetGeneralBenefitsCall()
+        {
+            List<Benefit> benefits = new List<Benefit>();
+
+
+
+
+            var cs = "host=" + DatabaseCredentials.Host + ";" +
+                "Username=" + DatabaseCredentials.Username + ";" +
+                "Password=" + DatabaseCredentials.Password + ";" +
+                "Database=" + DatabaseCredentials.Database + "";
+
+            using var con = new NpgsqlConnection(cs);
+            con.Open();
+
+            var sql = "SELECT * FROM benefit " +
+                "WHERE benefit.benefit_specificity = 'General'";
+
+
+            using var cmd = new NpgsqlCommand(sql, con);
+
+
+            using NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+            while (rdr.Read())
+            {
+                Benefit benefit = new Benefit();
+                benefit.BenefitId = rdr.GetInt32(0);
+                benefit.BenefitName = rdr.GetString(1);
+                benefit.BenefitSpecificity = rdr.GetString(2);
                 //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
                 benefits.Add(benefit);
             }

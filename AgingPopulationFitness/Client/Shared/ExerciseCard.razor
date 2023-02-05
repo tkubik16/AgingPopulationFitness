@@ -1,0 +1,35 @@
+﻿@using AgingPopulationFitness.Shared;
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@inject UserClient UserClient;
+@inject HttpClient HttpClient;
+@inject UserState UserState;
+
+<body>
+    <div class="exercise-card">
+      <div class="exercise-main-img-div">
+            <img class="exercise-main-img" src="@image" alt="@exercise.ExerciseName" />
+      </div>
+      <div class="all-exercise-info">
+          <div class="exercise-name">@exercise.ExerciseName</div>
+          <div class="exercise-info">
+            <div class="exercise-type">@exercise.ExerciseType</div>
+            <button class="exercise-link-btn">View on Google</button>
+          </div>
+      </div>
+      
+    </div>
+</body>
+
+
+@code {
+    [Parameter] public Exercise exercise { get; set; }
+    public string image = null;
+
+    // <img class="exercise-main-img" src="@image" alt="@exercise.ExerciseName" />
+
+    protected override async Task OnInitializedAsync()
+    {
+        image = string.Format("data:image/jpeg;base64,{0}", Convert.ToBase64String(exercise.ExerciseMainImage) );
+    }
+}

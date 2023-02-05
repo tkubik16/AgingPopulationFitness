@@ -42,6 +42,15 @@ namespace AgingPopulationFitness.Client
 
         }
 
+        public async Task<List<InjuryLocation>> GetUsersInjuryLocations(Guid? userUid)
+        {
+
+            var userInjuryLocations = await httpClient.GetFromJsonAsync($"injuries/locations/{userUid}", InjuryLocationContext.Default.ListInjuryLocation);
+            return userInjuryLocations;
+
+
+        }
+
         public async Task<bool> PostUserInjury( UserInjury userInjury)
         {
             var response = await httpClient.PostAsJsonAsync($"injuries", userInjury, InjuryLocationContext.Default.UserInjury);

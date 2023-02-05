@@ -1,0 +1,113 @@
+﻿
+.exercise-card {
+    display: flex;
+    flex-direction: row;
+    padding: 0.5rem;
+    width: 75%;
+    height: 10rem;
+    margin: auto;
+    justify-content: space-between;
+    border-style: solid;
+    border-color: blue;
+}
+
+.exercise-main-img-div {
+    flex: none;
+    border-style: solid;
+    border-color: pink;
+}
+
+.exercise-main-img {
+    display: inline;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+}
+
+.all-exercise-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 90%;
+    border-style: solid;
+    border-color: pink;
+}
+
+.exercise-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+
+}
+
+.exercise-name {
+
+    font-size: 1.5rem;
+    align-self: center;
+    margin-left: 1rem;
+    border-style: solid;
+    border-color: red;
+}
+
+.exercise-link-btn {
+    background-color: var(--clr-black);
+    color: var(--clr-white);
+    border-radius: .25rem;
+    border-width: 0;
+    box-sizing: border-box;
+    text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    text-align: center;
+    justify-content: center;
+    transition: transform .2s;
+}
+
+    .exercise-link-btn:hover {
+        text-shadow: rgba(0, 0, 0, .8) 2px 2px 2px;
+        transform: scale(1.1);
+    }
+
+
+.exercise-type {
+    font-size: 1.25rem;
+    border-style: solid;
+    border-color: red;
+}
+
+@media screen and (max-width: 641px) {
+
+    .exercise-card {
+        width: 100%;
+        height: fit-content;
+        padding: 1rem;
+    }
+
+    .exercise-name {
+        font-size: 1.5rem;
+        width: 100%;
+        margin-left: 0;
+        padding: 0.25rem
+    }
+
+    .exercise-type {
+        font-size: 1rem;
+    }
+    .all-exercise-info {
+        flex-direction: column;
+    }
+
+    .exercise-link-btn {
+        font-size: 1rem;
+    }
+
+    .exercise-main-img {
+        width: 8rem;
+        height: 8rem;
+        object-fit: scale-down;
+        overflow: hidden;
+    }
+
+}
+

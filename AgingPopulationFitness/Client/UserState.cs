@@ -10,9 +10,12 @@ namespace AgingPopulationFitness.Client
 
         public List<UserInjury> userInjuries { get; set; }
 
+        public List<InjuryLocation> injuryLocations { get; set; }
+
         public UserState()
         {
             userProfile = new UserProfile();
+            injuryLocations = new List<InjuryLocation>();
             isLoggedIn = false;
         }
 

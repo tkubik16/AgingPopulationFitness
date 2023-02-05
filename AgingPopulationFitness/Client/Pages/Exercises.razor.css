@@ -1,4 +1,15 @@
-﻿.exercise-main-img {
-    width: 10rem;
-    height: 10rem;
+﻿.exercise-cards {
+    display: flex;
+    flex-direction: column;
+
+
+    border-style: solid;
+    border-color: aqua;
+}
+
+.exercise-card-component {
+    display: flex;
+    flex-direction: column;
+    border-style: solid;
+    border-color: pink;
 }

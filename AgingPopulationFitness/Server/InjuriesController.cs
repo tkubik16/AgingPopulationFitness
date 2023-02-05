@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using AgingPopulationFitness;
+using AgingPopulationFitness.Client.Shared;
 using AgingPopulationFitness.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -54,6 +56,68 @@ namespace AgingPopulationFitness.Server
             }
             return responseUserInjuries;
             
+        }
+
+        [HttpGet("locations/{userUid}")]
+        public async Task<List<InjuryLocation>> GetUsersInjuryLocations(Guid userUid)
+        {
+            List<InjuryLocation> responseUserInjuryLocations = new List<InjuryLocation>();
+
+            responseUserInjuryLocations = await Task.Run(() => GetUsersInjuryLocationsCall(userUid));
+
+
+            return responseUserInjuryLocations;
+
+        }
+
+        public List<InjuryLocation> GetUsersInjuryLocationsCall(Guid userUid)
+        {
+            List<InjuryLocation> userInjuryLocations = new List<InjuryLocation>();
+
+            var cs = "host=" + DatabaseCredentials.Host + ";" +
+                "Username=" + DatabaseCredentials.Username + ";" +
+                "Password=" + DatabaseCredentials.Password + ";" +
+                "Database=" + DatabaseCredentials.Database + "";
+
+            using var con = new NpgsqlConnection(cs);
+            con.Open();
+
+            var sql = "SELECT injury_location.injury_location_id, injury_location.body_part FROM user_injury " +
+                        "FULL JOIN user_injury_injury_location " +
+                        "ON user_injury.user_injury_id = user_injury_injury_location.user_injury_id " +
+                        "FULL JOIN injury_location " +
+                        "ON user_injury_injury_location.injury_location_id = injury_location.injury_location_id " +
+                        "WHERE user_uid = @UserUid " +
+                        "GROUP BY injury_location.body_part, injury_location.injury_location_id " +
+                        "ORDER BY injury_location.body_part";
+
+            using var cmd = new NpgsqlCommand(sql, con);
+
+            cmd.Parameters.AddWithValue("UserUid", userUid);
+
+
+
+            try
+            {
+                using NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    InjuryLocation injuryLocation = new InjuryLocation();
+                    injuryLocation.InjuryLocationId = rdr.GetInt32(0);
+                    injuryLocation.BodyPart = rdr.GetString(1);
+                    userInjuryLocations.Add(injuryLocation);
+                }
+
+
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            return userInjuryLocations;
+
         }
 
         public List<UserInjury> GetUsersInjuriesCall( Guid userUid)
@@ -172,14 +236,20 @@ namespace AgingPopulationFitness.Server
         [HttpPost("update")]
         public async Task<ActionResult<bool>> UpdateUserInjury(UserInjury userInjury)
         {
-            bool deleteSuccess = false;
-            bool updateSuccess = false;
-            deleteSuccess = await Task.Run(() => DeleteUserInjuryHelper(userInjury));
-            if (deleteSuccess)
+            bool updateInjurySuccess = false;
+            bool updateInjuryLocationsSuccess = false;
+            bool deleteInjuryLocationsSuccess = false;
+
+            updateInjurySuccess = await Task.Run(() => UpdateUserInjuryHelper(userInjury));
+            if (updateInjurySuccess)
             {
-                updateSuccess = await Task.Run(() => PostUserInjuryHelper(userInjury));
+                deleteInjuryLocationsSuccess = await Task.Run(() => DeleteUserInjuryInjuryLocationsHelper(userInjury));
             }
-            return updateSuccess;
+            if (deleteInjuryLocationsSuccess)
+            {
+                updateInjuryLocationsSuccess = await Task.Run(() => AddAllInjuryLocations(userInjury));
+            }
+            return updateInjurySuccess;
         }
 
 
@@ -191,6 +261,105 @@ namespace AgingPopulationFitness.Server
             userInjury.PrintUserInjury();
             success = await Task.Run(() => DeleteUserInjuryHelper(userInjury));
             return success;
+        }
+
+        public bool DeleteUserInjuryInjuryLocationsHelper(UserInjury userInjury)
+        {
+            if (userInjury == null)
+            {
+                return false;
+            }
+            if (userInjury.InjuryId == null)
+            {
+                return false;
+            }
+            if (userInjury.UserId == null)
+            {
+                return false;
+            }
+
+            var cs = "host=" + DatabaseCredentials.Host + ";" +
+                "Username=" + DatabaseCredentials.Username + ";" +
+                "Password=" + DatabaseCredentials.Password + ";" +
+                "Database=" + DatabaseCredentials.Database + "";
+
+            using var con = new NpgsqlConnection(cs);
+            con.Open();
+
+            var sql = "DELETE FROM user_injury_injury_location " +
+                "WHERE user_injury_id = @user_injury_id ";
+
+
+            using var cmd = new NpgsqlCommand(sql, con);
+
+            cmd.Parameters.AddWithValue("user_injury_id", userInjury.InjuryId);
+            cmd.Prepare();
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            return false;
+
+        }
+
+        public bool UpdateUserInjuryHelper(UserInjury userInjury)
+        {
+            if (userInjury == null)
+            {
+                return false;
+            }
+            if (userInjury.InjuryId == null)
+            {
+                return false;
+            }
+            if (userInjury.UserId == null)
+            {
+                return false;
+            }
+
+            var cs = "host=" + DatabaseCredentials.Host + ";" +
+                "Username=" + DatabaseCredentials.Username + ";" +
+                "Password=" + DatabaseCredentials.Password + ";" +
+                "Database=" + DatabaseCredentials.Database + "";
+
+            using var con = new NpgsqlConnection(cs);
+            con.Open();
+
+            var sql = "UPDATE user_injury " +
+                "SET user_injury_name = @user_injury_name, " +
+                "user_injury_description = @user_injury_description, " +
+                "user_injury_severity = @user_injury_severity, " +
+                "user_injury_date = @user_injury_date " +
+                "WHERE user_uid = @user_uid AND user_injury_id = @injury_id";
+
+
+            using var cmd = new NpgsqlCommand(sql, con);
+
+            cmd.Parameters.AddWithValue("injury_id", userInjury.InjuryId);
+            cmd.Parameters.AddWithValue("user_uid", userInjury.UserId);
+            cmd.Parameters.AddWithValue("user_injury_name", userInjury.InjuryName);
+            cmd.Parameters.AddWithValue("user_injury_description", userInjury.InjuryDescription);
+            cmd.Parameters.AddWithValue("user_injury_severity", userInjury.InjurySeverity);
+            cmd.Parameters.AddWithValue("user_injury_date", userInjury.InjuryDate);
+            cmd.Prepare();
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            return false;
+
         }
 
         public bool DeleteUserInjuryHelper(UserInjury userInjury)

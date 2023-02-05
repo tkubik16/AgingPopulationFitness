@@ -1,0 +1,97 @@
+﻿@using AgingPopulationFitness.Shared;
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@inject UserClient UserClient;
+@inject HttpClient HttpClient;
+@inject ExerciseClient ExerciseClient;
+@inject UserState UserState;
+@inject ExerciseFilterState ExerciseFilterState;
+@inject IJSRuntime JSRuntime
+
+
+<div >
+    <div >
+        <div >
+            <label>Exercise Benefit:</label>
+            <div>
+                <select class="custom-select" id="SelectBenefitExerciseFilter" @onchange="ExerciseBenefitSelected">
+                    <option value="-1" >All</option>
+                    @for (var i = 0; i < ExerciseBenefits.Count; i++)
+                    {
+
+                        <option value="@i">@ExerciseBenefits[i].BenefitId @ExerciseBenefits[i].BenefitName </option>
+                    }
+                </select>
+            </div>
+            <label>Exercise Type:</label>
+            <div>
+                <select class="custom-select" id="SelectTypeExerciseFilter" @onchange="ExerciseTypeSelected">
+                    <option value="-1" >All</option>
+                    @for (var i = 0; i < ExerciseTypes.Count; i++)
+                    {
+
+                            <option value="@i">@ExerciseTypes[i].Type @ExerciseTypes[i].ExerciseTypeId</option>
+                    }
+                </select>
+            </div>
+            <label>Filter based on my injuries:</label>
+            <InputCheckbox class="checkbox" @bind-Value=ExerciseFilterState.ExerciseFilter.ExcludeBasedOnInjuries></InputCheckbox>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] public EventCallback OnConfirm { get; set; }
+
+    public List<Benefit> ExerciseBenefits = new List<Benefit>();
+    public List<ExerciseType> ExerciseTypes = new List<ExerciseType>();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        ExerciseBenefits = await ExerciseClient.GetGeneralBenefits();
+        ExerciseTypes = await ExerciseClient.GetExerciseTypes();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Task.Run(() => SetSelectedBenefit());
+        await Task.Run(() => SetSelectedType());
+    }
+
+    void ExerciseBenefitSelected(ChangeEventArgs e)
+    {
+        if (int.TryParse((string)e.Value, out var index) && index >= 0)
+        {
+            ExerciseFilterState.ExerciseFilter.benefit = ExerciseBenefits[index];
+            ExerciseFilterState.benefitSelectValue = (string)e.Value;
+        }
+    }
+
+    void ExerciseTypeSelected(ChangeEventArgs e)
+    {
+        if (int.TryParse((string)e.Value, out var index) && index >= 0)
+        {
+            ExerciseFilterState.ExerciseFilter.exerciseType = ExerciseTypes[index];
+            ExerciseFilterState.typeSelectValue = (string)e.Value;
+        }
+    }
+
+    public async void SetSelectedBenefit()
+    {
+        string value = ExerciseFilterState.benefitSelectValue;
+        await JSRuntime.InvokeVoidAsync("setBenefitSelectExerciseFilter", value);
+        StateHasChanged();
+    }
+
+    public async void SetSelectedType()
+    {
+        string value = ExerciseFilterState.typeSelectValue;
+        await JSRuntime.InvokeVoidAsync("setTypeSelectExerciseFilter", value);
+        StateHasChanged();
+    }
+
+}

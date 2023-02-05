@@ -27,11 +27,25 @@ namespace AgingPopulationFitness.Client
 
         }
 
+        public async Task<List<ExerciseType>> GetExerciseTypes()
+        {
+            var types = await httpClient.GetFromJsonAsync("exercise/types", ExerciseContext.Default.ListExerciseType);
+
+            return types;
+        }
+
         public async Task<List<Benefit>> GetBenefits()
         {
             var benefits = await httpClient.GetFromJsonAsync("exercise/benefits", ExerciseContext.Default.ListBenefit);
             
             return benefits;
+        }
+
+        public async Task<List<Benefit>> GetGeneralBenefits()
+        {
+            var generalBenefits = await httpClient.GetFromJsonAsync("exercise/benefits/general", ExerciseContext.Default.ListBenefit);
+
+            return generalBenefits;
         }
 
         public async Task<bool> PostSuggestedExercise(SuggestedExercise suggestedExercise)

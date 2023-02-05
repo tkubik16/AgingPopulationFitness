@@ -1,0 +1,28 @@
+﻿@using AgingPopulationFitness.Shared;
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@inject UserClient UserClient;
+@inject HttpClient HttpClient;
+@inject UserState UserState;
+
+@if( UserState.injuryLocations.Count != 0){
+    <div class="injuries">
+        <h1>Your Injuries Affect your:</h1>
+        @for (int i = 0; i < UserState.injuryLocations.Count; i++)
+        {
+            <div class="injury">
+                @UserState.injuryLocations[i].BodyPart
+            </div>
+        }
+    </div>
+}
+
+@code {
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+    }
+
+}

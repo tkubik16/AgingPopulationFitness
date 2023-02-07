@@ -7,14 +7,19 @@
 @inject IJSRuntime JS
 @inject InjuryState InjuryState
 @inject UserState UserState
+@inject ExerciseFilterState ExerciseFilterState
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 @using SixLabors.ImageSharp;
 
 <div>
-    <ExerciseFilterDialog></ExerciseFilterDialog>
+    <ExerciseFilterDialog OnSearch="UpdateExercises"></ExerciseFilterDialog>
 </div>
 
 @if (allExercises == null)
+{
+    <div class="spinner"></div>
+}
+@if (searching == true)
 {
     <div class="spinner"></div>
 }
@@ -40,6 +45,18 @@
 
 
 @code {
+    EventCallback OnSearch => EventCallback.Factory.Create(this, UpdateExercises);
+    public bool searching = false;
+
+    public async void UpdateExercises()
+    {
+        searching = true;
+        allExercises = await ExerciseClient.GetAllExercises(ExerciseFilterState.ExerciseFilter);
+        await Task.Run(() => ConvertToImages());
+        searching = false;
+        StateHasChanged();
+
+    }
 
     [CascadingParameter(Name = "UpdateMenuOnLogIn")] public EventCallback UpdateMenuOnLogIn { get; set; }
     [CascadingParameter(Name = "UpdateMenuOnRefresh")] public EventCallback UpdateMenuOnRefresh { get; set; }
@@ -73,19 +90,17 @@
 
             await UserState.Refresh(sessionStorage);
             await UpdateMenuOnRefresh.InvokeAsync();
+
+            
         }
 
         try
         {
-
-            allExercises = await ExerciseClient.GetAllExercises();
+            
+            Console.WriteLine(ExerciseFilterState.ExerciseFilter.ExcludeBasedOnInjuries);
+            allExercises = await ExerciseClient.GetAllExercises(ExerciseFilterState.ExerciseFilter);
             await Task.Run(() => ConvertToImages());
-            for (int i = 0; i < allExercises.Count; i++)
-            {
-
-                Console.WriteLine(allExercises[i].ExerciseName);
-
-            }
+            
 
 
         }
@@ -100,12 +115,14 @@
 
     public void ConvertToImages()
     {
-
-        for(int i = 0; i < allExercises.Count; i++)
-        {
-            allExerciseImages.Add(string.Format("data:image/jpeg;base64,{0}", Convert.ToBase64String( allExercises[i].ExerciseMainImage) ));
-            Console.WriteLine(allExerciseImages[i]);
+        if( allExercises != null){
+            for(int i = 0; i < allExercises.Count; i++)
+            {
+                allExerciseImages.Add(string.Format("data:image/jpeg;base64,{0}", Convert.ToBase64String( allExercises[i].ExerciseMainImage) ));
+                //Console.WriteLine(allExerciseImages[i]);
+            }
         }
     }
+
 
 }

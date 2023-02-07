@@ -17,10 +17,12 @@ namespace AgingPopulationFitness.Client
             this.httpClient = httpClient;
         }
 
-        public async Task<List<Exercise>> GetAllExercises()
+        public async Task<List<Exercise>> GetAllExercises(ExerciseFilter exerciseFilter)
         {
 
-            var exercises = await httpClient.GetFromJsonAsync($"exercise", ExerciseContext.Default.ListExercise);
+            var response = await httpClient.PostAsJsonAsync($"exercise", exerciseFilter, ExerciseContext.Default.ExerciseFilter);
+            response.EnsureSuccessStatusCode();
+            var exercises = await response.Content.ReadFromJsonAsync<List<Exercise>>();
             return exercises;
             
 

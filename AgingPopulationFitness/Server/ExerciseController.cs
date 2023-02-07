@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AgingPopulationFitness;
+using AgingPopulationFitness.Client.Pages;
 using AgingPopulationFitness.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ using Npgsql;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.PixelFormats;
+using System.Collections.Generic;
 
 namespace AgingPopulationFitness.Server
 {
@@ -20,18 +22,21 @@ namespace AgingPopulationFitness.Server
     {
         public DatabaseCredentials databaseCredentials = new DatabaseCredentials();
 
-        [HttpGet]
-        public async Task<List<Exercise>> GetExercises()
+        [HttpPost]
+        public async Task<List<Exercise>> GetExercises( ExerciseFilter exerciseFilter)
         {
             List<Exercise> responseExercises = new List<Exercise>();
 
-            responseExercises = await Task.Run(() => GetAllExercisesCall());
             
+            responseExercises = await Task.Run(() => GetAllExercisesCall( exerciseFilter));
+            
+            
+
 
             return responseExercises;
         }
 
-        public List<Exercise> GetAllExercisesCall()
+        public List<Exercise> GetAllExercisesCall(ExerciseFilter exerciseFilter)
         {
             List<Exercise> exercises = new List<Exercise>();
 
@@ -46,10 +51,45 @@ namespace AgingPopulationFitness.Server
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
-            var sql = "SELECT * FROM exercise";
+            string sql = "SELECT * FROM exercise";
+            if ((exerciseFilter.BenefitsList.Count != 0) && (exerciseFilter.ExerciseTypesList.Count != 0) && (exerciseFilter.ExcludeBasedOnInjuries == false))
+            {
+                sql = "SELECT * FROM exercise " +
+                    "WHERE " +
+                        "exercise.exercise_id NOT IN ( " +
+                            "SELECT exercise_id FROM exercise_injury_location " +
+                            "WHERE injury_location_id IN (-1) " +
+                            "GROUP BY exercise_id " +
+                            ") " +
+                        "AND exercise.exercise_id IN ( " +
+                            "SELECT exercise_id FROM exercise_benefit " +
+                            "WHERE benefit_id = ANY (@benefit_list) " +
+                            "GROUP BY exercise_id " +
+                        ") " +
+                        "AND exercise.exercise_type = ANY (@type_list)";
+            }
 
-
+            
             using var cmd = new NpgsqlCommand(sql, con);
+
+            List<int> benefitIdList = new List<int>();
+            for( int i = 0; i < exerciseFilter.BenefitsList.Count; i++)
+            {
+                benefitIdList.Add(exerciseFilter.BenefitsList[i].BenefitId);
+                Console.WriteLine(exerciseFilter.BenefitsList[i].BenefitName);
+            }
+            List<string> exerciseTypesList = new List<string>();
+            for (int i = 0; i < exerciseFilter.ExerciseTypesList.Count; i++)
+            {
+                exerciseTypesList.Add(exerciseFilter.ExerciseTypesList[i].Type);
+                Console.WriteLine(exerciseFilter.ExerciseTypesList[i].Type);
+            }
+
+            cmd.Parameters.AddWithValue( "benefit_list", benefitIdList.ToArray() ) ;
+            cmd.Parameters.AddWithValue( "type_list", exerciseTypesList.ToArray() ) ;
+            cmd.Prepare();
+            
+            
 
 
             using NpgsqlDataReader rdr = cmd.ExecuteReader();

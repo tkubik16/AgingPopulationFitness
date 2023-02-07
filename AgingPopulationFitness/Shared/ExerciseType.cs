@@ -18,7 +18,12 @@ namespace AgingPopulationFitness
         public ExerciseType()
         {
             ExerciseTypeId = -1;
-            Type = string.Empty;
+            Type = "All";
+        }
+        public ExerciseType(int exerciseTypeId, string type)
+        {
+            ExerciseTypeId = exerciseTypeId;
+            Type = type;
         }
     }
 }

@@ -8,19 +8,20 @@ namespace AgingPopulationFitness.Shared
 {
     public class ExerciseFilter
     {
-        public Benefit benefit { get; set; }
+        public Guid UserId { get; set; }
         
         public bool ExcludeBasedOnInjuries { get; set; }
-        public ExerciseType exerciseType { get; set; }
+        public List<InjuryLocation> InjuryLocations { get; set; }
+        public List<Benefit> BenefitsList { get; set; }
+        public List<ExerciseType> ExerciseTypesList { get; set; }
 
         public ExerciseFilter()
         {
+            UserId = Guid.NewGuid();
             ExcludeBasedOnInjuries = false;
-            benefit = new Benefit();
-            benefit.BenefitId = -1;
-            benefit.BenefitName = "All";
-            benefit.BenefitSpecificity = "All";
-            exerciseType = new ExerciseType();
+            InjuryLocations = new List<InjuryLocation>();
+            BenefitsList = new List<Benefit>();
+            ExerciseTypesList = new List<ExerciseType>();
         }
     }
 }

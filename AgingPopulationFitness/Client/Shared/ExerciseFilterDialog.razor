@@ -11,10 +11,10 @@
 
 <div >
     <div >
-        <div >
-            <label>Exercise Benefit:</label>
-            <div>
-                <select class="custom-select" id="SelectBenefitExerciseFilter" @onchange="ExerciseBenefitSelected">
+        <div class="whole-filter">
+            <div class="benefit-section">
+                <label>Exercise Benefit:</label>
+                <select class="benefit-select" id="SelectBenefitExerciseFilter" @onchange="ExerciseBenefitSelected">
                     <option value="-1" >Select Benefit</option>
                     @for (var i = 0; i < ExerciseBenefits.Count; i++)
                     {
@@ -23,18 +23,18 @@
                     }
                 </select>
             </div>
-            <div>
+            <div class="benefits">
                 @foreach (var benefit in ExerciseFilterState.ExerciseFilter.BenefitsList)
                 {
-                    <div>
+                    <div class="benefit">
                         @benefit.BenefitName
-                        <button type="button" @onclick="@(() => RemoveExerciseBenefit(benefit))">x</button>
+                        <button type="button" class="x-btn" @onclick="@(() => RemoveExerciseBenefit(benefit))">x</button>
                     </div>
                 }
             </div>
-            <label>Exercise Type:</label>
-            <div>
-                <select class="custom-select" id="SelectTypeExerciseFilter" @onchange="ExerciseTypeSelected">
+            <div class="type-selection">
+                <label>Exercise Type:</label>
+                <select class="type-select" id="SelectTypeExerciseFilter" @onchange="ExerciseTypeSelected">
                     <option value="-1" disabled select>Select Type</option>
                     @for (var i = 0; i < ExerciseTypes.Count; i++)
                     {
@@ -43,12 +43,12 @@
                     }
                 </select>
             </div>
-            <div >
+            <div class="types">
                 @foreach (var exerciseType in ExerciseFilterState.ExerciseFilter.ExerciseTypesList)
                 {
-                    <div >
+                    <div class="type">
                         @exerciseType.Type
-                        <button type="button"  @onclick="@(() => RemoveExerciseType(exerciseType))">x</button>
+                        <button class="x-btn" type="button"  @onclick="@(() => RemoveExerciseType(exerciseType))">x</button>
                     </div>
                 }
             </div>
@@ -73,8 +73,15 @@
 
         ExerciseBenefits = await ExerciseClient.GetGeneralBenefits();
         ExerciseTypes = await ExerciseClient.GetExerciseTypes();
-        ExerciseFilterState.ExerciseFilter.BenefitsList = await ExerciseClient.GetGeneralBenefits();
-        ExerciseFilterState.ExerciseFilter.ExerciseTypesList = await ExerciseClient.GetExerciseTypes();
+        if (ExerciseFilterState.ExerciseFilter.BenefitsList.Count == 0)
+        {
+            ExerciseFilterState.ExerciseFilter.BenefitsList = await ExerciseClient.GetGeneralBenefits();
+        }
+        if (ExerciseFilterState.ExerciseFilter.ExerciseTypesList.Count == 0)
+        {
+            ExerciseFilterState.ExerciseFilter.ExerciseTypesList = await ExerciseClient.GetExerciseTypes();
+        }
+        await OnSearch.InvokeAsync();
     }
 
     protected override async Task OnParametersSetAsync()

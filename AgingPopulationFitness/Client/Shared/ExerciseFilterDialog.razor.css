@@ -1,2 +1,62 @@
 ﻿
 
+.benefits {
+    text-align: left;
+    display: block;
+    padding-left: 0.5rem;
+}
+
+.benefit {
+    display: inline-block;
+    background-color: var(--clr-black);
+    color: var(--clr-white);
+    padding: 0.05rem 0.5rem;
+    border-radius: 2rem;
+    margin: 0.2rem 0.1rem;
+    font-weight: 500;
+    font-size: 0.85rem;
+    padding-right: 0;
+    border-style: solid;
+    border-color: var(--clr-black);
+    border-width: 2px;
+    text-transform: uppercase;
+}
+
+.types {
+    text-align: left;
+    display: block;
+    padding-left: 0.5rem;
+}
+
+.type {
+    display: inline-block;
+    background-color: var(--clr-black);
+    color: var(--clr-white);
+    padding: 0.05rem 0.5rem;
+    border-radius: 2rem;
+    margin: 0.2rem 0.1rem;
+    font-weight: 500;
+    font-size: 0.85rem;
+    padding-right: 0;
+    border-style: solid;
+    border-color: var(--clr-black);
+    border-width: 2px;
+    text-transform: uppercase;
+}
+
+.x-btn {
+    border: none;
+    aspect-ratio: 1 / 1;
+    height: 1.5rem;
+    border-radius: 1rem;
+    font-weight: 700;
+    color: var(--clr-black);
+    text-transform: uppercase;
+    margin-left: 0.25rem;
+}
+
+    .x-btn:hover {
+        color: black;
+        background-color: indianred;
+    }
+

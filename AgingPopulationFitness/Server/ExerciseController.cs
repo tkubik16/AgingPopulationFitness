@@ -21,6 +21,14 @@ namespace AgingPopulationFitness.Server
     public class ExerciseController : Controller
     {
         public DatabaseCredentials databaseCredentials = new DatabaseCredentials();
+        public string cs = "host=" + DatabaseCredentials.Host + ";" +
+                "Username=" + DatabaseCredentials.Username + ";" +
+                "Password=" + DatabaseCredentials.Password + ";" +
+                "Database=" + DatabaseCredentials.Database + ";" +
+                "Application Name=" + "ExerciseController" + ";" +
+                "Pooling=" + DatabaseCredentials.Pooling + ";" +
+                "Maximum Pool Size=" + DatabaseCredentials.MaxPoolSize + ";" +
+                "Minimum Pool Size=" + DatabaseCredentials.MinPoolSize + "";
 
         [HttpPost]
         public async Task<List<Exercise>> GetExercises( ExerciseFilter exerciseFilter)
@@ -42,23 +50,23 @@ namespace AgingPopulationFitness.Server
 
 
 
-
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
-
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
             string sql = "SELECT * FROM exercise";
-            if ((exerciseFilter.BenefitsList.Count != 0) && (exerciseFilter.ExerciseTypesList.Count != 0) && (exerciseFilter.ExcludeBasedOnInjuries == false))
-            {
-                sql = "SELECT * FROM exercise " +
+            
+
+            sql = "SELECT * FROM exercise " +
                     "WHERE " +
                         "exercise.exercise_id NOT IN ( " +
                             "SELECT exercise_id FROM exercise_injury_location " +
-                            "WHERE injury_location_id IN (-1) " +
+                            "WHERE injury_location_id = ANY (@injury_list) " +
                             "GROUP BY exercise_id " +
                             ") " +
                         "AND exercise.exercise_id IN ( " +
@@ -67,9 +75,8 @@ namespace AgingPopulationFitness.Server
                             "GROUP BY exercise_id " +
                         ") " +
                         "AND exercise.exercise_type = ANY (@type_list)";
-            }
 
-            
+
             using var cmd = new NpgsqlCommand(sql, con);
 
             List<int> benefitIdList = new List<int>();
@@ -84,9 +91,19 @@ namespace AgingPopulationFitness.Server
                 exerciseTypesList.Add(exerciseFilter.ExerciseTypesList[i].Type);
                 Console.WriteLine(exerciseFilter.ExerciseTypesList[i].Type);
             }
+            List<int> injuryLocationIdList = new List<int>();
+            if (exerciseFilter.ExcludeBasedOnInjuries == true)
+            {
+                for (int i = 0; i < exerciseFilter.InjuryLocations.Count; i++)
+                {
+                    injuryLocationIdList.Add(exerciseFilter.InjuryLocations[i].InjuryLocationId);
+                    Console.WriteLine(exerciseFilter.InjuryLocations[i].BodyPart);
+                }
+            }
 
             cmd.Parameters.AddWithValue( "benefit_list", benefitIdList.ToArray() ) ;
             cmd.Parameters.AddWithValue( "type_list", exerciseTypesList.ToArray() ) ;
+            cmd.Parameters.AddWithValue("injury_list", injuryLocationIdList.ToArray());
             cmd.Prepare();
             
             
@@ -107,7 +124,7 @@ namespace AgingPopulationFitness.Server
 
                 exercises.Add(anExercise);
             }
-
+            con.Close();
             return exercises;
         }
 
@@ -151,11 +168,12 @@ namespace AgingPopulationFitness.Server
 
 
 
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
-
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
@@ -176,7 +194,7 @@ namespace AgingPopulationFitness.Server
                 //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
                 types.Add(type);
             }
-
+            con.Close();
             return types;
         }
 
@@ -187,11 +205,12 @@ namespace AgingPopulationFitness.Server
 
 
 
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
-
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
@@ -212,7 +231,7 @@ namespace AgingPopulationFitness.Server
                 //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
                 benefits.Add(benefit);
             }
-
+            con.Close();
             return benefits;
         }
 
@@ -223,11 +242,12 @@ namespace AgingPopulationFitness.Server
 
 
 
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
-
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
@@ -249,15 +269,27 @@ namespace AgingPopulationFitness.Server
                 //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
                 benefits.Add(benefit);
             }
-
+            con.Close();
             return benefits;
         }
 
         [HttpPost("suggested")]
         public async Task<ActionResult<bool>> PostSuggestedExercise(SuggestedExercise suggestedExercise)
         {
+
             bool success = false;
-            success = await Task.Run(() => PostSuggestedExerciseHelper(suggestedExercise.Exercise));
+            bool adminPrivileges = false;
+
+            adminPrivileges = await Task.Run(() => HasAdminPrivileges(suggestedExercise.UserId));
+
+            if (adminPrivileges)
+            {
+                success = await Task.Run(() => PostSuggestedExerciseHelper(suggestedExercise.Exercise));
+            }
+            else
+            {
+                success = await Task.Run(() => PostSuggestedExerciseAsSuggestionHelper(suggestedExercise.Exercise));
+            }
             Console.WriteLine("~~~~~~~~~~~");
             Console.WriteLine(suggestedExercise.UserId);
             Console.WriteLine(suggestedExercise.Exercise.ExerciseName);
@@ -268,13 +300,57 @@ namespace AgingPopulationFitness.Server
             return success;
         }
 
+        public bool HasAdminPrivileges(Guid? uid)
+        {
+            int count = 0;
+
+            if( uid == null)
+            {
+                return false;
+            }
+
+            using var con = new NpgsqlConnection(cs);
+            con.Open();
+
+            var sql = "SELECT COUNT(DISTINCT user_uid) " +
+                "FROM admin_privileges " +
+                "WHERE user_uid = @uid";
+
+            using var cmd = new NpgsqlCommand(sql, con);
+
+            cmd.Parameters.AddWithValue("uid", uid);
+
+            try
+            {
+                using NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    count = rdr.GetInt32(0);
+                }
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            if( count == 1)
+            {
+                con.Close();
+                return true;
+            }
+            con.Close();
+            return false;
+        }
+
         public bool PostSuggestedExerciseHelper(Exercise exercise)
         {
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
-
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
@@ -295,25 +371,72 @@ namespace AgingPopulationFitness.Server
             try
             {
                 cmd.ExecuteNonQuery();
+                con.Close();
                 AddAllInjuryLocations(exercise);
                 AddAllBenefits(exercise);
+                
                 return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
+            con.Close();
+            return false;
+
+        }
+
+        public bool PostSuggestedExerciseAsSuggestionHelper(Exercise exercise)
+        {
+            /*
+            var cs = "host=" + DatabaseCredentials.Host + ";" +
+                "Username=" + DatabaseCredentials.Username + ";" +
+                "Password=" + DatabaseCredentials.Password + ";" +
+                "Database=" + DatabaseCredentials.Database + "";
+            */
+            using var con = new NpgsqlConnection(cs);
+            
+
+            try
+            {
+                con.Open();
+
+                var sql = "INSERT INTO suggested_exercise ( suggested_exercise_name, suggested_exercise_description, suggested_exercise_link, suggested_exercise_main_image, suggested_exercise_type, suggested_exercise_instructions) VALUES" +
+                    "(@exercise_name, @exercise_description, @exercise_link, @exercise_main_image, @exercise_type, @exercise_instructions)";
+
+
+                using var cmd = new NpgsqlCommand(sql, con);
+
+                cmd.Parameters.AddWithValue("exercise_name", exercise.ExerciseName);
+                cmd.Parameters.AddWithValue("exercise_description", exercise.ExerciseDescription);
+                cmd.Parameters.AddWithValue("exercise_link", exercise.ExerciseLink);
+                cmd.Parameters.AddWithValue("exercise_main_image", exercise.ExerciseMainImage);
+                cmd.Parameters.AddWithValue("exercise_type", exercise.ExerciseType);
+                cmd.Parameters.AddWithValue("exercise_instructions", exercise.ExerciseInstructions);
+                cmd.Prepare();
+
+                cmd.ExecuteNonQuery();
+                con.Close();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            con.Close();
             return false;
 
         }
 
         public bool AddAllInjuryLocations(Exercise exercise)
         {
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
-
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
@@ -333,19 +456,19 @@ namespace AgingPopulationFitness.Server
                 {
                     exercise.ExerciseId = rdr.GetInt32(0);
                 }
-
+                con.Close();
                 for (int i = 0; i < exercise.InjuryLocations.Count; i++)
                 {
                     AddOneInjuryLocation(exercise.ExerciseId, exercise.InjuryLocations[i].InjuryLocationId);
                 }
-
+                
                 return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
-
+            con.Close();
             return false;
         }
 
@@ -355,11 +478,12 @@ namespace AgingPopulationFitness.Server
             {
                 return;
             }
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
-                        "Username=" + DatabaseCredentials.Username + ";" +
-                        "Password=" + DatabaseCredentials.Password + ";" +
-                        "Database=" + DatabaseCredentials.Database + "";
-
+                "Username=" + DatabaseCredentials.Username + ";" +
+                "Password=" + DatabaseCredentials.Password + ";" +
+                "Database=" + DatabaseCredentials.Database + "";
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
@@ -373,15 +497,18 @@ namespace AgingPopulationFitness.Server
             
 
             cmd.ExecuteNonQuery();
+
+            con.Close();
         }
 
         public bool AddAllBenefits(Exercise exercise)
         {
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
-
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
@@ -401,19 +528,19 @@ namespace AgingPopulationFitness.Server
                 {
                     exercise.ExerciseId = rdr.GetInt32(0);
                 }
-
+                con.Close();
                 for (int i = 0; i < exercise.Benefits.Count; i++)
                 {
                     AddOneBenefit(exercise.ExerciseId, exercise.Benefits[i].BenefitId);
                 }
-
+                
                 return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
-
+            con.Close();
             return false;
         }
 
@@ -423,11 +550,12 @@ namespace AgingPopulationFitness.Server
             {
                 return;
             }
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
-                        "Username=" + DatabaseCredentials.Username + ";" +
-                        "Password=" + DatabaseCredentials.Password + ";" +
-                        "Database=" + DatabaseCredentials.Database + "";
-
+                "Username=" + DatabaseCredentials.Username + ";" +
+                "Password=" + DatabaseCredentials.Password + ";" +
+                "Database=" + DatabaseCredentials.Database + "";
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
@@ -441,6 +569,7 @@ namespace AgingPopulationFitness.Server
             
 
             cmd.ExecuteNonQuery();
+            con.Close();
         }
 
 

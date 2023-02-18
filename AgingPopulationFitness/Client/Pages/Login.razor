@@ -83,7 +83,9 @@
             if (fullUserProfile.UserId == null)
             {
                 UserDoesNotExist = true;
-
+                showSpinner = false;
+                StateHasChanged();
+                return;
             }
             else
             {

@@ -19,8 +19,30 @@ namespace AgingPopulationFitness.Server
     [ApiController]
     public class InjuriesController : Controller
     {
-        public DatabaseCredentials databaseCredentials = new DatabaseCredentials();
+        public DatabaseCredentials databaseCredentials;
+        public string connectionString;
+        public NpgsqlDataSource dataSource;
+        public string cs =  "host=" + DatabaseCredentials.Host + ";" +
+                "Username=" + DatabaseCredentials.Username + ";" +
+                "Password=" + DatabaseCredentials.Password + ";" +
+                "Database=" + DatabaseCredentials.Database + ";" +
+                "Application Name=" + "InjuriesController" + ";" +
+                "Pooling=" + DatabaseCredentials.Pooling + ";" +
+                "Maximum Pool Size=" + DatabaseCredentials.MaxPoolSize + ";" +
+                "Minimum Pool Size=" + DatabaseCredentials.MinPoolSize + "";
 
+        public InjuriesController() {
+            DatabaseCredentials databaseCredentials = new DatabaseCredentials();
+            connectionString = "host=" + DatabaseCredentials.Host + ";" +
+                "Username=" + DatabaseCredentials.Username + ";" +
+                "Password=" + DatabaseCredentials.Password + ";" +
+                "Database=" + DatabaseCredentials.Database + ";" +
+                "Application Name=" + "InjuriesController" + ";" +
+                "Pooling=" + DatabaseCredentials.Pooling + ";" +
+                "Maximum Pool Size=" + DatabaseCredentials.MaxPoolSize + ";" +
+                "Minimum Pool Size=" + DatabaseCredentials.MinPoolSize + "";
+            dataSource = NpgsqlDataSource.Create(connectionString);
+        }
 
         [HttpGet]
         public async Task<List<InjuryLocation>> GetInjuries()
@@ -73,12 +95,12 @@ namespace AgingPopulationFitness.Server
         public List<InjuryLocation> GetUsersInjuryLocationsCall(Guid userUid)
         {
             List<InjuryLocation> userInjuryLocations = new List<InjuryLocation>();
-
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
-
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
@@ -116,6 +138,7 @@ namespace AgingPopulationFitness.Server
             {
                 Console.WriteLine(e);
             }
+            con.Close();
             return userInjuryLocations;
 
         }
@@ -124,14 +147,15 @@ namespace AgingPopulationFitness.Server
         {
             List<UserInjury> userInjuries = new List<UserInjury>();
 
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
-
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
-
+            
             var sql = "SELECT user_injury.user_injury_id, user_uid, user_injury_name, user_injury_description, user_injury_severity, user_injury_date, injury_location.injury_location_id, body_part " +
                 "FROM user_injury " +
                 "FULL JOIN user_injury_injury_location ON user_injury.user_injury_id = user_injury_injury_location.user_injury_id " +
@@ -140,6 +164,9 @@ namespace AgingPopulationFitness.Server
                 "ORDER BY  user_injury_date, user_injury.user_injury_id, injury_location.injury_location_id";
 
             using var cmd = new NpgsqlCommand(sql, con);
+
+            
+            //using var cmd = dataSource.CreateCommand(sql);
 
             cmd.Parameters.AddWithValue("UserUid", userUid);
 
@@ -203,6 +230,7 @@ namespace AgingPopulationFitness.Server
             {
                 Console.WriteLine(e);
             }
+            con.Close();
             return userInjuries;
 
         }
@@ -278,11 +306,12 @@ namespace AgingPopulationFitness.Server
                 return false;
             }
 
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
-
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
@@ -298,12 +327,14 @@ namespace AgingPopulationFitness.Server
             try
             {
                 cmd.ExecuteNonQuery();
+                con.Close();
                 return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
+            con.Close();
             return false;
 
         }
@@ -323,11 +354,12 @@ namespace AgingPopulationFitness.Server
                 return false;
             }
 
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
-
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
@@ -352,12 +384,14 @@ namespace AgingPopulationFitness.Server
             try
             {
                 cmd.ExecuteNonQuery();
+                con.Close();
                 return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
+            con.Close();
             return false;
 
         }
@@ -377,11 +411,12 @@ namespace AgingPopulationFitness.Server
                 return false;
             }
 
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
-
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
@@ -398,23 +433,26 @@ namespace AgingPopulationFitness.Server
             try
             {
                 cmd.ExecuteNonQuery();
+                con.Close();
                 return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
+            con.Close();
             return false;
 
         }
 
         public bool PostUserInjuryHelper(UserInjury userInjury)
         {
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
-
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
@@ -433,24 +471,28 @@ namespace AgingPopulationFitness.Server
 
             try {
                 cmd.ExecuteNonQuery();
+                con.Close();
                 AddAllInjuryLocations(userInjury);
+                
                 return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
+            con.Close();
             return false;
             
         }
 
         public bool AddAllInjuryLocations( UserInjury userInjury)
         {
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
-
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
@@ -469,19 +511,19 @@ namespace AgingPopulationFitness.Server
                 {
                     userInjury.InjuryId = rdr.GetInt32(0);
                 }
-
-                for( int i = 0; i < userInjury.InjuryLocations.Count; i++)
+                con.Close();
+                for ( int i = 0; i < userInjury.InjuryLocations.Count; i++)
                 {
                     AddOneInjuryLocation( userInjury.InjuryId, userInjury.InjuryLocations[i].InjuryLocationId);
                 }
-
+                
                 return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
-
+            con.Close();
             return false;
         }
 
@@ -491,11 +533,12 @@ namespace AgingPopulationFitness.Server
             {
                 return;
             }
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
-                        "Username=" + DatabaseCredentials.Username + ";" +
-                        "Password=" + DatabaseCredentials.Password + ";" +
-                        "Database=" + DatabaseCredentials.Database + "";
-
+                "Username=" + DatabaseCredentials.Username + ";" +
+                "Password=" + DatabaseCredentials.Password + ";" +
+                "Database=" + DatabaseCredentials.Database + "";
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
@@ -509,6 +552,7 @@ namespace AgingPopulationFitness.Server
             //Console.WriteLine("adding injury loc: " + userInjuryId + " " + injuryLocationId);
 
             cmd.ExecuteNonQuery();
+            con.Close();
         }
 
         public List<InjuryLocation> GetInjuriesCall()
@@ -518,11 +562,12 @@ namespace AgingPopulationFitness.Server
 
 
 
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
-
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
@@ -542,7 +587,7 @@ namespace AgingPopulationFitness.Server
                 //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
                 injuryLocations.Add(injuryLocation);
             }
-
+            con.Close();
             return injuryLocations;
         }
 
@@ -564,11 +609,12 @@ namespace AgingPopulationFitness.Server
 
 
 
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
-
+            */
             using var con = new NpgsqlConnection(cs);
             con.Open();
 
@@ -593,9 +639,10 @@ namespace AgingPopulationFitness.Server
             }
             if (userProfileList.Count() == 1)
             {
+                con.Close();
                 return userProfileList[0];
             }
-
+            con.Close();
             return userProfile;
         }
 

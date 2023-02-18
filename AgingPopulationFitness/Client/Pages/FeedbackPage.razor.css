@@ -1,0 +1,27 @@
+﻿
+.dialog-body-input {
+    margin-top: 0.5rem;
+}
+
+.send-feedback-btn-div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.send-feedback-btn {
+    width: fit-content;
+    align-self: center;
+    margin-top: 0.5rem;
+}
+
+@media screen and (min-width: 641px) {
+    .feedback-form {
+        display: flex;
+        flex-direction: column;
+        margin: auto;
+        border-style: solid;
+        width: 75%;
+        color: black;
+    }
+}

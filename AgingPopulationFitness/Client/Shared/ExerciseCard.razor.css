@@ -13,6 +13,7 @@
 
 .exercise-main-img-div {
     flex: none;
+    aspect-ratio: 1 / 1;
     height: 100%;
     border-style: solid;
     border-color: pink;
@@ -22,7 +23,7 @@
     display: inline;
     width: 100%;
     height: 100%;
-    object-fit: fill;
+    object-fit: cover;
 }
 
 .all-exercise-info {

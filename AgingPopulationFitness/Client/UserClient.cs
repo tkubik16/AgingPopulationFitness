@@ -114,6 +114,14 @@ namespace AgingPopulationFitness.Client
             return userAdded;
         }
 
+        public async Task<bool> PostFeedback(Feedback feedback)
+        {
+            var response = await httpClient.PostAsJsonAsync($"user/PostFeedback", feedback, UserProfileContext.Default.Feedback);
+            response.EnsureSuccessStatusCode();
+            var feedbackPosted = await response.Content.ReadFromJsonAsync<bool>();
+            return feedbackPosted;
+        }
+
         public async void GetUser() =>
             await httpClient.GetFromJsonAsync($"user", UserProfileContext.Default.UserProfile);
     }

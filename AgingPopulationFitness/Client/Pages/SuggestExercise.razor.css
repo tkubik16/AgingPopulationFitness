@@ -1,9 +1,44 @@
 ﻿
+:root {
+    /*
+    --clr-white: #e0e1dd;
+    --clr-black: #415a77;
+        */
+    --clr-white: #f8f9fa;
+    --clr-black: #495057;
+}
+
 .suggest-exercise-form{
     margin: 1rem;
     padding: 1rem;
     border-style: ridge;
     border-color: blueviolet;
+}
+
+.dialog-body-input {
+    margin-top: 0.25rem;
+}
+
+.injuries {
+    text-align: center;
+    display: block;
+    padding-left: 0.5rem;
+}
+
+.injury {
+    display: inline-block;
+    background-color: var(--clr-black);
+    color: var(--clr-white);
+    padding: 0.05rem 0.5rem;
+    border-radius: 2rem;
+    margin: 0.2rem 0.1rem;
+    font-weight: 500;
+    font-size: 0.85rem;
+    padding-right: 0;
+    border-style: solid;
+    border-color: var(--clr-black);
+    border-width: 2px;
+    text-transform: uppercase;
 }
 
 .image-preview {
@@ -21,3 +56,19 @@ img {
     height: 100%;
     object-fit: contain;
 }
+
+.x-btn {
+    border: none;
+    aspect-ratio: 1 / 1;
+    height: 1.5rem;
+    border-radius: 1rem;
+    font-weight: 700;
+    color: var(--clr-black);
+    text-transform: uppercase;
+    margin-left: 0.25rem;
+}
+
+    .x-btn:hover {
+        color: black;
+        background-color: indianred;
+    }

@@ -35,11 +35,20 @@
                 <div>Find</div>
                 <div>Exercises</div>
             </NavLink>
-
+            /*
             <NavLink href="suggest-exercise-page" class="nav-tab">
                 <div>Suggest</div>
                 <div>Exercises</div>
             </NavLink>
+            */
+            <div class="dropdown">
+                <button class="dropbtn">More</button>
+                <div class="dropdown-content">
+                    <a href="suggest-exercise-page">Suggest Exercise</a>
+                    <a href="feedback">Feedback</a>
+                    <a href="testpage">Link 3</a>
+                </div>
+            </div>
 
             <NavLink href="login" class="nav-tab" @onclick="Logout">
                 <div>Logout</div>
@@ -83,6 +92,10 @@
             <NavLink href="suggest-exercise-page" @onclick="CloseNav"  class="nav-tab-mobile">
                 <div>Suggest</div>
                 <div>Exercises</div>
+            </NavLink>
+
+            <NavLink href="feedback" @onclick="CloseNav" class="nav-tab-mobile">
+                <div>Feedback</div>
             </NavLink>
 
             <NavLink href="login"  class="nav-tab-mobile" @onclick="Logout">

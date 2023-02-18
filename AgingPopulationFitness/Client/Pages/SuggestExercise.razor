@@ -12,7 +12,7 @@
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 
 
-
+<h1>Suggest an Exercise</h1>
 
 <div class="suggest-exercise-form">
     <div class="dialog-body-input">
@@ -24,13 +24,13 @@
     <div class="dialog-body-input">
         <label>Exercise Description:</label>
         <div>
-            <textarea rows="5" cols="45" style="resize: none;" @bind="suggestedExercise.Exercise.ExerciseDescription" />
+            <textarea rows="5" cols="35" style="resize: none;" @bind="suggestedExercise.Exercise.ExerciseDescription" />
         </div>
     </div>
     <div class="dialog-body-input">
         <label>Exercise Instructions:</label>
         <div>
-            <textarea rows="5" cols="45" style="resize: none;" @bind="suggestedExercise.Exercise.ExerciseInstructions" />
+            <textarea rows="5" cols="35" style="resize: none;" @bind="suggestedExercise.Exercise.ExerciseInstructions" />
         </div>
     </div>
     <div class="dialog-body-input">
@@ -83,7 +83,7 @@
         {
             <div class="injury">
                 @benefit.BenefitName
-                <button type="button" class="delete-injury" @onclick="@(() => RemoveBenefit(benefit))">x</button>
+                <button type="button" class="x-btn" @onclick="@(() => RemoveBenefit(benefit))">x</button>
             </div>
         }
     </div>
@@ -113,12 +113,12 @@
         {
             <div class="injury">
                 @injuryLocation.BodyPart
-                <button type="button" class="delete-injury" @onclick="@(() => RemoveInjuryLocation(injuryLocation))">x</button>
+                <button type="button" class="x-btn" @onclick="@(() => RemoveInjuryLocation(injuryLocation))">x</button>
             </div>
         }
     </div>
     <div>
-        <button @onclick="PrintExeciseSuggestion">Print Exercise</button>
+        <button @onclick="PrintExeciseSuggestion">Submit Exercise</button>
     </div>
 </div>
 @if (Image != string.Empty)
@@ -136,8 +136,37 @@
     public List<ExerciseType> ExerciseTypes = new List<ExerciseType>();
     public bool success = false;
 
+    [CascadingParameter(Name = "UpdateMenuOnLogIn")] public EventCallback UpdateMenuOnLogIn { get; set; }
+    [CascadingParameter(Name = "UpdateMenuOnRefresh")] public EventCallback UpdateMenuOnRefresh { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
+        if (UserState == null)
+        {
+            Console.WriteLine("user state is null");
+        }
+        else
+        {
+
+            if (UserState.userProfile == null)
+            {
+                Console.WriteLine("user profile: null");
+            }
+            else
+            {
+                Console.WriteLine("user profile:");
+                UserState.userProfile.PrintUserProfile();
+
+            }
+
+        }
+        if (await sessionStorage.ContainKeyAsync("UserId"))
+        {
+
+            await UserState.Refresh(sessionStorage);
+            await UpdateMenuOnRefresh.InvokeAsync(); 
+        }
+
         injuryLocations = await UserClient.GetInjuries();
         benefits = await ExerciseClient.GetBenefits();
         ExerciseTypes = await ExerciseClient.GetExerciseTypes();
@@ -149,6 +178,7 @@
                 suggestedExercise.UserId = UserState.userProfile.UserId;
             }
         }
+
     }
 
     void ExerciseTypeSelected(ChangeEventArgs e)

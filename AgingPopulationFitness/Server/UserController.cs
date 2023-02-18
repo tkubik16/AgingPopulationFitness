@@ -29,6 +29,14 @@ namespace AgingPopulationFitness.Server
         }
         */
         public DatabaseCredentials databaseCredentials = new DatabaseCredentials();
+        public string cs = "host=" + DatabaseCredentials.Host + ";" +
+                "Username=" + DatabaseCredentials.Username + ";" +
+                "Password=" + DatabaseCredentials.Password + ";" +
+                "Database=" + DatabaseCredentials.Database + ";" +
+                "Application Name=" + "UserController" + ";" +
+                "Pooling=" + DatabaseCredentials.Pooling + ";" +
+                "Maximum Pool Size=" + DatabaseCredentials.MaxPoolSize + ";" +
+                "Minimum Pool Size=" + DatabaseCredentials.MinPoolSize + "";
 
 
         [HttpGet]
@@ -49,6 +57,16 @@ namespace AgingPopulationFitness.Server
             responseUserProfile = await Task.Run(() => VerifyUserCall(userProfile));
 
             return responseUserProfile;
+        }
+
+        [HttpPost("PostFeedback")]
+        public async Task<ActionResult<bool>> PostFeedback(Feedback feedback)
+        {
+            bool response;
+
+            response = await Task.Run(() => PostFeedbackCall(feedback));
+
+            return response;
         }
 
         [HttpPost("UserExistsCheck")]
@@ -89,11 +107,12 @@ namespace AgingPopulationFitness.Server
 
             List<UserProfile> userProfileList = new List<UserProfile>();
 
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
-
+            */
 
             using var con = new NpgsqlConnection(cs);
             con.Open();
@@ -117,7 +136,7 @@ namespace AgingPopulationFitness.Server
             {
                 isLoggedIn = true;
             }
-
+            con.Close();
             return isLoggedIn;
         }
 
@@ -127,10 +146,12 @@ namespace AgingPopulationFitness.Server
             if (userProfile.Password == null) { return false; }
             if (UserExistsCheckCall(userProfile)) { return false; }
 
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
+            */
 
             using var con = new NpgsqlConnection(cs);
             con.Open();
@@ -146,7 +167,7 @@ namespace AgingPopulationFitness.Server
             cmd.ExecuteNonQuery();
 
             if (UserExistsCheckCall(userProfile)) { return true; }
-
+            con.Close();
             return false;
         }
 
@@ -160,10 +181,12 @@ namespace AgingPopulationFitness.Server
 
             List<UserProfile> userProfileList = new List<UserProfile>();
 
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
+            */
 
             using var con = new NpgsqlConnection(cs);
             con.Open();
@@ -188,7 +211,7 @@ namespace AgingPopulationFitness.Server
             {
                 userExists = true;
             }
-
+            con.Close();
             return userExists;
         }
 
@@ -198,10 +221,12 @@ namespace AgingPopulationFitness.Server
 
 
 
+            /*
             var cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
+            */
 
             using var con = new NpgsqlConnection(cs);
             con.Open();
@@ -228,10 +253,44 @@ namespace AgingPopulationFitness.Server
             }
             if (userProfileList.Count() == 1)
             {
+                con.Close();
                 return userProfileList[0];
             }
 
+            con.Close();
             return userProfile;
+        }
+
+        public bool PostFeedbackCall(Feedback feedback)
+        {
+            
+            
+            using var con = new NpgsqlConnection(cs);
+            con.Open();
+
+            var sql = "INSERT INTO feedback (title, type, body) VALUES " +
+                "(@title, @type, @body)";
+
+
+            using var cmd = new NpgsqlCommand(sql, con);
+
+            try
+            {
+                cmd.Parameters.AddWithValue("title", feedback.Title);
+                cmd.Parameters.AddWithValue("type", feedback.Type);
+                cmd.Parameters.AddWithValue("body", feedback.Body);
+                cmd.Prepare();
+
+                cmd.ExecuteNonQuery();
+            }
+            catch(Exception e)
+            {
+                con.Close();
+                return false;
+            }
+            
+            con.Close();
+            return true;
         }
 
     }

@@ -1,0 +1,113 @@
+﻿@page "/feedback"
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Collections.Generic
+@inject HttpClient HttpClient
+@inject UserClient UserClient
+@inject ExerciseClient ExerciseClient
+@inject InjuryState InjuryState
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject InjuryState InjuryState
+@inject UserState UserState
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
+
+
+
+<div class="feedback-form">
+    <h1>Feedback</h1>
+    <div class="dialog-body-input">
+        <label>Feedback Title:</label>
+        <div>
+            <input type="text"  @bind="feedback.Title"/>
+        </div>
+    </div>
+    <div class="dialog-body-input">
+        <label>Feedback Type:</label>
+        <div>
+            <select class="custom-select" @onchange="FeedbackTypeSelected">
+                <option value="-1" disabled selected>(select)</option>
+                @for (var i = 0; i < FeedbackTypes.Count; i++)
+                {
+
+                    <option value="@i">@i @FeedbackTypes[i]</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="dialog-body-input">
+        <label>Feedback:</label>
+        <div>
+            <textarea rows="5" cols="35" style="resize: none;"  @bind="feedback.Body"/>
+        </div>
+    </div>
+    <div class="send-feedback-btn-div">
+        <button class="send-feedback-btn" @onclick="SendFeedback">Send Feedback</button>
+    </div>
+</div>
+
+@code {
+    List<string> FeedbackTypes = new List<string>() { "Comment", "Suggestion", "Bug", "Feature Idea" };
+    Feedback feedback = new Feedback();
+    bool success = false;
+
+    [CascadingParameter(Name = "UpdateMenuOnLogIn")] public EventCallback UpdateMenuOnLogIn { get; set; }
+    [CascadingParameter(Name = "UpdateMenuOnRefresh")] public EventCallback UpdateMenuOnRefresh { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (UserState == null)
+        {
+            Console.WriteLine("user state is null");
+        }
+        else
+        {
+
+            if (UserState.userProfile == null)
+            {
+                Console.WriteLine("user profile: null");
+            }
+            else
+            {
+                Console.WriteLine("user profile:");
+                UserState.userProfile.PrintUserProfile();
+
+            }
+
+        }
+        if (await sessionStorage.ContainKeyAsync("UserId"))
+        {
+
+            await UserState.Refresh(sessionStorage);
+            await UpdateMenuOnRefresh.InvokeAsync();
+        }
+    }
+
+    void FeedbackTypeSelected(ChangeEventArgs e)
+    {
+        if (int.TryParse((string)e.Value, out var index) && index >= 0)
+        {
+            feedback.Type = FeedbackTypes[index];
+        }
+    }
+
+    async void SendFeedback()
+    {
+        Console.WriteLine(feedback.Title);
+        Console.WriteLine(feedback.Type);
+        Console.WriteLine(feedback.Body);
+        success = await UserClient.PostFeedback(feedback);
+        if(success)
+        {
+            ResetPage();
+        }
+    }
+
+    void ResetPage()
+    {
+        feedback.Title = string.Empty;
+        feedback.Body = string.Empty;
+        success = false;
+        StateHasChanged();
+        NavigationManager.NavigateTo("/");
+    }
+}

@@ -44,4 +44,5 @@ namespace AgingPopulationFitness
 [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Default, PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 [JsonSerializable(typeof(UserProfile))]
 [JsonSerializable(typeof(UserInjury))]
+[JsonSerializable(typeof(Feedback))]
 public partial class UserProfileContext : JsonSerializerContext { }

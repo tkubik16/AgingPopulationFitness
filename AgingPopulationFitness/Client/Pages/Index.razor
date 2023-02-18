@@ -61,6 +61,7 @@ of this project as well as disclaimers
             await UserState.Refresh( sessionStorage);
             await UpdateMenuOnRefresh.InvokeAsync();
             UserState.injuryLocations = await UserClient.GetUsersInjuryLocations(UserState.userProfile.UserId);
+            ExerciseFilterState.ExerciseFilter.InjuryLocations = UserState.injuryLocations;
             StateHasChanged();
             Console.Write("injuryLcoations list length: ");
             Console.WriteLine(UserState.injuryLocations.Count);

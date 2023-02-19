@@ -21,7 +21,7 @@
         </div>
         @if (UserState.isLoggedIn)
         {
-            <NavLink href="" class="nav-tab" Match="NavLinkMatch.All">
+            <NavLink href="home-page" class="nav-tab" Match="NavLinkMatch.All">
                 <div>Home</div>
             </NavLink>
 
@@ -44,9 +44,16 @@
             <div class="dropdown">
                 <button class="dropbtn">More</button>
                 <div class="dropdown-content">
-                    <a href="suggest-exercise-page">Suggest Exercise</a>
-                    <a href="feedback">Feedback</a>
-                    <a href="testpage">Link 3</a>
+                    <NavLink href="suggest-exercise-page" class="nav-tab-dropdown">
+                        <div>Suggest</div>
+                        <div>Exercise</div>
+                    </NavLink>
+                    <NavLink href="feedback" class="nav-tab-dropdown" >
+                        <div>Feedback</div>
+                    </NavLink>
+                    <NavLink href="" class="nav-tab-dropdown" Match="NavLinkMatch.All">
+                        <div>About</div>
+                    </NavLink>
                 </div>
             </div>
 
@@ -74,10 +81,9 @@
         </div>
         @if (UserState.isLoggedIn)
         {
-            <NavLink href="" @onclick="CloseNav"  class="nav-tab-mobile" Match="NavLinkMatch.All">
+            <NavLink href="home-page" @onclick="CloseNav"  class="nav-tab-mobile" >
                 <div>Home</div>
             </NavLink>
-
 
             <NavLink href="injuries-page" @onclick="CloseNav" class="nav-tab-mobile">
                 <div>My</div>
@@ -96,6 +102,10 @@
 
             <NavLink href="feedback" @onclick="CloseNav" class="nav-tab-mobile">
                 <div>Feedback</div>
+            </NavLink>
+
+            <NavLink href="" @onclick="CloseNav" class="nav-tab-mobile" Match="NavLinkMatch.All">
+                <div>About</div>
             </NavLink>
 
             <NavLink href="login"  class="nav-tab-mobile" @onclick="Logout">
@@ -152,7 +162,7 @@
         }
         UserState.isLoggedIn = await UserClient.IsLoggedIn(UserState.userProfile);
         Console.WriteLine("In LoggedInCheck: " + UserState.isLoggedIn);
-        Navigation.NavigateTo("");
+        Navigation.NavigateTo("/home-page");
         StateHasChanged();
 
     }

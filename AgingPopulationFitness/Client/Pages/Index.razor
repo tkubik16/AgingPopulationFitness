@@ -16,20 +16,6 @@ This section will eventually be used to describe the purpose
 of this project as well as disclaimers
 
 
-
-
-@if (UserState.userProfile.UserId.HasValue )
-{
-    <h2>Welcome,</h2>
-    <h2>@UserState.userProfile.Username</h2>
-    <InjuryLocations></InjuryLocations>
-
-    <div>@ExerciseFilterState.ExerciseFilter.ExcludeBasedOnInjuries</div>
-    <div>@ExerciseFilterState.benefitSelectValue</div>
-
-}
-
-
 @code{
     [CascadingParameter(Name = "UpdateMenuOnLogIn")] public EventCallback UpdateMenuOnLogIn { get; set; }
     [CascadingParameter(Name = "UpdateMenuOnRefresh")] public EventCallback UpdateMenuOnRefresh { get; set; }

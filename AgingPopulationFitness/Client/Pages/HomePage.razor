@@ -1,0 +1,25 @@
+﻿@page "/home-page"
+@inject UserState UserState;
+@inject NavigationManager Navigation;
+@inject HttpClient HttpClient
+@inject UserClient UserClient
+@inject ExerciseFilterState ExerciseFilterState
+@inject IJSRuntime JSRuntime
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
+
+<h3>HomePage</h3>
+
+@if (UserState.userProfile.UserId.HasValue)
+{
+    <h2>Welcome,</h2>
+    <h2>@UserState.userProfile.Username</h2>
+    <InjuryLocations></InjuryLocations>
+
+    <div>@ExerciseFilterState.ExerciseFilter.ExcludeBasedOnInjuries</div>
+    <div>@ExerciseFilterState.benefitSelectValue</div>
+
+}
+
+@code {
+
+}

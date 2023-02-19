@@ -151,7 +151,36 @@
         border-top: 1rem solid rgba(121, 146, 158, 0.65);
     }
 
+.nav-tab-dropdown {
+    margin: 0;
+    padding: 0.3rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    background-color: var(--clr-white);
+    color: var(--clr-black);
+    text-transform: uppercase;
+    transition: 0.2s ease-out;
+    text-decoration: none;
+}
 
+    .nav-tab-dropdown div {
+        flex-shrink: 2;
+    }
+
+    .nav-tab-dropdown:hover {
+        color: white;
+        text-decoration: none;
+        background-color: var(--clr-white);
+    }
+
+    .nav-tab-dropdown.active {
+        background-color: var(--clr-black);
+        color: var(--clr-white);
+        font-weight: 500;
+    }
 
 
 .dialog-container {

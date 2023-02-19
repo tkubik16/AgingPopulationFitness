@@ -107,8 +107,9 @@
         UserState.injuryLocations = await UserClient.GetUsersInjuryLocations(UserState.userProfile.UserId);
         Console.Write("injuryLcoations list length: ");
         Console.WriteLine(UserState.injuryLocations.Count);
-
+        UserState.isLoggedIn = true;
         await UpdateMenuOnLogIn.InvokeAsync();
+
         if (UserState.isLoggedIn)
         {
             Console.WriteLine("GotoHome");
@@ -127,7 +128,8 @@
 
     void GoToHome()
     {
-        Navigation.NavigateTo("");
+        Console.WriteLine("going to home");
+        Navigation.NavigateTo("/home-page");
     }
 
 }

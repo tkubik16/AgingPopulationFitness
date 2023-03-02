@@ -15,11 +15,10 @@
             <div class="benefit-section">
                 <label>Exercise Benefit:</label>
                 <select class="benefit-select" id="SelectBenefitExerciseFilter" @onchange="ExerciseBenefitSelected">
-                    <option value="-1" >Select Benefit</option>
-                    @for (var i = 0; i < ExerciseBenefits.Count; i++)
+                    <option value="-1" disabled select>Select Benefit</option>
+                    @for (var i = 0; i < ExerciseFilterState.AllBenefitsList.Count; i++)
                     {
-
-                        <option value="@i">@ExerciseBenefits[i].BenefitId @ExerciseBenefits[i].BenefitName </option>
+                        <option value="@i">@ExerciseFilterState.AllBenefitsList[i].BenefitId @ExerciseFilterState.AllBenefitsList[i].BenefitName </option>
                     }
                 </select>
             </div>
@@ -36,10 +35,10 @@
                 <label>Exercise Type:</label>
                 <select class="type-select" id="SelectTypeExerciseFilter" @onchange="ExerciseTypeSelected">
                     <option value="-1" disabled select>Select Type</option>
-                    @for (var i = 0; i < ExerciseTypes.Count; i++)
+                    @for (var i = 0; i < ExerciseFilterState.AllExerciseTypesList.Count; i++)
                     {
 
-                            <option value="@i">@ExerciseTypes[i].Type @ExerciseTypes[i].ExerciseTypeId</option>
+                        <option value="@i">@ExerciseFilterState.AllExerciseTypesList[i].Type @ExerciseFilterState.AllExerciseTypesList[i].ExerciseTypeId</option>
                     }
                 </select>
             </div>
@@ -62,26 +61,39 @@
 
 @code {
 
-    [Parameter] public EventCallback OnCancel { get; set; }
     [Parameter] public EventCallback OnSearch { get; set; }
 
-    public List<Benefit> ExerciseBenefits = new List<Benefit>();
-    public List<ExerciseType> ExerciseTypes = new List<ExerciseType>();
+    //public List<Benefit> ExerciseBenefits = new List<Benefit>();
+    //public List<ExerciseType> ExerciseTypes = new List<ExerciseType>();
 
     protected override async Task OnInitializedAsync()
     {
 
-        ExerciseBenefits = await ExerciseClient.GetGeneralBenefits();
-        ExerciseTypes = await ExerciseClient.GetExerciseTypes();
         if (ExerciseFilterState.ExerciseFilter.BenefitsList.Count == 0)
         {
             ExerciseFilterState.ExerciseFilter.BenefitsList = await ExerciseClient.GetGeneralBenefits();
+            for (int i = 0; i < ExerciseFilterState.ExerciseFilter.BenefitsList.Count; i++)
+            {
+                ExerciseFilterState.AllBenefitsList.Add(ExerciseFilterState.ExerciseFilter.BenefitsList[i]);
+            }
         }
         if (ExerciseFilterState.ExerciseFilter.ExerciseTypesList.Count == 0)
         {
             ExerciseFilterState.ExerciseFilter.ExerciseTypesList = await ExerciseClient.GetExerciseTypes();
+            for (int i = 0; i < ExerciseFilterState.ExerciseFilter.ExerciseTypesList.Count; i++)
+            {
+                ExerciseFilterState.AllExerciseTypesList.Add(ExerciseFilterState.ExerciseFilter.ExerciseTypesList[i]);
+            }
         }
-        await OnSearch.InvokeAsync();
+        if (ExerciseFilterState.ExerciseResults.Count == 0)
+        {
+            await OnSearch.InvokeAsync();
+        }
+        if (UserState.injuryLocations.Count == 0)
+        {
+            UserState.injuryLocations = await UserClient.GetUsersInjuryLocations(UserState.userProfile.UserId);
+            ExerciseFilterState.ExerciseFilter.InjuryLocations = UserState.injuryLocations;
+        }
     }
 
     protected override async Task OnParametersSetAsync()
@@ -95,7 +107,7 @@
     {
         if (int.TryParse((string)e.Value, out var index) && index >= 0)
         {
-            AddExerciseType(ExerciseTypes[index]);
+            AddExerciseType(ExerciseFilterState.AllExerciseTypesList[index]);
         }
         SetSelectedType();
     }
@@ -117,7 +129,7 @@
     {
         if (int.TryParse((string)e.Value, out var index) && index >= 0)
         {
-            AddExerciseBenefit(ExerciseBenefits[index]);
+            AddExerciseBenefit(ExerciseFilterState.AllBenefitsList[index]);
         }
         SetSelectedBenefit();
     }
@@ -134,42 +146,42 @@
     {
         ExerciseFilterState.ExerciseFilter.BenefitsList.RemoveAll(pt => pt.BenefitId == exerciseBenefit.BenefitId);
     }
-    /*
-    void ExerciseBenefitSelected(ChangeEventArgs e)
-    {
-        if (int.TryParse((string)e.Value, out var index) && index >= -1)
-        {
-            if (index == -1)
+        /*
+        void ExerciseBenefitSelected(ChangeEventArgs e)
             {
+                if (int.TryParse((string)e.Value, out var index) && index >= -1)
+                {
+                if (index == -1)
+                {
                 ExerciseFilterState.ExerciseFilter.benefit.BenefitId = -1;
-                ExerciseFilterState.ExerciseFilter.benefit.BenefitName = "All";
-            }
-            else
-            {
+            ExerciseFilterState.ExerciseFilter.benefit.BenefitName = "All";
+                }
+                else
+                {
                 ExerciseFilterState.ExerciseFilter.benefit.BenefitId = ExerciseBenefits[index].BenefitId;
-                ExerciseFilterState.ExerciseFilter.benefit.BenefitName = ExerciseBenefits[index].BenefitName;
-            }
-            ExerciseFilterState.benefitSelectValue = (string)e.Value;
-        }
+            ExerciseFilterState.ExerciseFilter.benefit.BenefitName = ExerciseBenefits[index].BenefitName;
+    }
+    ExerciseFilterState.benefitSelectValue = (string)e.Value;
+    }
     }
     */
-    /*
-    void ExerciseTypeSelected(ChangeEventArgs e)
-    {
-        if (int.TryParse((string)e.Value, out var index) && index >= -1)
+        /*
+        void ExerciseTypeSelected(ChangeEventArgs e)
         {
-            if (index == -1)
-            {
+        if (int.TryParse((string)e.Value, out var index) && index >= -1)
+                {
+                if (index == -1)
+                {
                 ExerciseFilterState.ExerciseFilter.exerciseType.ExerciseTypeId = -1;
                 ExerciseFilterState.ExerciseFilter.exerciseType.Type = "All";
             }
-            else
-            {
+                else
+                {
                 ExerciseFilterState.ExerciseFilter.exerciseType.ExerciseTypeId = ExerciseTypes[index].ExerciseTypeId;
                 ExerciseFilterState.ExerciseFilter.exerciseType.Type = ExerciseTypes[index].Type;
             }
             ExerciseFilterState.typeSelectValue = (string)e.Value;
-        }
+    }
     }
     */
     public async void SetSelectedBenefit()
@@ -180,7 +192,7 @@
         }
         catch( Exception e)
         {
-
+            Console.WriteLine(e);
         }
         StateHasChanged();
     }
@@ -193,7 +205,7 @@
         }
         catch( Exception e)
         {
-
+            Console.WriteLine(e);
         }
         StateHasChanged();
     }

@@ -1,0 +1,83 @@
+﻿@page "/exercise-info/{exerciseId:long}"
+@using AgingPopulationFitness.Shared;
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@inject UserClient UserClient;
+@inject ExerciseClient ExerciseClient;
+@inject HttpClient HttpClient;
+@inject UserState UserState;
+@inject ExerciseFilterState ExerciseFilterState
+@inject NavigationManager NavigationManager
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
+
+<div class="header">
+    <div class="name-type">
+        <h1>@pageExercise.ExerciseName</h1>
+        <h3>@pageExercise.ExerciseType</h3>
+    </div>
+</div>
+<div class="exercise-info-body">
+    <div class="benefits-and-injury-locations">
+        <div class="exercise-benefits-section">
+            <text>Benefits: </text>
+            <div class="exercise-info-benefits">
+
+                @foreach (var benefit in pageExercise.Benefits)
+                {
+                    <div class="exercise-info-benefit">
+                        @benefit.BenefitName
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="exercise-injuries-section">
+            <text>Aggravates: </text>
+            <div class="exercise-info-injuries">
+
+                @foreach (var injuryLocation in pageExercise.InjuryLocations)
+                {
+                    <div class="exercise-info-injury">
+                        @injuryLocation.BodyPart
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="exercise-text-info">
+        <h3>Description:</h3>
+        <p>@pageExercise.ExerciseDescription</p>
+        <h3>How to:</h3>
+        <p>@pageExercise.ExerciseInstructions</p>
+    </div>
+</div>
+<div class="footer">
+    <a class="google-it-btn" target="_blank" href="@pageExercise.ExerciseLink" >View on Google</a>
+</div>
+
+@code {
+    [Parameter] public long exerciseId { get; set; }
+
+    [CascadingParameter(Name = "UpdateMenuOnLogIn")] public EventCallback UpdateMenuOnLogIn { get; set; }
+    [CascadingParameter(Name = "UpdateMenuOnRefresh")] public EventCallback UpdateMenuOnRefresh { get; set; }
+
+    public Exercise pageExercise = new Exercise();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await sessionStorage.ContainKeyAsync("UserId"))
+        {
+
+            await UserState.Refresh(sessionStorage);
+            await UpdateMenuOnRefresh.InvokeAsync();
+
+
+        }
+
+        Console.WriteLine("Exercise Id:");
+        Console.WriteLine(exerciseId);
+        pageExercise = await ExerciseClient.GetExercise( exerciseId);
+
+    }
+
+
+}

@@ -4,6 +4,7 @@
 @inject UserClient UserClient
 @inject IJSRuntime JSRuntime
 @inject UserState UserState;
+@inject ToastService toastService;
 
 
 <div>
@@ -15,12 +16,6 @@
             <div class="username-section">
                 <input @bind="userProfile.Username" class="username" placeholder="Username">
             </div>
-            @if (userExists)
-            {
-                <div>
-                    <text>A User with that Username already exists.</text>
-                </div>
-            }
             <div class="password-section">
                 <input type="password" @bind="@passwordOne" class="password" placeholder="Password">
             </div>
@@ -48,12 +43,7 @@
                 <text>Failed to create user account. Please try again.</text>
             </div>
         }
-        @if (passwordTooShort)
-        {
-            <div>
-                <text>Password must be at least 5 characters and at most 50</text>
-            </div>
-        }
+
     </div>
     @if (showSpinner)
     {
@@ -78,6 +68,10 @@
             showSpinner = true;
             StateHasChanged();
             userExists = await UserClient.UserExistsCheck(userProfile);
+            if(userExists)
+            {
+                toastService.ShowToast("A User with that Username already exists.", ToastLevel.Warning);
+            }
             showSpinner = false;
             StateHasChanged();
             PasswordMatchCheck();
@@ -90,6 +84,7 @@
                 bool userAdded = false;
                 userProfile.Password = passwordOne;
                 passwordTooShort = !(userProfile.PasswordLengthCheck());
+                toastService.ShowToast("Password must be at least 5 characters and at most 50", ToastLevel.Warning);
                 if (userProfile.PasswordLengthCheck())
                 {
                     userAdded = await UserClient.AddUser(userProfile);
@@ -97,6 +92,7 @@
                     if (!userAdded)
                     {
                         userFailedToAdd = true;
+                        toastService.ShowToast("Failed to add user!", ToastLevel.Error);
                     }
                     else
                     {

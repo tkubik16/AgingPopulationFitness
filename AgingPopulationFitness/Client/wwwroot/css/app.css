@@ -5,8 +5,15 @@
     --clr-white: #e0e1dd;
     --clr-black: #415a77;
         */
-    --clr-white: #f8f9fa;
-    --clr-black: #495057;
+    --clr-white: rgba(248, 249, 250, 1);
+    --clr-white-75opa: rgba(248, 249, 250, 0.75);
+    --clr-black: rgba(73, 80, 87, 1);
+    --clr-black-75opa: rgba(73, 80, 87, 0.75);
+    --clr-black-85opa: rgba(73, 80, 87, 0.85);
+}
+
+body {
+    background-color: var(--clr-white);
 }
 
 .whole {
@@ -63,8 +70,8 @@
     left: 0;
     max-height: 5rem;
     width: 100%;
-    background-color: var(--clr-black);
-    backdrop-filter: blur(4px);
+    background-color: var(--clr-black-85opa);
+    backdrop-filter: blur(5px);
     display: flex;
     flex-direction: row;
     color: var(--clr-white);
@@ -183,27 +190,7 @@
     }
 
 
-.dialog-container {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: rgba(0,0,0,0.5);
-    z-index: 2000;
-    display: flex;
-    animation: dialog-container-entry 0.2s;
-}
 
-@keyframes dialog-container-entry {
-    0% {
-        opacity: 0;
-    }
-
-    100% {
-        opacity: 1;
-    }
-}
 
 
 #blazor-error-ui {
@@ -435,8 +422,8 @@
         flex-direction: row;
         height: 100%;
         width: 0rem;
-        background-color: var(--clr-black);
-        backdrop-filter: blur(4px);
+        background-color: var(--clr-black-85opa);
+        backdrop-filter: blur(5px);
         display: flex;
         flex-direction: column;
         overflow-x: hidden;
@@ -550,7 +537,7 @@
 
 /* Dropdown Button */
 .dropbtn {
-    background-color: var(--clr-black);
+    background: none;
     color: var(--clr-white);
     padding: 16px;
     font-size: 16px;

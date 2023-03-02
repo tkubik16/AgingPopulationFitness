@@ -2,6 +2,7 @@ using AgingPopulationFitness.Client;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Blazored.SessionStorage;
+using AgingPopulationFitness.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -13,6 +14,7 @@ builder.Services.AddHttpClient<ExerciseClient>(client => client.BaseAddress = ne
 builder.Services.AddScoped<UserState>();
 builder.Services.AddScoped<InjuryState>();
 builder.Services.AddScoped<ExerciseFilterState>();
+builder.Services.AddScoped<ToastService>();
 builder.Services.AddBlazoredSessionStorage();
 
 await builder.Build().RunAsync();

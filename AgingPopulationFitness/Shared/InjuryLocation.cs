@@ -16,7 +16,10 @@ namespace AgingPopulationFitness
         public string BodyPart { get; set; }
 
         
-        public InjuryLocation() { }
+        public InjuryLocation() {
+            InjuryLocationId = -1;
+            BodyPart = string.Empty;
+        }
         public InjuryLocation(int InjuryId, string BodyPart)
         {
             this.InjuryLocationId = InjuryId;

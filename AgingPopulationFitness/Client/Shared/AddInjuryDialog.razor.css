@@ -4,13 +4,11 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: rgba(0,0,0,0.5);
     z-index: 2000;
     display: flex;
     animation: dialog-container-entry 0.2s;
+    
 
-    border-style: dashed;
-    border-color: black;
 }
 
 @keyframes dialog-container-entry {
@@ -24,19 +22,20 @@
 }
 
 .dialog {
-    background-color: white;
     box-shadow: 0 0 12px rgba(0,0,0,0.6);
     display: flex;
     flex-direction: column;
     z-index: 2000;
     align-self: center;
-    border-radius: 1rem; 
+    border-radius: 1rem;
     margin: auto;
     padding: 1rem;
     min-width: 75%;
     min-height: 50%;
     animation: dialog-entry 0.4s;
     animation-timing-function: cubic-bezier(0.075, 0.820, 0.165, 1.000);
+    backdrop-filter: blur(10px);
+    background-color: rgba(248, 249, 250, 0.75);
 }
 
 @media screen and (max-width: 480px) {
@@ -48,10 +47,12 @@
 @keyframes dialog-entry {
     0% {
         transform: translateY(30px) scale(0.95);
+        backdrop-filter: blur(0px);
     }
 
     100% {
         transform: translateX(0px) scale(1.0);
+        backdrop-filter: blur(10px);
     }
 }
 

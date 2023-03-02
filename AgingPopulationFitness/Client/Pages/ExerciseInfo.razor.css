@@ -1,0 +1,177 @@
+﻿
+.header {
+    display: flex;
+    justify-content: center;
+}
+
+.name-type {
+    text-align: center;
+    align-content: center;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+}
+
+
+
+.exercise-injuries-section {
+    display: flex;
+    flex-direction: row;
+    height: fit-content;
+}
+
+    .exercise-injuries-section text {
+        font-weight: 600;
+    }
+
+.exercise-info-injuries {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: fit-content;
+    margin-top: 0.1rem;
+    font-weight: 600;
+    flex-wrap: wrap;
+}
+
+
+.exercise-info-injury {
+    display: flex;
+    flex-direction: row;
+    background-color: rgba(255, 105, 97, 0.95);
+    color: black;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    border-radius: 2rem;
+    margin: 0.1rem 0.05rem;
+    font-weight: 400;
+    font-size: 0.6rem;
+    border-style: solid;
+    border-color: rgba(255, 105, 97, 0.95);
+    border-width: 2px;
+    text-transform: uppercase;
+    flex-wrap: nowrap;
+}
+
+.exercise-benefits-section {
+    display: flex;
+    flex-direction: row;
+    height: fit-content;
+}
+
+    .exercise-benefits-section text {
+        font-weight: 600;
+    }
+
+.exercise-info-benefits {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    margin-top: 0.1rem;
+    font-weight: 600;
+    flex-wrap: wrap;
+}
+
+
+.exercise-info-benefit {
+    display: flex;
+    flex-direction: row;
+    background-color: rgba(138, 189, 145, 0.95);
+    color: black;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    border-radius: 2rem;
+    margin: 0.1rem 0.05rem;
+    font-weight: 400;
+    font-size: 0.6rem;
+    border-style: solid;
+    border-color: rgba(138, 189, 145, 0.95);
+    border-width: 2px;
+    text-transform: uppercase;
+    flex-wrap: nowrap;
+}
+
+.exercise-info-body {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+}
+.benefits-and-injury-locations {
+    width: 20%;
+    height: fit-content;
+    margin-right: 2.5%;
+    padding: 1rem;
+    border-style: solid;
+    border-color: var(--clr-black);
+    border-radius: 0.5rem;
+}
+
+.exercise-benefits-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.exercise-injuries-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.exercise-text-info {
+    width: 60%;
+    height: fit-content;
+    padding: 1rem;
+    border-style: solid;
+    border-color: var(--clr-black);
+    border-radius: 0.5rem;
+}
+
+.footer{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.google-it-btn {
+    
+    background-color: var(--clr-white);
+    color: var(--clr-black);
+    border-radius: .25rem;
+    border-style: solid;
+    border-width: 2px;
+    border-color: var(--clr-black);
+    font-weight: 700;
+    font-size: 1.5rem;
+    text-align: center;
+    justify-content: center;
+    transition: transform .2s;
+    z-index: 5;
+    padding: 0.25rem;
+    text-decoration: none;
+    margin-top: 1rem;
+}
+
+    .google-it-btn:hover {
+        border-color: var(--clr-white);
+        background-color: var(--clr-black);
+        color: var(--clr-white);
+        transform: scale(1.1);
+    }
+
+@media screen and (max-width: 641px) {
+
+    .exercise-info-body {
+
+        flex-direction: column;
+
+    }
+
+    .benefits-and-injury-locations{
+        width: 95%;
+    }
+
+    .exercise-text-info {
+        margin-top: 1rem;
+        width: 95%;
+    }
+
+}

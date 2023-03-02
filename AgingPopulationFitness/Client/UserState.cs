@@ -1,5 +1,6 @@
 ﻿using Blazored.SessionStorage;
 using System.ComponentModel;
+using AgingPopulationFitness;
 
 namespace AgingPopulationFitness.Client
 {
@@ -21,6 +22,7 @@ namespace AgingPopulationFitness.Client
 
         public async Task<bool> Refresh( Blazored.SessionStorage.ISessionStorageService sessionStorage)
         {
+
             this.userProfile.UserId = await sessionStorage.GetItemAsync<Guid>("UserId");
             this.userProfile.Username = await sessionStorage.GetItemAsync<String>("Username");
             this.userProfile.Password = await sessionStorage.GetItemAsync<String>("Password");

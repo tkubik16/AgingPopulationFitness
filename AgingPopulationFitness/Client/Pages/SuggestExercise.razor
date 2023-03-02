@@ -9,6 +9,7 @@
 @inject IJSRuntime JS
 @inject InjuryState InjuryState
 @inject UserState UserState
+@inject ToastService toastService
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 
 
@@ -118,7 +119,7 @@
         }
     </div>
     <div>
-        <button @onclick="PrintExeciseSuggestion">Submit Exercise</button>
+        <button @onclick="SubmitExerciseSuggestion">Submit Exercise</button>
     </div>
 </div>
 @if (Image != string.Empty)
@@ -252,9 +253,18 @@
 
     }
 
-    private async void PrintExeciseSuggestion()
+    public void MakeExerciseLink()
     {
-        
+        string nameModified = suggestedExercise.Exercise.ExerciseName.Replace(' ', '+');
+        suggestedExercise.Exercise.ExerciseLink = string.Format("http://www.google.com/search?q={0}", nameModified);
+        Console.WriteLine(suggestedExercise.Exercise.ExerciseLink);
+
+    }
+
+    private async void SubmitExerciseSuggestion()
+    {
+        bool successfullySubmitted = false; 
+
         Console.WriteLine("~~~~~~~~~~~");
         Console.WriteLine(suggestedExercise.UserId);
         Console.WriteLine(suggestedExercise.Exercise.ExerciseName);
@@ -264,8 +274,17 @@
         Console.WriteLine(suggestedExercise.Exercise.ExerciseLink);
         Console.WriteLine(suggestedExercise.Exercise.Benefits.Count);
         Console.WriteLine(suggestedExercise.Exercise.InjuryLocations.Count);
-        
-        success = await ExerciseClient.PostSuggestedExercise(suggestedExercise);
+        MakeExerciseLink();
+        successfullySubmitted = await ExerciseClient.PostSuggestedExercise(suggestedExercise);
+
+        if(successfullySubmitted)
+        {
+            toastService.ShowToast("Thank you for your suggestion!", ToastLevel.Success);
+        }
+        else
+        {
+            toastService.ShowToast("Failed to submit suggestion!", ToastLevel.Error);
+        }
     }
 
 }

@@ -1,0 +1,99 @@
+﻿.cs-toast {
+    display: none;
+    color: #fff;
+    z-index: 999;
+    position: absolute;
+    width: 25rem;
+    overflow: hidden;
+    top: 2rem;
+    border-radius: 25rem;
+    right: 2rem;
+    overflow: hidden;
+}
+
+.cs-toast-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.cs-toast-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding-top: 1rem;
+    font-size: 1.5rem;
+
+}
+
+    .cs-toast-body p {
+        margin-bottom: 0;
+        padding-bottom: 1rem;
+        font-size: 1rem;
+    }
+
+.cs-toast button{
+    aspect-ratio: 1 / 1;
+    width: 3rem;
+    height: 3rem;
+    align-self: center;
+    border: none;
+    border-radius: 5rem;
+    margin-right: 2rem;
+}
+
+.cs-toast-visible {
+    display: flex;
+    flex-direction: row;
+    animation: fadein 1.5s;
+}
+
+.bg-info-opa {
+    background-color: rgba(139, 153, 235, 0.95);
+}
+
+.bg-success-opa {
+    background-color: rgba(138, 189, 145, 0.95);
+}
+
+.bg-warning-opa {
+    background-color: rgba(255, 179, 71, 0.95);
+}
+
+.bg-danger-opa {
+    background-color: rgba(255, 105, 97, 0.95);
+}
+
+
+@media screen and (max-width: 641px) {
+
+    .cs-toast{
+        left: 50%;
+        width: 20rem;
+        margin-left: -10rem;
+        top: 88%;
+    }
+
+    .cs-toast-body {
+        
+        font-size: 1rem;
+    }
+
+        .cs-toast-body p {
+            
+            font-size: 0.75rem;
+        }
+
+}
+
+    @keyframes fadein {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }

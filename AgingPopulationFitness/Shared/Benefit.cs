@@ -29,5 +29,12 @@ namespace AgingPopulationFitness
             this.BenefitSpecificity = string.Empty;
         }
 
+        public Benefit(int BenefitId, string BenefitName, string BenefitSpecificity)
+        {
+            this.BenefitId = BenefitId;
+            this.BenefitName = BenefitName;
+            this.BenefitSpecificity = BenefitSpecificity;
+        }
+
     }
 }

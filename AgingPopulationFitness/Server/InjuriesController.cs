@@ -101,26 +101,29 @@ namespace AgingPopulationFitness.Server
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
             */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
-
-            var sql = "SELECT injury_location.injury_location_id, injury_location.body_part FROM user_injury " +
-                        "FULL JOIN user_injury_injury_location " +
-                        "ON user_injury.user_injury_id = user_injury_injury_location.user_injury_id " +
-                        "FULL JOIN injury_location " +
-                        "ON user_injury_injury_location.injury_location_id = injury_location.injury_location_id " +
-                        "WHERE user_uid = @UserUid " +
-                        "GROUP BY injury_location.body_part, injury_location.injury_location_id " +
-                        "ORDER BY injury_location.body_part";
-
-            using var cmd = new NpgsqlCommand(sql, con);
-
-            cmd.Parameters.AddWithValue("UserUid", userUid);
+            
+            
 
 
 
             try
             {
+                using var con = new NpgsqlConnection(cs);
+                con.Open();
+
+                var sql = "SELECT injury_location.injury_location_id, injury_location.body_part FROM user_injury " +
+                            "FULL JOIN user_injury_injury_location " +
+                            "ON user_injury.user_injury_id = user_injury_injury_location.user_injury_id " +
+                            "FULL JOIN injury_location " +
+                            "ON user_injury_injury_location.injury_location_id = injury_location.injury_location_id " +
+                            "WHERE user_uid = @UserUid " +
+                            "GROUP BY injury_location.body_part, injury_location.injury_location_id " +
+                            "ORDER BY injury_location.body_part";
+
+                using var cmd = new NpgsqlCommand(sql, con);
+
+                cmd.Parameters.AddWithValue("UserUid", userUid);
+
                 using NpgsqlDataReader rdr = cmd.ExecuteReader();
 
                 while (rdr.Read())
@@ -132,13 +135,13 @@ namespace AgingPopulationFitness.Server
                 }
 
 
-
+                con.Close();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
-            con.Close();
+            
             return userInjuryLocations;
 
         }

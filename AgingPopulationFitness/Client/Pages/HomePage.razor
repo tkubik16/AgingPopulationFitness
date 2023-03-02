@@ -3,7 +3,9 @@
 @inject NavigationManager Navigation;
 @inject HttpClient HttpClient
 @inject UserClient UserClient
+@inject ExerciseClient ExerciseClient
 @inject ExerciseFilterState ExerciseFilterState
+@inject ExerciseFilterState ExerciseFilterState;
 @inject IJSRuntime JSRuntime
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 
@@ -21,5 +23,64 @@
 }
 
 @code {
+
+    [CascadingParameter(Name = "UpdateMenuOnLogIn")] public EventCallback UpdateMenuOnLogIn { get; set; }
+    [CascadingParameter(Name = "UpdateMenuOnRefresh")] public EventCallback UpdateMenuOnRefresh { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        if (await sessionStorage.ContainKeyAsync("UserId"))
+        {
+
+            await UserState.Refresh(sessionStorage);
+            await UpdateMenuOnRefresh.InvokeAsync();
+            RequeryInfo();
+
+        }
+
+        try
+        {
+
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+
+
+    }
+
+    
+
+    async void RequeryInfo()
+    {
+        //get Users injury lcoations
+        UserState.injuryLocations = await UserClient.GetUsersInjuryLocations(UserState.userProfile.UserId);
+        ExerciseFilterState.ExerciseFilter.InjuryLocations = UserState.injuryLocations;
+        //get benefits, exercise types and injury locations
+        if (ExerciseFilterState.ExerciseFilter.BenefitsList.Count == 0)
+        {
+            ExerciseFilterState.ExerciseFilter.BenefitsList = await ExerciseClient.GetGeneralBenefits();
+            for (int i = 0; i < ExerciseFilterState.ExerciseFilter.BenefitsList.Count; i++)
+            {
+                ExerciseFilterState.AllBenefitsList.Add(ExerciseFilterState.ExerciseFilter.BenefitsList[i]);
+            }
+        
+        }
+        if (ExerciseFilterState.ExerciseFilter.ExerciseTypesList.Count == 0)
+        {
+            ExerciseFilterState.ExerciseFilter.ExerciseTypesList = await ExerciseClient.GetExerciseTypes();
+            for (int i = 0; i < ExerciseFilterState.ExerciseFilter.ExerciseTypesList.Count; i++)
+            {
+                ExerciseFilterState.AllExerciseTypesList.Add(ExerciseFilterState.ExerciseFilter.ExerciseTypesList[i]);
+            }
+        }
+        
+
+
+    }
 
 }

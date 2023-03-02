@@ -1,22 +1,29 @@
 ﻿
 .exercise-card {
-    display: flex;
-    flex-direction: row;
+
     padding: 0.5rem;
-    width: 75%;
-    height: 10rem;
+    width: 65%;
+    height: fit-content;
     margin: auto;
     justify-content: space-between;
     border-style: solid;
-    border-color: blue;
+    border-color: var(--clr-black);
+    margin-bottom: 2px;
+    border-radius: 0.5rem;
+    z-index: 1;
+}
+
+.exercise-card:hover {
+    background-color: var(--clr-black);
+    color: var(--clr-white);
 }
 
 .exercise-main-img-div {
+    display: none;
     flex: none;
     aspect-ratio: 1 / 1;
     height: 100%;
-    border-style: solid;
-    border-color: pink;
+
 }
 
 .exercise-main-img {
@@ -28,16 +35,16 @@
 
 .all-exercise-info {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 90%;
-    border-style: solid;
-    border-color: pink;
+    flex-direction: column;
+    width: 100%;
+    height: fit-content;
+
+    
 }
 
 .exercise-info {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: space-between;
     align-items: center;
 
@@ -45,70 +52,142 @@
 
 .exercise-name {
 
-    font-size: 1rem;
+    font-size: 1.25rem;
+    font-weight: 600;
     align-self: center;
-    margin-left: 1rem;
-    border-style: solid;
-    border-color: red;
+
 }
 
 .exercise-link-btn {
-    background-color: var(--clr-black);
-    color: var(--clr-white);
+    position: relative;
+    width: 10rem;
+    left: 100%;
+    margin-left: -8.5rem;
+    background-color: var(--clr-white);
+    color: var(--clr-black);
     border-radius: .25rem;
-    border-width: 0;
+    border-style: solid;
+    border-width: 2px;
+    border-color: var(--clr-black);
     box-sizing: border-box;
-    text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
+
     font-weight: 700;
     font-size: 1rem;
     text-align: center;
     justify-content: center;
     transition: transform .2s;
+    z-index: 5;
+    padding: 0.25rem;
+    text-decoration: none;
+
 }
 
     .exercise-link-btn:hover {
-        text-shadow: rgba(0, 0, 0, .8) 2px 2px 2px;
-        transform: scale(1.1);
+        border-color: var(--clr-white);
+        background-color: var(--clr-black);
+        color: var(--clr-white);
+        transform: scale(2);
     }
 
 
 .exercise-type {
     font-size: 1rem;
+
+}
+
+.injuries-section {
+    display: flex;
+    flex-direction: row;
+    height: fit-content;
+
+}
+
+    .injuries-section text{
+        font-weight: 600;
+    }
+
+.exercise-card-injuries {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: fit-content;
+    margin-top: 0.1rem;
+    font-weight: 600;
+    flex-wrap: wrap;
+}
+
+
+.exercise-card-injury {
+    display: flex;
+    flex-direction: row;
+    background-color: rgba(255, 105, 97, 0.95);
+    color: black;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    border-radius: 2rem;
+    margin: 0.1rem 0.05rem;
+    font-weight: 400;
+    font-size: 0.6rem;
     border-style: solid;
-    border-color: red;
+    border-color: rgba(255, 105, 97, 0.95);
+    border-width: 2px;
+    text-transform: uppercase;
+    flex-wrap: nowrap;
+}
+
+.benefits-section {
+    display: flex;
+    flex-direction: row;
+    height: fit-content;
+
+}
+
+    .benefits-section text {
+        font-weight: 600;
+    }
+
+.exercise-card-benefits {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    margin-top: 0.1rem;
+    font-weight: 600;
+    flex-wrap: wrap;
+}
+
+
+.exercise-card-benefit {
+    display: flex;
+    flex-direction: row;
+    background-color: rgba(138, 189, 145, 0.95);
+    color: black;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    border-radius: 2rem;
+    margin: 0.1rem 0.05rem;
+    font-weight: 400;
+    font-size: 0.6rem;
+    border-style: solid;
+    border-color: rgba(138, 189, 145, 0.95);
+    border-width: 2px;
+    text-transform: uppercase;
+    flex-wrap: nowrap;
 }
 
 @media screen and (max-width: 641px) {
 
     .exercise-card {
         width: 100%;
-        height: fit-content;
-        padding: 1rem;
     }
-
-    .exercise-name {
-        font-size: 1rem;
-        width: 100%;
-        margin-left: 0;
-        padding: 0.25rem
-    }
-
-    .exercise-type {
-        font-size: 1rem;
-    }
-    .all-exercise-info {
+    .benefits-section {
+        display: flex;
         flex-direction: column;
+
     }
 
-    .exercise-link-btn {
-        font-size: 1rem;
-    }
-
-    .exercise-main-img {
-        width: 8rem;
-        height: 8rem;
-        object-fit: scale-down;
-        overflow: hidden;
+    .injuries-section {
+        display: flex;
+        flex-direction: column;
     }
 
 }

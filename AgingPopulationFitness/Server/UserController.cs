@@ -115,28 +115,35 @@ namespace AgingPopulationFitness.Server
             */
 
             using var con = new NpgsqlConnection(cs);
-            con.Open();
-
-            var sql = "SELECT user_uid FROM user_profile WHERE user_uid = @user_id ";
-
-            using var cmd = new NpgsqlCommand(sql, con);
-
-            cmd.Parameters.AddWithValue("user_id", userProfile.UserId);
-            cmd.Prepare();
-
-            using NpgsqlDataReader rdr = cmd.ExecuteReader();
-
-            while (rdr.Read())
+            try
             {
-                UserProfile newUserProfile = new UserProfile();
-                newUserProfile.UserId = rdr.GetGuid(0);
-                userProfileList.Add(newUserProfile);
+                con.Open();
+
+                var sql = "SELECT user_uid FROM user_profile WHERE user_uid = @user_id ";
+
+                using var cmd = new NpgsqlCommand(sql, con);
+
+                cmd.Parameters.AddWithValue("user_id", userProfile.UserId);
+                cmd.Prepare();
+
+                using NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    UserProfile newUserProfile = new UserProfile();
+                    newUserProfile.UserId = rdr.GetGuid(0);
+                    userProfileList.Add(newUserProfile);
+                }
+                if (userProfileList.Count() == 1)
+                {
+                    isLoggedIn = true;
+                }
+                con.Close();
             }
-            if (userProfileList.Count() == 1)
+            catch(Exception e)
             {
-                isLoggedIn = true;
+                Console.WriteLine(e);
             }
-            con.Close();
             return isLoggedIn;
         }
 

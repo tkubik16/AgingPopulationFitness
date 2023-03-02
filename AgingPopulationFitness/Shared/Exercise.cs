@@ -35,6 +35,7 @@ namespace AgingPopulationFitness
             this.Benefits = new List<Benefit>();
             this.InjuryLocations = new List<InjuryLocation>();
         }
+
     }
 }
 

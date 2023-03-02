@@ -6,6 +6,7 @@
 @inject IJSRuntime JS
 @inject InjuryState InjuryState
 @inject UserState UserState
+@inject ExerciseFilterState ExerciseFilterState
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 
 
@@ -13,7 +14,7 @@
 {
     <AddInjuryDialog userInjury="InjuryState.ConfiguringUserInjury"
                  OnCancel="InjuryState.CancelConfigureUserInjuryDialog"
-                 OnConfirm="InjuryState.ConfirmConfigureUserInjuryDialog" />
+                 OnConfirm="OnConfirmAddInjury" />
 }
 @if (userInjuries == null)
 {
@@ -23,7 +24,7 @@
 {
     @if( userInjuries.Count == 0)
     {
-        <h1 class="no-cards-message">No injuries have been added.</h1>
+        <h1 class="no-cards-message">You have no Injuries</h1>
     }
 }
 @if (userInjuries != null)
@@ -32,7 +33,7 @@
         <div class="add-injury-button-div">
             <button class="add-injury-button" @onclick="@(() => InjuryState.ShowConfigureUserInjuryDialog())">Add Injury</button>
         </div>
-
+        <InjuryLocations update="UpdateInjuryLocations"></InjuryLocations>
         <ul class="user-injury-cards">
             @if (userInjuries != null)
             {
@@ -69,6 +70,7 @@
     [CascadingParameter(Name = "UpdateMenuOnRefresh")] public EventCallback UpdateMenuOnRefresh { get; set; }
 
     public List<UserInjury> userInjuries;
+    public bool UpdateInjuryLocations = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -97,7 +99,7 @@
             await UserState.Refresh(sessionStorage);
             await UpdateMenuOnRefresh.InvokeAsync();
         }
-        
+
         if (UserState.userProfile.UserId != null)
         {
             try
@@ -110,13 +112,38 @@
                 {
                     userInjuries[i].PrintUserInjury();
                 }
+                UserState.injuryLocations = await UserClient.GetUsersInjuryLocations(UserState.userProfile.UserId);
+                ExerciseFilterState.ExerciseFilter.InjuryLocations = UserState.injuryLocations;
             }
             catch( Exception e)
             {
                 Console.WriteLine(e);
             }
         }
-        
+
+    }
+
+    public async void OnConfirmAddInjury()
+    {
+        InjuryState.ConfirmConfigureUserInjuryDialog();
+        try
+        {
+
+            userInjuries = await UserClient.GetUsersInjuries(UserState.userProfile.UserId);
+            UserState.userInjuries = userInjuries;
+
+            UserState.injuryLocations = await UserClient.GetUsersInjuryLocations(UserState.userProfile.UserId);
+            ExerciseFilterState.ExerciseFilter.InjuryLocations = UserState.injuryLocations;
+
+            NavigationManager.NavigateTo("/injuries-page");
+            UpdateInjuryLocations = true;
+            StateHasChanged();
+            UpdateInjuryLocations = false;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
     }
 
 

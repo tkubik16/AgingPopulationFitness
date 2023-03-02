@@ -4,6 +4,8 @@
 @inject UserClient UserClient;
 @inject HttpClient HttpClient;
 @inject UserState UserState;
+@inject ExerciseFilterState ExerciseFilterState
+@inject ToastService toastService
 
 <div class="dialog-container">
     <div class="dialog">
@@ -100,7 +102,7 @@
     protected override async Task OnInitializedAsync()
     {
         injuryLocations = await UserClient.GetInjuries();
-        
+
         /*
         UserClient.GetInjuriesString();
 
@@ -149,7 +151,19 @@
     {
         userInjury.UserId = UserState.userProfile.UserId;
         successfullyAdded = await UserClient.PostUserInjury(userInjury);
+        UserState.injuryLocations = await UserClient.GetUsersInjuryLocations(UserState.userProfile.UserId);
+        ExerciseFilterState.ExerciseFilter.InjuryLocations = UserState.injuryLocations;
+        await OnConfirm.InvokeAsync();
         StateHasChanged();
+
+        if(successfullyAdded)
+        {
+            toastService.ShowToast(string.Format("Injury '{0}' added!", userInjury.InjuryName), ToastLevel.Success);
+        }
+        else
+        {
+            toastService.ShowToast(string.Format("Failed to add '{0}'", userInjury.InjuryName), ToastLevel.Error);
+        }
     }
 
 }

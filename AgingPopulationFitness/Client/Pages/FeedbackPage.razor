@@ -9,6 +9,7 @@
 @inject IJSRuntime JS
 @inject InjuryState InjuryState
 @inject UserState UserState
+@inject ToastService toastService
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 
 
@@ -92,13 +93,19 @@
 
     async void SendFeedback()
     {
+        bool successfullySubmitted = false;
         Console.WriteLine(feedback.Title);
         Console.WriteLine(feedback.Type);
         Console.WriteLine(feedback.Body);
-        success = await UserClient.PostFeedback(feedback);
-        if(success)
+        successfullySubmitted = await UserClient.PostFeedback(feedback);
+        if (successfullySubmitted)
         {
+            toastService.ShowToast("Thank you for your feedback!", ToastLevel.Success);
             ResetPage();
+        }
+        else
+        {
+            toastService.ShowToast("Failed to submit!", ToastLevel.Error);
         }
     }
 

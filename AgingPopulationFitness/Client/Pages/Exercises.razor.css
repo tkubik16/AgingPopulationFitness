@@ -1,4 +1,18 @@
-﻿.exercise-cards {
+﻿
+.filter-and-cards {
+    display: flex;
+    flex-direction: row;
+}
+
+.cards-and-page-selector {
+    display: flex;
+    flex-direction: column;
+    width: 75%;
+    margin-right: 1rem;
+    margin-left: 1rem;
+}
+
+.exercise-cards {
     display: flex;
     flex-direction: column;
     background-color: var(--clr-white);
@@ -91,3 +105,17 @@
         color: var(--clr-white);
 
     }
+
+
+@media screen and (max-width: 641px) {
+
+    .filter-and-cards {
+        flex-direction: column;
+
+    }
+
+    .cards-and-page-selector {
+        width: 100%;
+    }
+
+}

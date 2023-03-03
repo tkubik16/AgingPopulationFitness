@@ -18,7 +18,7 @@
 .login-title {
     width: fit-content;
     margin: auto;
-
+    color: var(--clr-secondary);
 }
 
 .username-password-fields {
@@ -51,12 +51,12 @@
 }
 
 .login-button {
-    background-color: var(--clr-black);
+    background-color: var(--clr-cta);
     border-radius: .25rem;
     border-width: 0;
     box-sizing: border-box;
     text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
-    color: var(--clr-white);
+    color: var(--clr-neutral);
     font-weight: 500;
     font-size: 1.2rem;
     text-align: center;

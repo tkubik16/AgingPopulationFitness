@@ -10,6 +10,21 @@
     --clr-black: rgba(73, 80, 87, 1);
     --clr-black-75opa: rgba(73, 80, 87, 0.75);
     --clr-black-85opa: rgba(73, 80, 87, 0.85);
+    /*rgba(255, 245, 227, 1);*/
+    /*rgba(68, 152, 179, 1);*/
+    /*
+    --clr-neutral: rgba(252, 251, 247, 1); 
+    --clr-secondary: rgba(2, 126, 166, 1); 
+    --clr-cta: rgba(255, 123, 73, 1);
+    */
+    /*
+    --clr-neutral: rgba(44, 73, 68, 1);
+    --clr-secondary: rgba(179, 198, 197, 1);
+    --clr-cta: rgba(248, 188, 20, 1);
+    */
+    --clr-neutral: rgba(252, 251, 247, 1);
+    --clr-secondary: rgba(2, 126, 166, 1);
+    --clr-cta: rgba(255, 123, 73, 1);
 }
 
 body {
@@ -41,7 +56,7 @@ body {
     height: 100%;
     overflow: auto;
     font-family: 'quicksand';
-    background-color: var(--clr-white);
+    background-color: var(--clr-neutral);
     padding-top: 5rem;
 
 }
@@ -70,11 +85,11 @@ body {
     left: 0;
     max-height: 5rem;
     width: 100%;
-    background-color: var(--clr-black-85opa);
+    background-color: var(--clr-secondary);
     backdrop-filter: blur(5px);
     display: flex;
     flex-direction: row;
-    color: var(--clr-white);
+    color: var(--clr-neutral);
     z-index: 1030;
     font-family: 'Quicksand', serif;
 
@@ -114,7 +129,7 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 0.9rem;
-    color: var(--clr-white);
+    color: var(--clr-neutral);
     text-transform: uppercase;
     transition: 0.2s ease-out;
     text-decoration: none;
@@ -128,11 +143,11 @@ body {
     .nav-tab:hover {
         color: black;
         text-decoration: none;
-        background-color: var(--clr-white);
+        background-color: var(--clr-neutral);
     }
 
     .nav-tab.active {
-        background-color: var(--clr-white);
+        background-color: var(--clr-neutral);
         color: black;
         font-weight: 600;
     }
@@ -166,8 +181,8 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 0.9rem;
-    background-color: var(--clr-white);
-    color: var(--clr-black);
+    background-color: var(--clr-neutral);
+    color: var(--clr-secondary);
     text-transform: uppercase;
     transition: 0.2s ease-out;
     text-decoration: none;
@@ -180,12 +195,12 @@ body {
     .nav-tab-dropdown:hover {
         color: white;
         text-decoration: none;
-        background-color: var(--clr-white);
+        background-color: var(--clr-neutral);
     }
 
     .nav-tab-dropdown.active {
-        background-color: var(--clr-black);
-        color: var(--clr-white);
+        background-color: var(--clr-secondary);
+        color: var(--clr-neutral);
         font-weight: 500;
     }
 
@@ -296,7 +311,7 @@ body {
     display: flex;
     justify-content: end;
     margin-right: 1rem;
-
+    
 }
 
 .user-injury-cards {
@@ -310,17 +325,55 @@ body {
     
 }
 
+
     .user-injury-cards > li {
         width: 20rem;
         padding: 1rem;
         gap: 1rem;
-        color: var(--clr-white);
-        background-color: var(--clr-black);
+        color: var(--clr-secondary);
+        background-color: var(--clr-neutral);
         border-radius: 0.5rem;
+        box-shadow: 2px 2px 5px var(--clr-secondary);
+        transition: all 0.2s;
     }
 
         .user-injury-cards > li:hover {
             transform: scale(1.02);
+            box-shadow: 0 0 10px var(--clr-cta);
+        }
+
+.injury-title{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+}
+
+    .injury-title::after {
+        content: "";
+        width: 90%;
+        height: 1px;
+        background-color: var(--clr-secondary);
+        margin-top: 0.5rem;
+    }
+
+.add-injury-li {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--clr-cta);
+}
+
+    .add-injury-li svg {
+        aspect-ratio: 1 / 1;
+        fill: var(--clr-cta);
+        width: 50%;
+        height: 50%;
+    }
+
+        .add-injury-li svg path {
+            fill: var(--clr-cta);
         }
 
 .user-injury-info {
@@ -333,8 +386,8 @@ body {
     }
 
 .add-injury-button {
-    background-color: var(--clr-black);
-    color: var(--clr-white);
+    background-color: var(--clr-cta);
+    color: var(--clr-neutral);
     border-radius: .25rem;
     border-width: 0;
     box-sizing: border-box;
@@ -358,8 +411,8 @@ body {
 }
 
 .view-injury-button {
-    background-color: var(--clr-white);
-    color: var(--clr-black);
+    background-color: var(--clr-cta);
+    color: var(--clr-neutral);
     border-radius: .25rem;
     border-width: 0;
     box-sizing: border-box;
@@ -384,13 +437,72 @@ body {
 
 .injury {
     display: inline-block;
-    background-color: var(--clr-white);
-    color: var(--clr-black);
+    background-color: var(--clr-neutral);
+    color: var(--clr-secondary);
     padding: 0.05rem 0.5rem;
     border-radius: 2rem;
     margin: 0.2rem 0.1rem;
     font-weight: 700;
     font-size: 1rem;
+
+    background-color: rgba(255, 105, 97, 0.95);
+    color: black;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    border-radius: 2rem;
+    margin: 0.1rem 0.05rem;
+    font-weight: 700;
+    font-size: 0.75rem;
+    border-style: solid;
+    border-color: rgba(255, 105, 97, 0.95);
+    border-width: 2px;
+    text-transform: uppercase;
+    flex-wrap: nowrap;
+}
+
+.x-btn {
+    border: none;
+    aspect-ratio: 1 / 1;
+    height: 1.5rem;
+    border-radius: 1rem;
+    font-weight: 700;
+    color: var(--clr-black);
+    text-transform: uppercase;
+    margin-left: 0.25rem;
+}
+
+    .x-btn:hover {
+        color: black;
+        background-color: indianred;
+    }
+
+.exercise-card-injuries {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: fit-content;
+    margin-top: 0.1rem;
+    font-weight: 600;
+    flex-wrap: wrap;
+}
+
+
+.exercise-card-injury {
+    display: flex;
+    flex-direction: row;
+    background-color: rgba(255, 105, 97, 0.95);
+    color: black;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    border-radius: 2rem;
+    margin: 0.1rem 0.05rem;
+    font-weight: 400;
+    font-size: 0.6rem;
+    border-style: solid;
+    border-color: rgba(255, 105, 97, 0.95);
+    border-width: 2px;
+    text-transform: uppercase;
+    flex-wrap: nowrap;
 }
 
 @media screen and (max-width: 641px) {
@@ -416,23 +528,22 @@ body {
         overflow: hidden;
         
     }
-    
+
     .top-bar-mobile {
         display: flex;
         flex-direction: row;
         height: 100%;
         width: 0rem;
-        background-color: var(--clr-black-85opa);
+        background-color: var(--clr-secondary);
         backdrop-filter: blur(5px);
         display: flex;
         flex-direction: column;
         overflow-x: hidden;
-        color: var(--clr-white);
+        color: var(--clr-neutral);
         -webkit-box-shadow: inset 0px 0px 13px 4px rgba(0,0,0,0.37);
         padding: 0;
         z-index: 1030;
         font-family: 'Quicksand', serif;
-
         transition: 0.5s;
     }
 
@@ -488,17 +599,17 @@ body {
         text-decoration: none;
     }
 
-    .nav-tab-mobile:hover {
-        color: black;
-        text-decoration: none;
-        background-color: var(--clr-white);
-    }
+        .nav-tab-mobile:hover {
+            color: black;
+            text-decoration: none;
+            background-color: var(--clr-neutral);
+        }
 
-    .nav-tab-mobile.active {
-        background-color: var(--clr-white);
-        color: black;
-        font-weight: 600;
-    }
+        .nav-tab-mobile.active {
+            background-color: var(--clr-neutral);
+            color: black;
+            font-weight: 600;
+        }
 }
 
 .checkbox {
@@ -538,7 +649,7 @@ body {
 /* Dropdown Button */
 .dropbtn {
     background: none;
-    color: var(--clr-white);
+    color: var(--clr-neutral);
     padding: 16px;
     font-size: 16px;
     border: none;
@@ -556,7 +667,7 @@ body {
 .dropdown-content {
     display: none;
     position: absolute;
-    background-color: var(--clr-white);
+    background-color: var(--clr-neutral);
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
@@ -572,8 +683,8 @@ body {
 
         /* Change color of dropdown links on hover */
         .dropdown-content a:hover {
-            background-color: var(--clr-black);
-            color: var(--clr-white);
+            background-color: var(--clr-secondary);
+            color: var(--clr-neutral);
         }
 
 /* Show the dropdown menu on hover */
@@ -583,7 +694,7 @@ body {
 
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown:hover .dropbtn {
-    background-color: var(--clr-white);
-    color: var(--clr-black);
+    background-color: var(--clr-neutral);
+    color: var(--clr-secondary);
 }
 

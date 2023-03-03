@@ -9,13 +9,19 @@
 @inject IJSRuntime JSRuntime
 
 
-<div >
-    <div >
+
         <div class="whole-filter">
             <div class="benefit-section">
                 <label>Exercise Benefit:</label>
                 <select class="benefit-select" id="SelectBenefitExerciseFilter" @onchange="ExerciseBenefitSelected">
-                    <option value="-1" disabled select>Select Benefit</option>
+                    @if (ExerciseFilterState.AllBenefitsList.Count == 0)
+                    {
+                        <option value="-1" disabled select selected>All Benefits Selected</option>
+                    }
+                    else
+                    {
+                        <option value="-1" disabled select selected>Select Benefit</option>
+                    }
                     @for (var i = 0; i < ExerciseFilterState.AllBenefitsList.Count; i++)
                     {
                         <option value="@i">@ExerciseFilterState.AllBenefitsList[i].BenefitId @ExerciseFilterState.AllBenefitsList[i].BenefitName </option>
@@ -31,10 +37,17 @@
                     </div>
                 }
             </div>
-            <div class="type-selection">
+            <div class="type-section">
                 <label>Exercise Type:</label>
                 <select class="type-select" id="SelectTypeExerciseFilter" @onchange="ExerciseTypeSelected">
-                    <option value="-1" disabled select>Select Type</option>
+                    @if (ExerciseFilterState.AllExerciseTypesList.Count == 0)
+                    {
+                        <option value="-1" disabled select selected>All Types Selected</option>
+                    }
+                    else
+                    {
+                        <option value="-1" disabled select selected>Select Type</option>
+                    }
                     @for (var i = 0; i < ExerciseFilterState.AllExerciseTypesList.Count; i++)
                     {
 
@@ -55,8 +68,7 @@
             <InputCheckbox class="checkbox" @bind-Value=ExerciseFilterState.ExerciseFilter.ExcludeBasedOnInjuries></InputCheckbox>
             <button @onclick="OnSearch">Search</button>
         </div>
-    </div>
-</div>
+
 
 
 @code {
@@ -74,7 +86,7 @@
             ExerciseFilterState.ExerciseFilter.BenefitsList = await ExerciseClient.GetGeneralBenefits();
             for (int i = 0; i < ExerciseFilterState.ExerciseFilter.BenefitsList.Count; i++)
             {
-                ExerciseFilterState.AllBenefitsList.Add(ExerciseFilterState.ExerciseFilter.BenefitsList[i]);
+                //ExerciseFilterState.AllBenefitsList.Add(ExerciseFilterState.ExerciseFilter.BenefitsList[i]);
             }
         }
         if (ExerciseFilterState.ExerciseFilter.ExerciseTypesList.Count == 0)
@@ -82,7 +94,7 @@
             ExerciseFilterState.ExerciseFilter.ExerciseTypesList = await ExerciseClient.GetExerciseTypes();
             for (int i = 0; i < ExerciseFilterState.ExerciseFilter.ExerciseTypesList.Count; i++)
             {
-                ExerciseFilterState.AllExerciseTypesList.Add(ExerciseFilterState.ExerciseFilter.ExerciseTypesList[i]);
+                //ExerciseFilterState.AllExerciseTypesList.Add(ExerciseFilterState.ExerciseFilter.ExerciseTypesList[i]);
             }
         }
         if (ExerciseFilterState.ExerciseResults.Count == 0)
@@ -118,11 +130,20 @@
         {
             ExerciseFilterState.ExerciseFilter.ExerciseTypesList.Add(new ExerciseType(exerciseType.ExerciseTypeId, exerciseType.Type));
         }
+
+        ExerciseFilterState.AllExerciseTypesList.RemoveAll(pt => pt.Type == exerciseType.Type);
+        SetSelectedType();
     }
 
     void RemoveExerciseType(ExerciseType exerciseType)
     {
         ExerciseFilterState.ExerciseFilter.ExerciseTypesList.RemoveAll(pt => pt.Type == exerciseType.Type);
+
+        if (ExerciseFilterState.AllExerciseTypesList.Find(pt => pt.Type == exerciseType.Type) == null)
+        {
+            ExerciseFilterState.AllExerciseTypesList.Add(new ExerciseType(exerciseType.ExerciseTypeId, exerciseType.Type));
+        }
+        SetSelectedType();
     }
 
     void ExerciseBenefitSelected(ChangeEventArgs e)
@@ -140,11 +161,18 @@
         {
             ExerciseFilterState.ExerciseFilter.BenefitsList.Add(new Benefit(exerciseBenefit.BenefitId, exerciseBenefit.BenefitName));
         }
+        ExerciseFilterState.AllBenefitsList.RemoveAll(pt => pt.BenefitId == exerciseBenefit.BenefitId);
+        SetSelectedBenefit();
     }
 
     void RemoveExerciseBenefit(Benefit exerciseBenefit)
     {
         ExerciseFilterState.ExerciseFilter.BenefitsList.RemoveAll(pt => pt.BenefitId == exerciseBenefit.BenefitId);
+        if (ExerciseFilterState.AllBenefitsList.Find(pt => pt.BenefitId == exerciseBenefit.BenefitId) == null)
+        {
+            ExerciseFilterState.AllBenefitsList.Add(new Benefit(exerciseBenefit.BenefitId, exerciseBenefit.BenefitName));
+        }
+        SetSelectedBenefit();
     }
         /*
         void ExerciseBenefitSelected(ChangeEventArgs e)

@@ -1,4 +1,13 @@
-﻿
+﻿select {
+    border-radius: 1rem;
+    padding: 3px;
+}
+
+
+.whole-filter{
+    width: 25%;
+    margin-left: 1rem;
+}
 
 .benefits {
     text-align: left;
@@ -20,6 +29,14 @@
     border-color: var(--clr-black);
     border-width: 2px;
     text-transform: uppercase;
+}
+
+.benefit-section > label {
+    font-weight: 600;
+}
+
+.type-section > label {
+    font-weight: 600;
 }
 
 .types {
@@ -60,3 +77,10 @@
         background-color: indianred;
     }
 
+@media screen and (max-width: 641px) {
+
+    .whole-filter {
+        width: 100%;
+        margin-left: 0rem;
+    }
+}

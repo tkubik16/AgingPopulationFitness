@@ -222,11 +222,11 @@
         ExerciseFilterState.AllExerciseTypesList.Clear();
         for (int i = 0; i < ExerciseFilterState.ExerciseFilter.BenefitsList.Count; i++)
         {
-            ExerciseFilterState.AllBenefitsList.Add(ExerciseFilterState.ExerciseFilter.BenefitsList[i]);
+            //ExerciseFilterState.AllBenefitsList.Add(ExerciseFilterState.ExerciseFilter.BenefitsList[i]);
         }
         for (int i = 0; i < ExerciseFilterState.ExerciseFilter.ExerciseTypesList.Count; i++)
         {
-            ExerciseFilterState.AllExerciseTypesList.Add(ExerciseFilterState.ExerciseFilter.ExerciseTypesList[i]);
+            //ExerciseFilterState.AllExerciseTypesList.Add(ExerciseFilterState.ExerciseFilter.ExerciseTypesList[i]);
         }
         await sessionStorage.ClearAsync();
         IsLoggedInHelper();

@@ -448,27 +448,34 @@ namespace AgingPopulationFitness.Server
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
             */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
-
-            var sql = "SELECT * FROM exercise_type " +
-                "ORDER BY exercise_type ASC";
-
-
-            using var cmd = new NpgsqlCommand(sql, con);
-
-
-            using NpgsqlDataReader rdr = cmd.ExecuteReader();
-
-            while (rdr.Read())
+            try
             {
-                ExerciseType type = new ExerciseType();
-                type.ExerciseTypeId = rdr.GetInt32(0);
-                type.Type = rdr.GetString(1);
-                //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
-                types.Add(type);
+                using var con = new NpgsqlConnection(cs);
+                con.Open();
+
+                var sql = "SELECT * FROM exercise_type " +
+                    "ORDER BY exercise_type ASC";
+
+
+                using var cmd = new NpgsqlCommand(sql, con);
+
+
+                using NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    ExerciseType type = new ExerciseType();
+                    type.ExerciseTypeId = rdr.GetInt32(0);
+                    type.Type = rdr.GetString(1);
+                    //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
+                    types.Add(type);
+                }
+                con.Close();
             }
-            con.Close();
+            catch( Exception e)
+            {
+                Console.WriteLine(e);
+            }
             return types;
         }
 
@@ -522,28 +529,35 @@ namespace AgingPopulationFitness.Server
                 "Password=" + DatabaseCredentials.Password + ";" +
                 "Database=" + DatabaseCredentials.Database + "";
             */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
-
-            var sql = "SELECT * FROM benefit " +
-                "WHERE benefit.benefit_specificity = 'General'";
-
-
-            using var cmd = new NpgsqlCommand(sql, con);
-
-
-            using NpgsqlDataReader rdr = cmd.ExecuteReader();
-
-            while (rdr.Read())
+            try
             {
-                Benefit benefit = new Benefit();
-                benefit.BenefitId = rdr.GetInt32(0);
-                benefit.BenefitName = rdr.GetString(1);
-                benefit.BenefitSpecificity = rdr.GetString(2);
-                //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
-                benefits.Add(benefit);
+                using var con = new NpgsqlConnection(cs);
+                con.Open();
+
+                var sql = "SELECT * FROM benefit " +
+                    "WHERE benefit.benefit_specificity = 'General'";
+
+
+                using var cmd = new NpgsqlCommand(sql, con);
+
+
+                using NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    Benefit benefit = new Benefit();
+                    benefit.BenefitId = rdr.GetInt32(0);
+                    benefit.BenefitName = rdr.GetString(1);
+                    benefit.BenefitSpecificity = rdr.GetString(2);
+                    //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
+                    benefits.Add(benefit);
+                }
+                con.Close();
             }
-            con.Close();
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+            }
             return benefits;
         }
 

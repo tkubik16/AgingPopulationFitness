@@ -12,11 +12,6 @@
 @using SixLabors.ImageSharp;
 
 
-
-<div>
-    <ExerciseFilterDialog OnSearch="UpdateExercises"></ExerciseFilterDialog>
-</div>
-
 @if (ExerciseFilterState.ExerciseResults == null)
 {
     <div class="spinner"></div>
@@ -25,55 +20,64 @@
 {
     <div class="spinner"></div>
 }
-@if (ExerciseFilterState.ExerciseResults != null)
-{
-    @if (ExerciseFilterState.ExerciseResults.Count == 0)
-    {
-        <h1 class="no-cards-message">Database returned 0 exercises based on your search.</h1>
-    }
-}
-@if (ExerciseFilterState.ExerciseResults != null)
-{
-    <div class="exercise-cards">
-        @for (int i = 0; i < ExerciseFilterState.ExerciseResults.Count; i++)
+
+<div class="filter-and-cards">
+
+    <ExerciseFilterDialog OnSearch="UpdateExercises"></ExerciseFilterDialog>
+
+
+    <div class="cards-and-page-selector">
+        @if (ExerciseFilterState.ExerciseResults != null)
         {
-            <div class="exercise-card-component">
-                <ExerciseCard exercise="ExerciseFilterState.ExerciseResults[i]" 
-                            index="i"></ExerciseCard>
+            @if (ExerciseFilterState.ExerciseResults.Count == 0)
+            {
+                <h1 class="no-cards-message">Database returned 0 exercises based on your search.</h1>
+            }
+        }
+        @if (ExerciseFilterState.ExerciseResults != null)
+        {
+            <div class="exercise-cards">
+                @for (int i = 0; i < ExerciseFilterState.ExerciseResults.Count; i++)
+                {
+                    <div class="exercise-card-component">
+                        <ExerciseCard exercise="ExerciseFilterState.ExerciseResults[i]" 
+                                    index="i"></ExerciseCard>
+                    </div>
+                }
             </div>
+            @if (ExerciseFilterState.ExerciseResults.Count != 0)
+            {
+                <div class="page-selector">
+                    @if (ExerciseFilterState.CurrentPage != 1)
+                    {
+                        <button class="page-arrows-btn" @onclick="PrevPage" >
+                            <svg fill="currentColor" height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 492.004 492.004" xml:space="preserve" transform="matrix(-1, 0, 0, 1, 0, 0)">
+                                <path d="M382.678,226.804L163.73,7.86C158.666,2.792,151.906,0,144.698,0s-13.968,2.792-19.032,7.86l-16.124,16.12 c-10.492,10.504-10.492,27.576,0,38.064L293.398,245.9l-184.06,184.06c-5.064,5.068-7.86,11.824-7.86,19.028 c0,7.212,2.796,13.968,7.86,19.04l16.124,16.116c5.068,5.068,11.824,7.86,19.032,7.86s13.968-2.792,19.032-7.86L382.678,265 c5.076-5.084,7.864-11.872,7.848-19.088C390.542,238.668,387.754,231.884,382.678,226.804z" />
+                            </svg>
+                        </button>
+                        <button class="page-num"@onclick="GoToFirstPage">1</button>
+                        <svg fill="currentColor" width="800px" height="800px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 13.5a1.5 1.5 0 1 1 1.5-1.5 1.502 1.502 0 0 1-1.5 1.5zM13.5 12a1.5 1.5 0 1 0-1.5 1.5 1.502 1.502 0 0 0 1.5-1.5zm-8 0A1.5 1.5 0 1 0 4 13.5 1.502 1.502 0 0 0 5.5 12z"/><path fill="none" d="M0 0h24v24H0z"/></svg>
+                    }
+                    <lable>@ExerciseFilterState.CurrentPage</lable>
+                    @if (ExerciseFilterState.CurrentPage != ExerciseFilterState.PageCount)
+                    {
+                        <svg fill="currentColor" width="800px" height="800px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 13.5a1.5 1.5 0 1 1 1.5-1.5 1.502 1.502 0 0 1-1.5 1.5zM13.5 12a1.5 1.5 0 1 0-1.5 1.5 1.502 1.502 0 0 0 1.5-1.5zm-8 0A1.5 1.5 0 1 0 4 13.5 1.502 1.502 0 0 0 5.5 12z" /><path fill="none" d="M0 0h24v24H0z" /></svg>
+                        <button class="page-num" @onclick="GoToLastPage">@ExerciseFilterState.PageCount</button>
+                        <button class="page-arrows-btn" @onclick="NextPage" >
+                            <svg fill="currentColor" height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                        viewBox="0 0 492.004 492.004" xml:space="preserve">
+                                <path d="M382.678,226.804L163.73,7.86C158.666,2.792,151.906,0,144.698,0s-13.968,2.792-19.032,7.86l-16.124,16.12
+			                c-10.492,10.504-10.492,27.576,0,38.064L293.398,245.9l-184.06,184.06c-5.064,5.068-7.86,11.824-7.86,19.028
+			                c0,7.212,2.796,13.968,7.86,19.04l16.124,16.116c5.068,5.068,11.824,7.86,19.032,7.86s13.968-2.792,19.032-7.86L382.678,265
+			                c5.076-5.084,7.864-11.872,7.848-19.088C390.542,238.668,387.754,231.884,382.678,226.804z" />
+                            </svg>
+                        </button>
+                    }
+                </div>
+            }
         }
     </div>
-    @if (ExerciseFilterState.ExerciseResults.Count != 0)
-    {
-        <div class="page-selector">
-            @if (ExerciseFilterState.CurrentPage != 1)
-            {
-                <button class="page-arrows-btn" @onclick="PrevPage" >
-                    <svg fill="currentColor" height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 492.004 492.004" xml:space="preserve" transform="matrix(-1, 0, 0, 1, 0, 0)">
-                        <path d="M382.678,226.804L163.73,7.86C158.666,2.792,151.906,0,144.698,0s-13.968,2.792-19.032,7.86l-16.124,16.12 c-10.492,10.504-10.492,27.576,0,38.064L293.398,245.9l-184.06,184.06c-5.064,5.068-7.86,11.824-7.86,19.028 c0,7.212,2.796,13.968,7.86,19.04l16.124,16.116c5.068,5.068,11.824,7.86,19.032,7.86s13.968-2.792,19.032-7.86L382.678,265 c5.076-5.084,7.864-11.872,7.848-19.088C390.542,238.668,387.754,231.884,382.678,226.804z" />
-                    </svg>
-                </button>
-                <button class="page-num"@onclick="GoToFirstPage">1</button>
-                <svg fill="currentColor" width="800px" height="800px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 13.5a1.5 1.5 0 1 1 1.5-1.5 1.502 1.502 0 0 1-1.5 1.5zM13.5 12a1.5 1.5 0 1 0-1.5 1.5 1.502 1.502 0 0 0 1.5-1.5zm-8 0A1.5 1.5 0 1 0 4 13.5 1.502 1.502 0 0 0 5.5 12z"/><path fill="none" d="M0 0h24v24H0z"/></svg>
-            }
-            <lable>@ExerciseFilterState.CurrentPage</lable>
-            @if (ExerciseFilterState.CurrentPage != ExerciseFilterState.PageCount)
-            {
-                <svg fill="currentColor" width="800px" height="800px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 13.5a1.5 1.5 0 1 1 1.5-1.5 1.502 1.502 0 0 1-1.5 1.5zM13.5 12a1.5 1.5 0 1 0-1.5 1.5 1.502 1.502 0 0 0 1.5-1.5zm-8 0A1.5 1.5 0 1 0 4 13.5 1.502 1.502 0 0 0 5.5 12z" /><path fill="none" d="M0 0h24v24H0z" /></svg>
-                <button class="page-num" @onclick="GoToLastPage">@ExerciseFilterState.PageCount</button>
-                <button class="page-arrows-btn" @onclick="NextPage" >
-                    <svg fill="currentColor" height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                viewBox="0 0 492.004 492.004" xml:space="preserve">
-                        <path d="M382.678,226.804L163.73,7.86C158.666,2.792,151.906,0,144.698,0s-13.968,2.792-19.032,7.86l-16.124,16.12
-			        c-10.492,10.504-10.492,27.576,0,38.064L293.398,245.9l-184.06,184.06c-5.064,5.068-7.86,11.824-7.86,19.028
-			        c0,7.212,2.796,13.968,7.86,19.04l16.124,16.116c5.068,5.068,11.824,7.86,19.032,7.86s13.968-2.792,19.032-7.86L382.678,265
-			        c5.076-5.084,7.864-11.872,7.848-19.088C390.542,238.668,387.754,231.884,382.678,226.804z" />
-                    </svg>
-                </button>
-            }
-        </div>
-    }
-}
+</div>
 
 
 

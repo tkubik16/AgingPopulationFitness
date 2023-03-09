@@ -13,36 +13,39 @@
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 
 
+<div class="feedback-page">
+    <div class="feedback-form">
+        <div class="title-div">
+            <h1>Feedback</h1>
+        </div>
+        <div class="dialog-body-input">
+            <label>Feedback Title:</label>
+            <div>
+                <input type="text"  @bind="feedback.Title"/>
+            </div>
+        </div>
+        <div class="dialog-body-input">
+            <label>Feedback Type:</label>
+            <div>
+                <select class="custom-select" @onchange="FeedbackTypeSelected">
+                    <option value="-1" disabled selected>(select)</option>
+                    @for (var i = 0; i < FeedbackTypes.Count; i++)
+                    {
 
-<div class="feedback-form">
-    <h1>Feedback</h1>
-    <div class="dialog-body-input">
-        <label>Feedback Title:</label>
-        <div>
-            <input type="text"  @bind="feedback.Title"/>
+                        <option value="@i">@i @FeedbackTypes[i]</option>
+                    }
+                </select>
+            </div>
         </div>
-    </div>
-    <div class="dialog-body-input">
-        <label>Feedback Type:</label>
-        <div>
-            <select class="custom-select" @onchange="FeedbackTypeSelected">
-                <option value="-1" disabled selected>(select)</option>
-                @for (var i = 0; i < FeedbackTypes.Count; i++)
-                {
-
-                    <option value="@i">@i @FeedbackTypes[i]</option>
-                }
-            </select>
+        <div class="dialog-body-input">
+            <label>Feedback:</label>
+            <div>
+                <textarea rows="5" cols="35" style="resize: none;"  @bind="feedback.Body"/>
+            </div>
         </div>
-    </div>
-    <div class="dialog-body-input">
-        <label>Feedback:</label>
-        <div>
-            <textarea rows="5" cols="35" style="resize: none;"  @bind="feedback.Body"/>
+        <div class="submit-feedback-btn-div">
+            <button class="submit-feedback-btn" @onclick="SendFeedback">Send Feedback</button>
         </div>
-    </div>
-    <div class="send-feedback-btn-div">
-        <button class="send-feedback-btn" @onclick="SendFeedback">Send Feedback</button>
     </div>
 </div>
 

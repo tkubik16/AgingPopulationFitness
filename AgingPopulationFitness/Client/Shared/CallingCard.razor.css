@@ -1,0 +1,165 @@
+﻿
+.calling-card-whole {
+    aspect-ratio: 2/3;
+    width: 20rem;
+    outline-style: double;
+    outline-color: var(--clr-section-bg-outline);
+    border-radius: 50rem;
+    overflow: hidden;
+    margin-top: 1rem;
+}
+
+.isolate {
+    height: 100%;
+    width: 100%;
+    isolation: isolate;
+    position: relative;
+}
+
+.noise {
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.43' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    height: 100%;
+}
+.overlay {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(147deg, rgba(41, 47, 59,1) 10%, rgba(92, 192, 216, 1) , rgba(93, 180, 163, 1) , rgba(129, 194, 148, 1) );
+    mix-blend-mode: multiply;
+    backdrop-filter: blur(0.5px);
+    
+}
+
+.calling-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.calling-card-content-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.calling-card-img-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
+    width: calc( 100% - 4rem);
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 50rem;
+    overflow: hidden;
+}
+
+.calling-card-name {
+    color: black;
+    font-size: 2rem;
+}
+
+.calling-card-title {
+    color: black;
+    font-size: 1.25rem;
+}
+
+.calling-card-link-icons {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    gap: 0.5rem;
+}
+
+
+
+.calling-card-link-icons > svg {
+    width: 32px;
+    height: 32px;
+}
+
+.linked-in-svg {
+    position: relative;
+    color: white;
+    transition: transform .2s;
+}
+
+.linkedin-a {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.linked-in-svg:hover {
+    text-shadow: rgba(0, 0, 0, .8) 2px 2px 2px;
+    transform: scale(1.1);
+}
+
+.github-svg {
+    position: relative;
+    color: white;
+    transition: transform .2s;
+}
+
+.github-a {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.github-svg:hover {
+    text-shadow: rgba(0, 0, 0, .8) 2px 2px 2px;
+    transform: scale(1.1);
+}
+
+.calling-card-img {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    object-fit: cover;
+}
+
+.blur {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    
+}
+
+
+@media screen and (min-width: 641px) {
+
+    .calling-card-whole {
+        aspect-ratio: 3.5 / 2;
+        width: unset;
+        height: 20rem;
+        margin-bottom: 1rem;
+    }
+
+    .calling-card-content {
+        flex-direction: row;
+
+    }
+
+    .calling-card-img-div {
+        aspect-ratio: 1 / 1;
+        width: unset;
+        height: calc( 100% - 2rem);
+        margin-top: 0;
+        margin-bottom: 0;
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+
+}

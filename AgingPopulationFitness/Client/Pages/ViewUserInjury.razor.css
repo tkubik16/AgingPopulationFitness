@@ -1,37 +1,52 @@
-﻿.dialog-body {
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: 0;
-    height: 100%;
+﻿
+input {
+    border-radius: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    border-style: solid;
+    border-width: 1px;
+}
+
+select {
+    border-radius: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+textarea {
+    border-radius: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+.view-injury-page {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
     width: 100%;
-    padding-top: 5rem;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border-style: groove;
-    border-color: red;
-    overflow-y: scroll;
 }
 
-.user-injury-form-field {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 75%;
-    margin-bottom: 1rem;
-    border-style: groove;
-    border-color: red;
+.dialog-body {
+    margin: 1rem;
+    padding: 1rem;
+    max-width: 85rem;
+    width: fit-content;
+    background-color: var(--clr-section-bg);
+    border-radius: 0.25rem;
+    outline-style: groove;
+    outline-width: 1px;
+    outline-color: var(--clr-section-bg-outline);
 }
 
-.injury-description-div {
+.injury-name {
     display: flex;
-    flex-direction: column;
-    width: 75%;
-    margin: auto;
-    border-style: groove;
-    border-color: black;
+    flex-direction: row;
+    justify-content: center;
+    text-transform: capitalize;
 }
 
 .injuries {
@@ -42,8 +57,8 @@
 
 .injury {
     display: inline-block;
-    background-color: var(--clr-black);
-    color: var(--clr-white);
+    background-color: var(--clr-section-bg-outline);
+    color: var(--clr-secondary);
     padding: 0.05rem 0.5rem;
     border-radius: 2rem;
     margin: 0.2rem 0.1rem;
@@ -51,7 +66,7 @@
     font-size: 0.85rem;
     padding-right: 0;
     border-style: solid;
-    border-color: var(--clr-black);
+    border-color: var(--clr-section-bg-outline);
     border-width: 2px;
     text-transform: uppercase;
 }
@@ -70,6 +85,57 @@
     .x-btn:hover {
         color: black;
         background-color: indianred;
+    }
+
+.user-injury-form-field {
+    padding-bottom: 0.5rem;
+}
+
+.update-delete-injury {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.update-injury-btn {
+    background-color: var(--clr-cta);
+    color: var(--clr-neutral);
+    width: fit-content;
+    border-radius: .25rem;
+    border-width: 0;
+    box-sizing: border-box;
+    text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    text-align: center;
+    justify-content: center;
+    transition: transform .2s;
+}
+
+    .update-injury-btn:hover {
+        text-shadow: rgba(0, 0, 0, .8) 2px 2px 2px;
+        transform: scale(1.1);
+    }
+
+.delete-injury-btn {
+    background-color: var(--clr-injury);
+    color: var(--clr-neutral);
+    width: fit-content;
+    border-radius: .25rem;
+    border-width: 0;
+    box-sizing: border-box;
+    text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-align: center;
+    justify-content: center;
+    transition: transform .2s;
+}
+
+    .delete-injury-btn:hover {
+        text-shadow: rgba(0, 0, 0, .8) 2px 2px 2px;
+        transform: scale(1.1);
     }
 
 @media screen and (max-width: 480px) {

@@ -8,15 +8,64 @@
     --clr-black: #495057;
 }
 
-.suggest-exercise-form{
+input {
+    border-radius: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    border-style: solid;
+    border-width: 1px;
+}
+
+select {
+    border-radius: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+option {
+    border-radius: 1rem;
+}
+
+textarea {
+    border-radius: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+.suggest-exercise-page {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+}
+
+.suggest-exercise-form {
     margin: 1rem;
     padding: 1rem;
-    border-style: ridge;
-    border-color: blueviolet;
+    max-width: 85rem;
+    background-color: var(--clr-section-bg);
+    border-radius: 0.25rem;
+    outline-style: groove;
+    outline-width: 1px;
+    outline-color: var(--clr-section-bg-outline);
+}
+
+.title-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 }
 
 .dialog-body-input {
     margin-top: 0.25rem;
+}
+
+.dialog-body-input > label {
+    padding-right: 0.5rem;
 }
 
 .injuries {
@@ -27,8 +76,8 @@
 
 .injury {
     display: inline-block;
-    background-color: var(--clr-black);
-    color: var(--clr-white);
+    background-color: var(--clr-section-bg-outline);
+    color: var(--clr-secondary);
     padding: 0.05rem 0.5rem;
     border-radius: 2rem;
     margin: 0.2rem 0.1rem;
@@ -36,7 +85,7 @@
     font-size: 0.85rem;
     padding-right: 0;
     border-style: solid;
-    border-color: var(--clr-black);
+    border-color: var(--clr-section-bg-outline);
     border-width: 2px;
     text-transform: uppercase;
 }
@@ -71,4 +120,29 @@ img {
     .x-btn:hover {
         color: black;
         background-color: indianred;
+    }
+
+.submit-exercise-btn-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.submit-exercise-btn {
+    background-color: var(--clr-cta);
+    color: var(--clr-neutral);
+    border-radius: .25rem;
+    border-width: 0;
+    box-sizing: border-box;
+    text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    text-align: center;
+    justify-content: center;
+    transition: transform .2s;
+}
+
+    .submit-exercise-btn:hover {
+        text-shadow: rgba(0, 0, 0, .8) 2px 2px 2px;
+        transform: scale(1.1);
     }

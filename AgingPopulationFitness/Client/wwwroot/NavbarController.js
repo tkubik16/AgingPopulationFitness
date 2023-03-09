@@ -23,3 +23,8 @@ function setTypeSelectExerciseFilter(value) {
     const $select = document.querySelector('#SelectTypeExerciseFilter');
     $select.value = value;
 }
+
+function setInjuryLocationInjuryDialog(value) {
+    const $select = document.querySelector('#SelectInjuryLocationInjuryDialog');
+    $select.value = value;
+}

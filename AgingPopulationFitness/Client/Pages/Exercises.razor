@@ -20,10 +20,15 @@
 {
     <div class="spinner"></div>
 }
+<div class="injuries-widget-exercises">
+    <InjuryLocations update="UpdateInjuryLocations"></InjuryLocations>
+</div>
 
 <div class="filter-and-cards">
 
-    <ExerciseFilterDialog OnSearch="UpdateExercises"></ExerciseFilterDialog>
+
+        <ExerciseFilterDialog OnSearch="UpdateExercises"></ExerciseFilterDialog>
+        
 
 
     <div class="cards-and-page-selector">
@@ -86,6 +91,7 @@
 @code {
     EventCallback OnSearch => EventCallback.Factory.Create(this, UpdateExercises);
     public bool searching = false;
+    public bool UpdateInjuryLocations = false;
 
     public async void UpdateExercises()
     {
@@ -115,6 +121,7 @@
 
     public List<Exercise> allExercises;
     public List<string> allExerciseImages = new List<string>();
+    
 
     protected override async Task OnInitializedAsync()
     {
@@ -161,7 +168,20 @@
             Console.WriteLine(e);
         }
 
+        try
+        {
+            UserState.injuryLocations = await UserClient.GetUsersInjuryLocations(UserState.userProfile.UserId);
+            ExerciseFilterState.ExerciseFilter.InjuryLocations = UserState.injuryLocations;
 
+            
+            UpdateInjuryLocations = true;
+            StateHasChanged();
+            UpdateInjuryLocations = false;
+        }
+        catch( Exception e)
+        {
+            Console.WriteLine(e);
+        }
 
     }
 

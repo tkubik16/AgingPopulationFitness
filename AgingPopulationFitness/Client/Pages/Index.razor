@@ -16,15 +16,45 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Index</h1>
-
-This section will eventually be used to describe the purpose
-of this project as well as disclaimers
-
+<div class="index-page">
+    <section class="landing-section">
+        <div class="landing-text-section">
+            <div class="landing-text">
+                <div class="landing-header">
+                    <h1 class="landing-title title-p1">Welcome to</h1>
+                    <h1 class="landing-title title-p2">Aging Population Fitness!</h1>
+                </div>
+                <div class="landing-body">
+                    <p>
+                        This is a web software which allows you to keep track of your various injuries and what parts of your body those injuries affect. 
+                        After recording your injuries and the locations that injury is part of you can find exercises that you can do without aggitating your injuries.
+                        You can choose from differnt types of exercises, various benefits the exercise has for you and whether or not you want the software to account
+                        for your injuries when searching for exercises for you to perform.
+                    </p>
+                </div>
+                @if ( !UserState.isLoggedIn )
+                {
+                    <div class="landing-footer">
+                        <button class="create-account-btn" @onclick="GoToRegister" >Get Started</button>
+                        <button class="log-in-btn" @onclick="GoToLogin" >Log in</button>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="landing-splash-img-section">
+            <img class="landing-splash-img" src="Images/tkubik_splash_image_gym_fitness_equipment_f420bd5d-b0e6-4767-991d-24c84bc705cf.png"/>
+        </div>
+    </section>
+    <section class="calling-card-section">
+        <CallingCard></CallingCard>
+    </section>
+</div>
+<!--
 <button class="btn btn-info" @onclick="@(() => toastService.ShowToast("I'm an INFO message", ToastLevel.Info))">Info Toast</button>
 <button class="btn btn-success" @onclick="@(() => toastService.ShowToast("I'm a SUCCESS message", ToastLevel.Success))">Success Toast</button>
 <button class="btn btn-warning" @onclick="@(() => toastService.ShowToast("I'm a WARNING message", ToastLevel.Warning))">Warning Toast</button>
 <button class="btn btn-danger" @onclick="@(() => toastService.ShowToast("I'm an ERROR message", ToastLevel.Error))">Error Toast</button>
+-->
 
 @code{
     [CascadingParameter(Name = "UpdateMenuOnLogIn")] public EventCallback UpdateMenuOnLogIn { get; set; }
@@ -64,5 +94,15 @@ of this project as well as disclaimers
         }
 
 
+    }
+
+    public void GoToRegister()
+    {
+        Navigation.NavigateTo("/register");
+    }
+
+    public void GoToLogin()
+    {
+        Navigation.NavigateTo("/login");
     }
 }

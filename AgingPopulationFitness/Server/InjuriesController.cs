@@ -563,34 +563,34 @@ namespace AgingPopulationFitness.Server
             List<InjuryLocation> injuryLocations = new List<InjuryLocation>();
 
 
-
-
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
-
-            var sql = "SELECT * FROM injury_location";
-
-
-            using var cmd = new NpgsqlCommand(sql, con);
-
-
-            using NpgsqlDataReader rdr = cmd.ExecuteReader();
-
-            while (rdr.Read())
+            try
             {
-                InjuryLocation injuryLocation = new InjuryLocation();
-                injuryLocation.InjuryLocationId = rdr.GetInt32(0);
-                injuryLocation.BodyPart = rdr.GetString(1);
-                //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
-                injuryLocations.Add(injuryLocation);
+                using var con = new NpgsqlConnection(cs);
+                con.Open();
+
+                var sql = "SELECT * FROM injury_location " +
+                            "ORDER BY injury_location.body_part";
+
+
+                using var cmd = new NpgsqlCommand(sql, con);
+
+
+                using NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    InjuryLocation injuryLocation = new InjuryLocation();
+                    injuryLocation.InjuryLocationId = rdr.GetInt32(0);
+                    injuryLocation.BodyPart = rdr.GetString(1);
+                    //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
+                    injuryLocations.Add(injuryLocation);
+                }
+                con.Close();
             }
-            con.Close();
+            catch( Exception e)
+            {
+                Console.WriteLine(e);
+            }
             return injuryLocations;
         }
 

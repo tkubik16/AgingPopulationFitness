@@ -13,121 +13,129 @@
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 
 
-<h1>Suggest an Exercise</h1>
 
-<div class="suggest-exercise-form">
-    <div class="dialog-body-input">
-        <label>Exercise Name:</label>
-        <div>
-            <input type="text" @bind="suggestedExercise.Exercise.ExerciseName" />
+<div class="suggest-exercise-page">
+    <div class="suggest-exercise-form">
+        <div class="title-div">
+            <h1>Suggest an Exercise</h1>
         </div>
-    </div>
-    <div class="dialog-body-input">
-        <label>Exercise Description:</label>
-        <div>
-            <textarea rows="5" cols="35" style="resize: none;" @bind="suggestedExercise.Exercise.ExerciseDescription" />
-        </div>
-    </div>
-    <div class="dialog-body-input">
-        <label>Exercise Instructions:</label>
-        <div>
-            <textarea rows="5" cols="35" style="resize: none;" @bind="suggestedExercise.Exercise.ExerciseInstructions" />
-        </div>
-    </div>
-    <div class="dialog-body-input">
-        <label>Exercise Internet Link:</label>
-        <div>
-            <input type="text" @bind="suggestedExercise.Exercise.ExerciseLink" />
-        </div>
-    </div>
-    <div class="dialog-body-input">
-        <label>Exercise Main Image:</label>
-        <div>
-            <InputFile accept=".JPG, .PNG" OnChange="@RunFileConversion"/>
-        </div>
-    </div>
-    <div class="dialog-body-input">
-        <label>Exercise Type:</label>
-        <div>
-            <select class="custom-select" @onchange="ExerciseTypeSelected">
-                <option value="-1" disabled selected>(select)</option>
-                @for (var i = 0; i < ExerciseTypes.Count; i++)
-                {
-
-                    <option value="@i">@i @ExerciseTypes[i].Type @ExerciseTypes[i].ExerciseTypeId</option>
-                }
-            </select>
-        </div>
-    </div>
-    <div class="dialog-body-input">
-        <label>Add Exercise Benefits: </label>
-        @if (benefits == null)
-        {
-            <select class="custom-select" disabled>
-                <option>(loading...)</option>
-            </select>
-        }
-        else
-        {
-            <select class="custom-select" @onchange="BenefitSelected">
-                <option value="-1" disabled selected>(select)</option>
-                @for (var i = 0; i < benefits.Count; i++)
-                {
-
-                    <option value="@i">@i @benefits[i].BenefitId @benefits[i].BenefitName @benefits[i].BenefitSpecificity</option>
-                }
-            </select>
-        }
-    </div>
-    <div class="injuries">
-        @foreach (var benefit in suggestedExercise.Exercise.Benefits)
-        {
-            <div class="injury">
-                @benefit.BenefitName
-                <button type="button" class="x-btn" @onclick="@(() => RemoveBenefit(benefit))">x</button>
+        <div class="dialog-body-input">
+            <label>Exercise Name:</label>
+            <div>
+                <input type="text" @bind="suggestedExercise.Exercise.ExerciseName" />
             </div>
-        }
-    </div>
-    <div class="dialog-body-input">
-        <label>Add Injury Location it would aggravate: </label>
-        @if (injuryLocations == null)
-        {
-            <select class="custom-select" disabled>
-                <option>(loading...)</option>
-            </select>
-        }
-        else
-        {
-            <select class="custom-select" @onchange="InjuryLocationSelected">
-                <option value="-1" disabled selected>(select)</option>
-                @for (var i = 0; i < injuryLocations.Count; i++)
-                {
-
-                    <option value="@i">@i @injuryLocations[i].InjuryLocationId @injuryLocations[i].BodyPart </option>
-                }
-            </select>
-        }
-    </div>
-
-    <div class="injuries">
-        @foreach (var injuryLocation in suggestedExercise.Exercise.InjuryLocations)
-        {
-            <div class="injury">
-                @injuryLocation.BodyPart
-                <button type="button" class="x-btn" @onclick="@(() => RemoveInjuryLocation(injuryLocation))">x</button>
+        </div>
+        <div class="dialog-body-input">
+            <label>Exercise Description:</label>
+            <div>
+                <textarea rows="5" cols="35" style="resize: none;" @bind="suggestedExercise.Exercise.ExerciseDescription" />
             </div>
-        }
+        </div>
+        <div class="dialog-body-input">
+            <label>Exercise Instructions:</label>
+            <div>
+                <textarea rows="5" cols="35" style="resize: none;" @bind="suggestedExercise.Exercise.ExerciseInstructions" />
+            </div>
+        </div>
+        <!--
+        <div class="dialog-body-input">
+            <label>Exercise Internet Link:</label>
+            <div>
+                <input type="text" @bind="suggestedExercise.Exercise.ExerciseLink" />
+            </div>
+        </div>
+        -->
+        <!--
+        <div class="dialog-body-input">
+            <label>Exercise Main Image:</label>
+            <div>
+                <InputFile accept=".JPG, .PNG" OnChange="@RunFileConversion"/>
+            </div>
+        </div>
+        -->
+        <div class="dialog-body-input">
+            <label>Exercise Type:</label>
+            <div>
+                <select class="custom-select" @onchange="ExerciseTypeSelected">
+                    <option value="-1" disabled selected>(select)</option>
+                    @for (var i = 0; i < ExerciseTypes.Count; i++)
+                    {
+
+                        <option value="@i">@i @ExerciseTypes[i].Type @ExerciseTypes[i].ExerciseTypeId</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="dialog-body-input">
+            <label>Add Exercise Benefits: </label>
+            @if (benefits == null)
+            {
+                <select class="custom-select" disabled>
+                    <option>(loading...)</option>
+                </select>
+            }
+            else
+            {
+                <select class="custom-select" @onchange="BenefitSelected">
+                    <option value="-1" disabled selected>(select)</option>
+                    @for (var i = 0; i < benefits.Count; i++)
+                    {
+
+                        <option value="@i">@i @benefits[i].BenefitId @benefits[i].BenefitName @benefits[i].BenefitSpecificity</option>
+                    }
+                </select>
+            }
+        </div>
+        <div class="injuries">
+            @foreach (var benefit in suggestedExercise.Exercise.Benefits)
+            {
+                <div class="injury">
+                    @benefit.BenefitName
+                    <button type="button" class="x-btn" @onclick="@(() => RemoveBenefit(benefit))">x</button>
+                </div>
+            }
+        </div>
+        <div class="dialog-body-input">
+            <label>Add Injury Location it would aggravate: </label>
+            @if (injuryLocations == null)
+            {
+                <select class="custom-select" disabled>
+                    <option>(loading...)</option>
+                </select>
+            }
+            else
+            {
+                <select class="custom-select" @onchange="InjuryLocationSelected">
+                    <option value="-1" disabled selected>(select)</option>
+                    @for (var i = 0; i < injuryLocations.Count; i++)
+                    {
+
+                        <option value="@i">@i @injuryLocations[i].InjuryLocationId @injuryLocations[i].BodyPart </option>
+                    }
+                </select>
+            }
+        </div>
+
+        <div class="injuries">
+            @foreach (var injuryLocation in suggestedExercise.Exercise.InjuryLocations)
+            {
+                <div class="injury">
+                    @injuryLocation.BodyPart
+                    <button type="button" class="x-btn" @onclick="@(() => RemoveInjuryLocation(injuryLocation))">x</button>
+                </div>
+            }
+        </div>
+        <div class="submit-exercise-btn-div">
+            <button class="submit-exercise-btn" @onclick="SubmitExerciseSuggestion">Submit Exercise</button>
+        </div>
     </div>
-    <div>
-        <button @onclick="SubmitExerciseSuggestion">Submit Exercise</button>
-    </div>
+    @if (Image != string.Empty)
+    {
+        <div class="image-preview">
+            <img class="suggested-exercise-main-img" src="@Image" alt="default" />
+        </div>
+    }
 </div>
-@if (Image != string.Empty)
-{
-    <div class="image-preview">
-        <img class="suggested-exercise-main-img" src="@Image" alt="default" />
-    </div>
-}
 
 @code {
     public string Image = string.Empty;

@@ -1,14 +1,60 @@
-﻿.dialog-container {
+﻿
+input {
+    border-radius: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.input-range {
+    padding: 0;
+    
+}
+
+select {
+    border-radius: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+textarea {
+    border-radius: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+
+.dialog-blocker {
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 2000;
+    z-index: 2001;
     display: flex;
     animation: dialog-container-entry 0.2s;
-    
+    backdrop-filter: blur(10px);
+}
 
+.dialog-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: fit-content;
+    height: fit-content;
+    z-index: 2100;
+    display: flex;
+    animation: dialog-container-entry 0.2s;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    
 }
 
 @keyframes dialog-container-entry {
@@ -25,17 +71,17 @@
     box-shadow: 0 0 12px rgba(0,0,0,0.6);
     display: flex;
     flex-direction: column;
-    z-index: 2000;
+    z-index: 2100;
     align-self: center;
     border-radius: 1rem;
     margin: auto;
     padding: 1rem;
-    min-width: 75%;
+    width: fit-content;
     min-height: 50%;
     animation: dialog-entry 0.4s;
     animation-timing-function: cubic-bezier(0.075, 0.820, 0.165, 1.000);
-    backdrop-filter: blur(10px);
-    background-color: rgba(248, 249, 250, 0.75);
+    
+    background-color: var(--clr-section-bg-opa-50);
 }
 
 @media screen and (max-width: 480px) {
@@ -59,6 +105,7 @@
 .dialog-top-bar {
     display: flex;
     justify-content: end;
+    z-index: 3000;
 }
 
 .dialog-title {
@@ -71,7 +118,7 @@
     background-color: rgba(251, 129, 129, 0.8);
     width: 2rem;
     height: 2rem;
-    border-radius: .25rem;
+    border-radius: 5rem;
     border-width: 0;
     box-sizing: border-box;
     text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
@@ -108,15 +155,48 @@
     padding-left: 4rem;
 }
 
+
+
 .dialog .injury {
     display: inline-block;
-    background-color: #a04343;
-    color: white;
-    padding: 0.2rem 1rem;
+    background-color: var(--clr-neutral);
+    color: var(--clr-secondary);
+    padding: 0.05rem 0.5rem;
     border-radius: 2rem;
-    margin: 0.4rem 0.3rem;
+    margin: 0.2rem 0.1rem;
     font-weight: 700;
+    font-size: 1rem;
+    background-color: rgba(255, 105, 97, 0.95);
+    color: black;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    border-radius: 2rem;
+    margin: 0.1rem 0.05rem;
+    font-weight: 700;
+    font-size: 0.75rem;
+    border-style: solid;
+    border-color: rgba(255, 105, 97, 0.95);
+    border-width: 2px;
+    text-transform: uppercase;
+    flex-wrap: nowrap;
+    padding-right: 0;
 }
+
+.delete-injury {
+    border: none;
+    aspect-ratio: 1 / 1;
+    height: 1.5rem;
+    border-radius: 1rem;
+    font-weight: 700;
+    color: black;
+    text-transform: uppercase;
+    margin-left: 0.25rem;
+}
+
+    .delete-injury:hover {
+        color: black;
+        background-color: indianred;
+    }
 
 .add-injury {
     display: flex;
@@ -125,7 +205,8 @@
 }
 
 .add-button {
-    background-color: rgba(129, 251, 129, 0.8);
+    background-color: var(--clr-cta);
+    color: var(--clr-neutral);
     border-radius: .25rem;
     border-width: 0;
     box-sizing: border-box;
@@ -141,3 +222,4 @@
         text-shadow: rgba(0, 0, 0, .8) 2px 2px 2px;
         transform: scale(1.1);
     }
+

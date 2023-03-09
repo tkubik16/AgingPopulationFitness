@@ -19,10 +19,8 @@
 
 <div class="whole">
     <div class="top-bar" id="nav-bar">
-        <div class="logo-close-button">
-            <a class="logo" href="">
-                <text>LOGO</text>
-            </a>
+        <div class="logo-div" @onclick="GoToIndex" >
+            <img class="logo-div-img" src="Images/tkubik_simple_fitness_logo_neon_signs_green_orange_760dedd0-69c1-4c03-b1cf-0708f194c620.png"/>
         </div>
         @if (UserState.isLoggedIn)
         {
@@ -42,7 +40,8 @@
             </NavLink>
             
             <div class="dropdown">
-                <button class="dropbtn">More</button>
+                <!-- <button class="dropbtn">More</button>-->
+                <div>More</div>
                 <div class="dropdown-content">
                     <NavLink href="suggest-exercise-page" class="nav-tab-dropdown">
                         <div>Suggest</div>
@@ -121,10 +120,11 @@
 
 
     </div>
+    <!--
     <div class="open-nav-mobile" id="open-nav-button-mobile">
         <button @onclick="OpenNav"><img src="Images/menu.svg" /></button>
     </div>
-
+    -->
     <div class="content" id="main-body">
         <CascadingValue Value=@UpdateMenuOnLogIn Name="UpdateMenuOnLogIn">
             <CascadingValue Value=@UpdateMenuOnRefresh Name="UpdateMenuOnRefresh">
@@ -231,6 +231,11 @@
         await sessionStorage.ClearAsync();
         IsLoggedInHelper();
 
+    }
+
+    public void GoToIndex()
+    {
+        Navigation.NavigateTo("/");
     }
 
     public async void OpenNav()

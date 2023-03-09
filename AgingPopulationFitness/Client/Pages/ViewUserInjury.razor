@@ -9,65 +9,68 @@
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 
 
-
-<div class="dialog-body">
-    <h3>@userInjury.InjuryName</h3>
-    <div class="user-injury-form-field">
-        <label>Name:</label>
-        <div>
-            <input type="text" @bind="userInjury.InjuryName" />
+<div class="view-injury-page">
+    <div class="dialog-body">
+        <div class="injury-name">
+            <h3>@userInjury.InjuryName</h3>
         </div>
-    </div>
-    <div class="user-injury-form-field">
-        <label>Description:</label>
-        <div class="injury-description-div">
-            <textarea id="injury-description" rows="4" cols="15" @bind="userInjury.InjuryDescription" />
-        </div>
-    </div>
-    <div class="user-injury-form-field">
-        <label>Severity:</label>
-        <input type="range" min="1" max="10" step="1" @bind="userInjury.InjurySeverity" @bind:event="oninput" />
-        <label>@userInjury.InjurySeverity</label>
-    </div>
-    <div class="user-injury-form-field">
-        <label>Date:</label>
-        <input type="date" @bind="userInjury.InjuryDate" />
-    </div>
-    <div class="user-injury-form-field">
-        <label>Add Injuries:</label>
-        @if (injuryLocations == null)
-        {
-            <select class="custom-select" disabled>
-                <option>(loading...)</option>
-            </select>
-        }
-        else
-        {
-            <select class="custom-select" @onchange="InjuryLocationSelected">
-                <option value="-1" disabled selected>(select)</option>
-                @for (var i = 0; i < injuryLocations.Count; i++)
-                {
-
-                    <option value="@i">@i @injuryLocations[i].InjuryLocationId @injuryLocations[i].BodyPart </option>
-                }
-            </select>
-        }
-    </div>
-
-    <div class="injuries">
-        @foreach (var injuryLocation in userInjury.InjuryLocations)
-        {
-            <div class="injury">
-                @injuryLocation.BodyPart
-                <button type="button" class="x-btn" @onclick="@(() => RemoveInjuryLocation(injuryLocation))">x</button>
+        <div class="user-injury-form-field">
+            <label>Name:</label>
+            <div>
+                <input type="text" @bind="userInjury.InjuryName" />
             </div>
-        }
-    </div>
-    <div class="update-delete-injury">
-        <button @onclick="UpdateUserInjury">Update Injury</button>
-        <button  @onclick="DeleteUserInjury">Delete Injury</button>
-    </div>
+        </div>
+        <div class="user-injury-form-field">
+            <label>Description:</label>
+            <div class="injury-description-div">
+                <textarea id="injury-description" rows="5" cols="35" @bind="userInjury.InjuryDescription" />
+            </div>
+        </div>
+        <div class="user-injury-form-field">
+            <label>Severity:</label>
+            <input type="range" min="1" max="10" step="1" @bind="userInjury.InjurySeverity" @bind:event="oninput" />
+            <label>@userInjury.InjurySeverity</label>
+        </div>
+        <div class="user-injury-form-field">
+            <label>Date:</label>
+            <input type="date" @bind="userInjury.InjuryDate" />
+        </div>
+        <div class="user-injury-form-field">
+            <label>Add Injuries:</label>
+            @if (injuryLocations == null)
+            {
+                <select class="custom-select" disabled>
+                    <option>(loading...)</option>
+                </select>
+            }
+            else
+            {
+                <select class="custom-select" @onchange="InjuryLocationSelected">
+                    <option value="-1" disabled selected>(select)</option>
+                    @for (var i = 0; i < injuryLocations.Count; i++)
+                    {
 
+                        <option value="@i">@i @injuryLocations[i].InjuryLocationId @injuryLocations[i].BodyPart </option>
+                    }
+                </select>
+            }
+        </div>
+
+        <div class="injuries">
+            @foreach (var injuryLocation in userInjury.InjuryLocations)
+            {
+                <div class="injury">
+                    @injuryLocation.BodyPart
+                    <button type="button" class="x-btn" @onclick="@(() => RemoveInjuryLocation(injuryLocation))">x</button>
+                </div>
+            }
+        </div>
+        <div class="update-delete-injury">
+            <button class="update-injury-btn" @onclick="UpdateUserInjury">Update Injury</button>
+            <button  class="delete-injury-btn" @onclick="DeleteUserInjury">Delete Injury</button>
+        </div>
+
+    </div>
 </div>
 
 @code {

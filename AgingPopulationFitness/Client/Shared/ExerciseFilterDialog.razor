@@ -11,8 +11,11 @@
 
 
         <div class="whole-filter">
+            <div class="filter-title-div">
+                <label class="exercise-filter-label">Exercise Filter</label>
+            </div>
             <div class="benefit-section">
-                <label>Exercise Benefit:</label>
+                
                 <select class="benefit-select" id="SelectBenefitExerciseFilter" @onchange="ExerciseBenefitSelected">
                     @if (ExerciseFilterState.AllBenefitsList.Count == 0)
                     {
@@ -38,7 +41,7 @@
                 }
             </div>
             <div class="type-section">
-                <label>Exercise Type:</label>
+                
                 <select class="type-select" id="SelectTypeExerciseFilter" @onchange="ExerciseTypeSelected">
                     @if (ExerciseFilterState.AllExerciseTypesList.Count == 0)
                     {
@@ -64,9 +67,14 @@
                     </div>
                 }
             </div>
-            <label>Filter based on my injuries:</label>
-            <InputCheckbox class="checkbox" @bind-Value=ExerciseFilterState.ExerciseFilter.ExcludeBasedOnInjuries></InputCheckbox>
-            <button @onclick="OnSearch">Search</button>
+            <div class="line-above-radio-section"></div>
+            <div class="based-on-injuries-radio">
+                <label>Filter based on my injuries:</label>
+                <InputCheckbox class="checkbox" @bind-Value=ExerciseFilterState.ExerciseFilter.ExcludeBasedOnInjuries></InputCheckbox>
+            </div>
+            <div class="filter-search-btn-div">
+                <button class="filter-search-btn" @onclick="OnSearch">Search</button>
+            </div>
         </div>
 
 

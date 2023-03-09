@@ -6,9 +6,12 @@
 @inject UserState UserState;
 @inject ExerciseFilterState ExerciseFilterState
 @inject ToastService toastService
+@inject IJSRuntime JSRuntime
 
-<div class="dialog-container">
-    <div class="dialog">
+<div class="dialog-blocker" @onclick="OnCancel">
+</div>
+<div class="dialog-container" >
+    <div class="dialog" >
         <div class="dialog-top-bar">
             <button class="cancel-button" @onclick="OnCancel">x</button>
         </div>
@@ -33,7 +36,7 @@
             </div>
             <div class="dialog-body-input">
                 <label>Severity:</label>
-                <input type="range" min="1" max="10" step="1" @bind="userInjury.InjurySeverity" @bind:event="oninput"/>
+                <input type="range" min="1" max="10" step="1" class="input-range" @bind="userInjury.InjurySeverity" @bind:event="oninput"/>
                 <label>@userInjury.InjurySeverity</label>
             </div>
             <div class="dialog-body-input">
@@ -41,7 +44,6 @@
                 <input type="date" @bind="userInjury.InjuryDate" />
             </div>
             <div class="dialog-body-input">
-                <label>Add Injuries: </label>
                 @if (injuryLocations == null)
                 {
                     <select class="custom-select" disabled>
@@ -50,12 +52,12 @@
                 }
                 else
                 {
-                    <select class="custom-select" @onchange="InjuryLocationSelected">
-                        <option value="-1" disabled selected>(select)</option>
+                    <select class="custom-select" id="SelectInjuryLocationInjuryDialog"  @onchange="InjuryLocationSelected">
+                        <option value="-1" disabled selected>Add Injury Location(s)</option>
                         @for (var i = 0; i < injuryLocations.Count; i++)
                         {
 
-                            <option value="@i">@i @injuryLocations[i].InjuryLocationId @injuryLocations[i].BodyPart </option>
+                            <option value="@i">  @injuryLocations[i].BodyPart </option>
                         }
                     </select>
                 }
@@ -126,6 +128,7 @@
         {
             AddInjuryLocation(injuryLocations[index]);
         }
+        SetSelectedInjuryLocation();
     }
 
     void AddInjuryLocation(InjuryLocation injuryLocation)
@@ -134,11 +137,18 @@
         {
             userInjury.InjuryLocations.Add(new InjuryLocation( injuryLocation.InjuryLocationId, injuryLocation.BodyPart) );
         }
+        injuryLocations.RemoveAll(pt => pt.BodyPart == injuryLocation.BodyPart);
+        SetSelectedInjuryLocation();
     }
 
     void RemoveInjuryLocation(InjuryLocation injuryLocation)
     {
         userInjury.InjuryLocations.RemoveAll(pt => pt.BodyPart == injuryLocation.BodyPart);
+        if (injuryLocations.Find(pt => pt.BodyPart == injuryLocation.BodyPart) == null)
+        {
+            injuryLocations.Add(new InjuryLocation(injuryLocation.InjuryLocationId, injuryLocation.BodyPart) );
+        }
+        SetSelectedInjuryLocation();
     }
 
     void PrintUserInjury()
@@ -164,6 +174,20 @@
         {
             toastService.ShowToast(string.Format("Failed to add '{0}'", userInjury.InjuryName), ToastLevel.Error);
         }
+    }
+
+    public async void SetSelectedInjuryLocation()
+    {
+        string value = ExerciseFilterState.benefitSelectValue;
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("setInjuryLocationInjuryDialog", -1);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        StateHasChanged();
     }
 
 }

@@ -1,22 +1,27 @@
 ﻿
 .exercise-card {
-
     padding: 0.5rem;
     width: 100%;
     height: fit-content;
     margin: auto;
     justify-content: space-between;
-    border-style: solid;
-    border-color: var(--clr-black);
-    margin-bottom: 2px;
+    color: var(--clr-secondary);
+    background-color: var(--clr-section-bg);
+    border-radius: 0.25rem;
+    
+    outline-style: groove;
+    outline-width: 1px;
+    outline-color: var(--clr-section-bg-outline);
+        
+    margin-bottom: 5px;
     border-radius: 0.5rem;
     z-index: 1;
 }
 
-.exercise-card:hover {
-    background-color: var(--clr-black);
-    color: var(--clr-white);
-}
+    .exercise-card:hover {
+        background-color: var(--clr-section-bg-outline);
+        color: var(--clr-secondary);
+    }
 
 .exercise-main-img-div {
     display: none;

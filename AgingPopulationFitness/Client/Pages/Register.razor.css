@@ -1,4 +1,13 @@
-﻿.register-form {
+﻿
+input {
+    border-radius: 1rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.register-form {
     height: fit-content;
     width: fit-content;
     margin: auto;
@@ -66,7 +75,7 @@
     font-size: 0.90rem;
     border: none;
     background: none;
-
+    color: var(--clrsecondary);
 }
 
     .button-subtle:hover {

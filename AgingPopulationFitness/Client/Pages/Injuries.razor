@@ -30,8 +30,8 @@
 @if (userInjuries != null)
 {
     <div class="main">
+        <h1>MY INJURIES</h1>
         
-        <InjuryLocations update="UpdateInjuryLocations"></InjuryLocations>
         <ul class="user-injury-cards">
 
             <li class="add-injury-li" @onclick="@(() => InjuryState.ShowConfigureUserInjuryDialog())">
@@ -51,7 +51,7 @@
                         <h3 class="injury-title">@userInjury.InjuryName</h3>
                         <text class="severity-label">Severity: @userInjury.InjurySeverity</text>
                         <text class="date-label">Date: @userInjury.InjuryDate</text>
-                        <text class="affects-label">Affects:</text>
+                        <text class="affects-label">Affects</text>
                         <div class="injuries">
                             @foreach (var injuryLocation in userInjury.InjuryLocations)
                             {

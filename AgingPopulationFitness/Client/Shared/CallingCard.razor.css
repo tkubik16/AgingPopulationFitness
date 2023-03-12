@@ -2,8 +2,10 @@
 .calling-card-whole {
     aspect-ratio: 2/3;
     width: 20rem;
+    /*
     outline-style: double;
     outline-color: var(--clr-section-bg-outline);
+        */
     border-radius: 50rem;
     overflow: hidden;
     margin-top: 1rem;
@@ -17,7 +19,9 @@
 }
 
 .noise {
+    /*
     background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.43' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    */
     height: 100%;
 }
 .overlay {
@@ -25,9 +29,11 @@
     top: 0;
     width: 100%;
     height: 100%;
+    /*
     background: linear-gradient(147deg, rgba(41, 47, 59,1) 10%, rgba(92, 192, 216, 1) , rgba(93, 180, 163, 1) , rgba(129, 194, 148, 1) );
     mix-blend-mode: multiply;
     backdrop-filter: blur(0.5px);
+        */
     
 }
 
@@ -58,15 +64,17 @@
     margin-bottom: 2rem;
     border-radius: 50rem;
     overflow: hidden;
+    outline-style: double;
+    outline-color: var(--clr-section-bg-outline);
 }
 
 .calling-card-name {
-    color: black;
+    color: white;
     font-size: 2rem;
 }
 
 .calling-card-title {
-    color: black;
+    color: white;
     font-size: 1.25rem;
 }
 

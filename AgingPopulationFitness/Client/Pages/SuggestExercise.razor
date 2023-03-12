@@ -10,6 +10,7 @@
 @inject InjuryState InjuryState
 @inject UserState UserState
 @inject ToastService toastService
+@inject IJSRuntime JSRuntime
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 
 
@@ -61,13 +62,13 @@
                     @for (var i = 0; i < ExerciseTypes.Count; i++)
                     {
 
-                        <option value="@i">@i @ExerciseTypes[i].Type @ExerciseTypes[i].ExerciseTypeId</option>
+                        <option value="@i">@ExerciseTypes[i].Type </option>
                     }
                 </select>
             </div>
         </div>
         <div class="dialog-body-input">
-            <label>Add Exercise Benefits: </label>
+            <label>Add Exercise Benefit(s): </label>
             @if (benefits == null)
             {
                 <select class="custom-select" disabled>
@@ -76,12 +77,12 @@
             }
             else
             {
-                <select class="custom-select" @onchange="BenefitSelected">
+                <select class="custom-select" id="suggest-exercise-select-benefit" @onchange="BenefitSelected">
                     <option value="-1" disabled selected>(select)</option>
                     @for (var i = 0; i < benefits.Count; i++)
                     {
 
-                        <option value="@i">@i @benefits[i].BenefitId @benefits[i].BenefitName @benefits[i].BenefitSpecificity</option>
+                        <option value="@i"> @benefits[i].BenefitName @string.Format("({0})", benefits[i].BenefitSpecificity)</option>
                     }
                 </select>
             }
@@ -96,7 +97,7 @@
             }
         </div>
         <div class="dialog-body-input">
-            <label>Add Injury Location it would aggravate: </label>
+            <label>Add Injury Location(s) it would aggravate: </label>
             @if (injuryLocations == null)
             {
                 <select class="custom-select" disabled>
@@ -105,12 +106,12 @@
             }
             else
             {
-                <select class="custom-select" @onchange="InjuryLocationSelected">
+                <select class="custom-select" id="suggest-exercise-select-injury-location" @onchange="InjuryLocationSelected">
                     <option value="-1" disabled selected>(select)</option>
                     @for (var i = 0; i < injuryLocations.Count; i++)
                     {
 
-                        <option value="@i">@i @injuryLocations[i].InjuryLocationId @injuryLocations[i].BodyPart </option>
+                        <option value="@i"> @injuryLocations[i].BodyPart </option>
                     }
                 </select>
             }
@@ -204,6 +205,7 @@
         {
             AddInjuryLocation(injuryLocations[index]);
         }
+        SetSelectedInjuryLocation();
     }
 
     void AddInjuryLocation(InjuryLocation injuryLocation)
@@ -212,11 +214,18 @@
         {
             suggestedExercise.Exercise.InjuryLocations.Add(new InjuryLocation(injuryLocation.InjuryLocationId, injuryLocation.BodyPart));
         }
+        injuryLocations.RemoveAll(pt => pt.BodyPart == injuryLocation.BodyPart);
+        SetSelectedInjuryLocation();
     }
 
     void RemoveInjuryLocation(InjuryLocation injuryLocation)
     {
         suggestedExercise.Exercise.InjuryLocations.RemoveAll(pt => pt.BodyPart == injuryLocation.BodyPart);
+        if (injuryLocations.Find(pt => pt.BodyPart == injuryLocation.BodyPart) == null)
+        {
+            injuryLocations.Add(new InjuryLocation(injuryLocation.InjuryLocationId, injuryLocation.BodyPart));
+        }
+        SetSelectedInjuryLocation();
     }
 
     void BenefitSelected(ChangeEventArgs e)
@@ -225,19 +234,27 @@
         {
             AddBenefit(benefits[index]);
         }
+        SetSelectedBenefit();
     }
 
     void AddBenefit(Benefit benefit)
     {
         if (suggestedExercise.Exercise.Benefits.Find(pt => pt.BenefitName == benefit.BenefitName) == null)
         {
-            suggestedExercise.Exercise.Benefits.Add(new Benefit(benefit.BenefitId, benefit.BenefitName));
+            suggestedExercise.Exercise.Benefits.Add(new Benefit(benefit.BenefitId, benefit.BenefitName, benefit.BenefitSpecificity));
         }
+        benefits.RemoveAll(pt => pt.BenefitName == benefit.BenefitName);
+        SetSelectedBenefit();
     }
 
     void RemoveBenefit(Benefit benefit)
     {
         suggestedExercise.Exercise.Benefits.RemoveAll(pt => pt.BenefitName == benefit.BenefitName);
+        if (benefits.Find(pt => pt.BenefitName == benefit.BenefitName) == null)
+        {
+            benefits.Add(new Benefit(benefit.BenefitId, benefit.BenefitName, benefit.BenefitSpecificity));
+        }
+        SetSelectedBenefit();
     }
 
 
@@ -293,6 +310,34 @@
         {
             toastService.ShowToast("Failed to submit suggestion!", ToastLevel.Error);
         }
+    }
+
+    public async void SetSelectedInjuryLocation()
+    {
+
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("setSelectInputToValue", -1, "#suggest-exercise-select-injury-location");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        StateHasChanged();
+    }
+
+    public async void SetSelectedBenefit()
+    {
+
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("setSelectInputToValue", -1, "#suggest-exercise-select-benefit");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        StateHasChanged();
     }
 
 }

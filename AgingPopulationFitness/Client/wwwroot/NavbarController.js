@@ -28,3 +28,13 @@ function setInjuryLocationInjuryDialog(value) {
     const $select = document.querySelector('#SelectInjuryLocationInjuryDialog');
     $select.value = value;
 }
+
+function setInjuryLocationViewInjury(value) {
+    const $select = document.querySelector('#select-injury-in-view-injury');
+    $select.value = value;
+}
+
+function setSelectInputToValue(value, string) {
+    const $select = document.querySelector(string);
+    $select.value = value;
+}

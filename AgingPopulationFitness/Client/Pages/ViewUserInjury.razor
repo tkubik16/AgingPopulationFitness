@@ -6,6 +6,7 @@
 @inject HttpClient HttpClient;
 @inject UserState UserState;
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage;
 
 
@@ -45,12 +46,12 @@
             }
             else
             {
-                <select class="custom-select" @onchange="InjuryLocationSelected">
+                <select class="custom-select" id="select-injury-in-view-injury" @onchange="InjuryLocationSelected">
                     <option value="-1" disabled selected>(select)</option>
                     @for (var i = 0; i < injuryLocations.Count; i++)
                     {
 
-                        <option value="@i">@i @injuryLocations[i].InjuryLocationId @injuryLocations[i].BodyPart </option>
+                        <option value="@i"> @injuryLocations[i].BodyPart </option>
                     }
                 </select>
             }
@@ -123,6 +124,8 @@
 
             }
         }
+
+        // grab the info from the correct user injury based on id
         for( int i = 0; i < UserState.userInjuries.Count; i++)
         {
             if( UserState.userInjuries[i].InjuryId == injuryId)
@@ -130,6 +133,12 @@
                 userInjury = UserState.userInjuries[i];
             }
         }
+        // remove the injury locatiosn that are part of this user injuury from the select input drop down options
+        for( int i = 0; i < userInjury.InjuryLocations.Count; i++)
+        {
+            RemoveFromSelectInputOnLoad(userInjury.InjuryLocations[i]);
+        }
+        
 
         if (await sessionStorage.ContainKeyAsync("UserId"))
         {
@@ -137,6 +146,8 @@
             await UserState.Refresh(sessionStorage);
             await UpdateMenuOnRefresh.InvokeAsync();
         }
+
+
 
 
     }
@@ -147,6 +158,7 @@
         {
             AddInjuryLocation(injuryLocations[index]);
         }
+        SetSelectedInjuryLocation();
     }
 
     void AddInjuryLocation(InjuryLocation injuryLocation)
@@ -155,11 +167,24 @@
         {
             userInjury.InjuryLocations.Add(new InjuryLocation(injuryLocation.InjuryLocationId, injuryLocation.BodyPart));
         }
+        injuryLocations.RemoveAll(pt => pt.BodyPart == injuryLocation.BodyPart);
+        SetSelectedInjuryLocation();
     }
 
     void RemoveInjuryLocation(InjuryLocation injuryLocation)
     {
         userInjury.InjuryLocations.RemoveAll(pt => pt.BodyPart == injuryLocation.BodyPart);
+        if (injuryLocations.Find(pt => pt.BodyPart == injuryLocation.BodyPart) == null)
+        {
+            injuryLocations.Add(new InjuryLocation(injuryLocation.InjuryLocationId, injuryLocation.BodyPart));
+        }
+        SetSelectedInjuryLocation();
+    }
+
+    void RemoveFromSelectInputOnLoad(InjuryLocation injuryLocation)
+    {
+
+        injuryLocations.RemoveAll(pt => pt.BodyPart == injuryLocation.BodyPart);
     }
 
     async void DeleteUserInjury()
@@ -189,4 +214,19 @@
         }
 
     }
+
+    public async void SetSelectedInjuryLocation()
+    {
+        
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("setInjuryLocationViewInjury", -1);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+        StateHasChanged();
+    }
+
 }

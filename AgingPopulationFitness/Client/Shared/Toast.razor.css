@@ -2,7 +2,7 @@
     display: none;
     color: #fff;
     z-index: 999;
-    position: absolute;
+    position: fixed;
     width: 25rem;
     overflow: hidden;
     top: 2rem;

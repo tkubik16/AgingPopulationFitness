@@ -5,6 +5,17 @@
 @inject HttpClient HttpClient;
 @inject UserState UserState;
 
+@if (UserState.injuryLocations.Count == 0)
+{
+    <div class="injuries">
+        <h1>Your Injuries Affect your:</h1>
+        
+            <div class="injury">
+                You have no injuries added.
+            </div>
+        
+    </div>
+}
 @if( UserState.injuryLocations.Count != 0){
     <div class="injuries">
         <h1>Your Injuries Affect your:</h1>

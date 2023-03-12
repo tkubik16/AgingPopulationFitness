@@ -629,6 +629,7 @@ h1 {
     margin-bottom: 0.5rem;
     margin-top: 1rem;
     font-size: 4rem;
+    text-align: center;
 }
 
 .injuries-widget {
@@ -947,6 +948,11 @@ h1 {
     max-width: 45rem;
 }
 
+    .landing-body > p {
+        text-indent: 2rem;
+        text-align: justify;
+    }
+
 .landing-footer {
     display: flex;
     flex-direction: column;
@@ -1003,6 +1009,80 @@ h1 {
         transform: scale(1.1);
     }
 
+.created-by-text {
+    font-size: 1.5rem;
+    padding-top: 1rem;
+}
+
+.home-page-widgets {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 1rem;
+    padding: 0;
+    list-style: none;
+    justify-content: center;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    width: fit-content;
+}
+
+.add-user-injury-widget {
+    width: fit-content;
+    height: fit-content;
+
+}
+
+.add-user-injury-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1 / 1;
+    width: 15rem;
+    padding: 1rem;
+    color: var(--clr-secondary);
+    background-color: var(--clr-section-bg);
+    border-radius: 0.25rem;
+    outline-style: groove;
+    outline-width: 1px;
+    outline-color: var(--clr-section-bg-outline);
+    transition: all 0.2s;
+    text-align: center;
+}
+    .add-user-injury-card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 10px var(--clr-cta);
+    }
+
+    .add-user-injury-card svg {
+        aspect-ratio: 1 / 1;
+        fill: var(--clr-cta);
+        width: 50%;
+        height: 50%;
+    }
+
+        .add-user-injury-card svg path {
+            fill: var(--clr-cta);
+        }
+
+
+.liability-notice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 85rem;
+}
+
+    .liability-notice > p {
+        width: 100%;
+        text-align: center;
+        padding: 2rem;
+        font-size: 0.70rem;
+        padding-bottom: 0;
+        text-indent: 2rem;
+    }
 
 
 @media screen and (min-width: 641px) {
@@ -1035,8 +1115,16 @@ h1 {
 
     }
 
-    .calling-card-section {
-        
+    .created-by-text {
+        padding-top: 0rem;
+    }
+
+    .liability-notice > p {
+        width: 100%;
+        text-align: center;
+        padding: 5rem;
+        font-size: 0.70rem;
+        padding-bottom: 0;
     }
 
 }

@@ -100,10 +100,12 @@
     width: 20%;
     height: fit-content;
     margin-right: 2.5%;
+    background-color: var(--clr-section-bg);
+    border-radius: 0.25rem;
+    outline-style: groove;
+    outline-width: 1px;
+    outline-color: var(--clr-section-bg-outline);
     padding: 1rem;
-    border-style: solid;
-    border-color: var(--clr-black);
-    border-radius: 0.5rem;
 }
 
 .exercise-benefits-section {
@@ -117,13 +119,25 @@
 }
 
 .exercise-text-info {
+    display: flex;
+    flex-direction: column;
     width: 60%;
     height: fit-content;
+    background-color: var(--clr-section-bg);
+    border-radius: 0.25rem;
+    outline-style: groove;
+    outline-width: 1px;
+    outline-color: var(--clr-section-bg-outline);
     padding: 1rem;
-    border-style: solid;
-    border-color: var(--clr-black);
-    border-radius: 0.5rem;
+    white-space: pre-wrap;
+
+
 }
+
+    .exercise-text-info > p {
+        padding-left: 1rem;
+
+    }
 
 .footer{
     display: flex;
@@ -133,29 +147,30 @@
 
 .google-it-btn {
     
-    background-color: var(--clr-white);
-    color: var(--clr-black);
+
+    background-color: var(--clr-cta);
     border-radius: .25rem;
-    border-style: solid;
-    border-width: 2px;
-    border-color: var(--clr-black);
-    font-weight: 700;
-    font-size: 1.5rem;
+    border-width: 0;
+    box-sizing: border-box;
+    text-shadow: rgba(0, 0, 0, .3) 1px 1px 1px;
+    color: var(--clr-neutral);
+    font-weight: 500;
+    font-size: 1.2rem;
     text-align: center;
     justify-content: center;
-    transition: transform .2s;
-    z-index: 5;
     padding: 0.25rem;
     text-decoration: none;
     margin-top: 1rem;
+    transition: transform .2s;
 }
 
     .google-it-btn:hover {
-        border-color: var(--clr-white);
-        background-color: var(--clr-black);
-        color: var(--clr-white);
+        text-shadow: rgba(0, 0, 0, .8) 2px 2px 2px;
         transform: scale(1.1);
+        
     }
+
+
 
 @media screen and (max-width: 641px) {
 

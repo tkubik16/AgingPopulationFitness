@@ -84,7 +84,9 @@
                 bool userAdded = false;
                 userProfile.Password = passwordOne;
                 passwordTooShort = !(userProfile.PasswordLengthCheck());
-                toastService.ShowToast("Password must be at least 5 characters and at most 50", ToastLevel.Warning);
+                if( passwordTooShort){
+                    toastService.ShowToast("Password must be at least 5 characters and at most 50", ToastLevel.Warning);
+                }
                 if (userProfile.PasswordLengthCheck())
                 {
                     userAdded = await UserClient.AddUser(userProfile);

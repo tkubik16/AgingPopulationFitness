@@ -11,23 +11,15 @@ using Npgsql;
 
 
 
+
 namespace AgingPopulationFitness.Server
 {
     [Route("user")]
     [ApiController]
     public class UserController : Controller
     {
-        /*
-        [HttpGet("{userProfile}")]
-        public  Task<ActionResult<UserProfile>> GetUser( UserProfile userProfile)
-        {
-            var newUserProfile = new UserProfile();
-            newUserProfile.Username = "testUsername";
-            newUserProfile.Username = "testPassword";
-
-            return newUserProfile;
-        }
-        */
+        
+        
         public DatabaseCredentials databaseCredentials = new DatabaseCredentials();
         public string cs = "host=" + DatabaseCredentials.Host + ";" +
                 "Username=" + DatabaseCredentials.Username + ";" +
@@ -97,7 +89,7 @@ namespace AgingPopulationFitness.Server
             return isLoggedIn;
         }
 
-        public bool IsLoggedInCall(UserProfile userProfile)
+        public async Task<bool> IsLoggedInCall(UserProfile userProfile)
         {
             if (userProfile.UserId == null)
             {
@@ -107,21 +99,15 @@ namespace AgingPopulationFitness.Server
 
             List<UserProfile> userProfileList = new List<UserProfile>();
 
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
+            
 
-            using var con = new NpgsqlConnection(cs);
             try
             {
-                con.Open();
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
                 var sql = "SELECT user_uid FROM user_profile WHERE user_uid = @user_id ";
 
-                using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
                 cmd.Parameters.AddWithValue("user_id", userProfile.UserId);
                 cmd.Prepare();
@@ -138,7 +124,7 @@ namespace AgingPopulationFitness.Server
                 {
                     isLoggedIn = true;
                 }
-                con.Close();
+                connection.Close();
             }
             catch(Exception e)
             {
@@ -147,38 +133,38 @@ namespace AgingPopulationFitness.Server
             return isLoggedIn;
         }
 
-        public bool AddUserCall(UserProfile userProfile)
+        public async Task<bool> AddUserCall(UserProfile userProfile)
         {
             if (userProfile.Username == null) { return false; }
             if (userProfile.Password == null) { return false; }
-            if (UserExistsCheckCall(userProfile)) { return false; }
+            if ( await UserExistsCheckCall(userProfile)) { return false; }
 
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
+           
+            try
+            {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
+                var sql = "INSERT INTO user_profile( user_uid, username, user_password ) VALUES ( uuid_generate_v4(), @username, crypt(@password, gen_salt('bf')) )";
 
-            var sql = "INSERT INTO user_profile( user_uid, username, user_password ) VALUES ( uuid_generate_v4(), @username, crypt(@password, gen_salt('bf')) )";
+                using var cmd = new NpgsqlCommand(sql, connection);
 
-            using var cmd = new NpgsqlCommand(sql, con);
+                cmd.Parameters.AddWithValue("username", userProfile.Username);
+                cmd.Parameters.AddWithValue("password", userProfile.Password);
+                cmd.Prepare();
 
-            cmd.Parameters.AddWithValue("username", userProfile.Username);
-            cmd.Parameters.AddWithValue("password", userProfile.Password);
-            cmd.Prepare();
+                cmd.ExecuteNonQuery();
 
-            cmd.ExecuteNonQuery();
-
-            if (UserExistsCheckCall(userProfile)) { return true; }
-            con.Close();
+                if (await UserExistsCheckCall(userProfile)) { return true; }
+                connection.Close();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+            }
             return false;
         }
 
-        public bool UserExistsCheckCall(UserProfile userProfile)
+        public async Task<bool> UserExistsCheckCall(UserProfile userProfile)
         {
             if (userProfile.Username == null)
             {
@@ -188,116 +174,121 @@ namespace AgingPopulationFitness.Server
 
             List<UserProfile> userProfileList = new List<UserProfile>();
 
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
-
-            var sql = "SELECT username FROM user_profile WHERE username = @username ";
-
-            using var cmd = new NpgsqlCommand(sql, con);
-
-            cmd.Parameters.AddWithValue("username", userProfile.Username);
-            cmd.Prepare();
-
-            using NpgsqlDataReader rdr = cmd.ExecuteReader();
-
-            while (rdr.Read())
+           
+            try
             {
-                UserProfile newUserProfile = new UserProfile();
-                newUserProfile.Username = rdr.GetString(0);
-                newUserProfile.PrintUserProfile();          // console print statement
-                userProfileList.Add(newUserProfile);
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
+
+                var sql = "SELECT username FROM user_profile WHERE username = @username ";
+
+                using var cmd = new NpgsqlCommand(sql, connection);
+
+                cmd.Parameters.AddWithValue("username", userProfile.Username);
+                cmd.Prepare();
+
+                using NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    UserProfile newUserProfile = new UserProfile();
+                    newUserProfile.Username = rdr.GetString(0);
+                    newUserProfile.PrintUserProfile();          // console print statement
+                    userProfileList.Add(newUserProfile);
+                }
+                if (userProfileList.Count() > 0)
+                {
+                    userExists = true;
+                }
+                connection.Close();
             }
-            if (userProfileList.Count() > 0)
-            {
-                userExists = true;
+            catch(Exception e) {
+                Console.WriteLine(e);
             }
-            con.Close();
+
             return userExists;
         }
 
-        public UserProfile VerifyUserCall(UserProfile userProfile)
+        public async Task<UserProfile> VerifyUserCall(UserProfile userProfile)
         {
             List<UserProfile> userProfileList = new List<UserProfile>();
 
 
 
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
-
-            var sql = "SELECT * FROM user_profile WHERE username = @username AND user_password = crypt( @user_password, user_password )";
-
-
-            using var cmd = new NpgsqlCommand(sql, con);
-
-            cmd.Parameters.AddWithValue("username", userProfile.Username);
-            cmd.Parameters.AddWithValue("user_password", userProfile.Password);
-            cmd.Prepare();
-
-            using NpgsqlDataReader rdr = cmd.ExecuteReader();
-
-            while (rdr.Read())
-            {
-                UserProfile newUserProfile = new UserProfile();
-                newUserProfile.UserId = rdr.GetGuid(0);
-                newUserProfile.Username = rdr.GetString(1);
-                newUserProfile.Password = rdr.GetString(2);
-                newUserProfile.PrintUserProfile();
-                userProfileList.Add(newUserProfile);
-            }
-            if (userProfileList.Count() == 1)
-            {
-                con.Close();
-                return userProfileList[0];
-            }
-
-            con.Close();
-            return userProfile;
-        }
-
-        public bool PostFeedbackCall(Feedback feedback)
-        {
-            
-            
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
-
-            var sql = "INSERT INTO feedback (title, type, body) VALUES " +
-                "(@title, @type, @body)";
-
-
-            using var cmd = new NpgsqlCommand(sql, con);
-
+         
             try
             {
-                cmd.Parameters.AddWithValue("title", feedback.Title);
-                cmd.Parameters.AddWithValue("type", feedback.Type);
-                cmd.Parameters.AddWithValue("body", feedback.Body);
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
+
+                var sql = "SELECT * FROM user_profile WHERE username = @username AND user_password = crypt( @user_password, user_password )";
+
+
+                using var cmd = new NpgsqlCommand(sql, connection);
+
+                cmd.Parameters.AddWithValue("username", userProfile.Username);
+                cmd.Parameters.AddWithValue("user_password", userProfile.Password);
                 cmd.Prepare();
 
-                cmd.ExecuteNonQuery();
+                using NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    UserProfile newUserProfile = new UserProfile();
+                    newUserProfile.UserId = rdr.GetGuid(0);
+                    newUserProfile.Username = rdr.GetString(1);
+                    newUserProfile.Password = rdr.GetString(2);
+                    newUserProfile.PrintUserProfile();
+                    userProfileList.Add(newUserProfile);
+                }
+                if (userProfileList.Count() == 1)
+                {
+                    connection.Close();
+                    return userProfileList[0];
+                }
+
+                connection.Close();
             }
             catch(Exception e)
             {
-                con.Close();
-                return false;
+                Console.WriteLine(e);
             }
-            
-            con.Close();
-            return true;
+
+            return userProfile;
+        }
+
+        public async Task<bool> PostFeedbackCall(Feedback feedback)
+        {
+
+
+
+            try
+            {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
+
+                var sql = "INSERT INTO feedback (title, type, body) VALUES " +
+                    "(@title, @type, @body)";
+
+
+                using var cmd = new NpgsqlCommand(sql, connection);
+
+                
+                    cmd.Parameters.AddWithValue("title", feedback.Title);
+                    cmd.Parameters.AddWithValue("type", feedback.Type);
+                    cmd.Parameters.AddWithValue("body", feedback.Body);
+                    cmd.Prepare();
+
+                    cmd.ExecuteNonQuery();
+                
+                    
+                
+
+                connection.Close();
+                return true;
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            return false;
         }
 
     }

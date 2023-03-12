@@ -90,14 +90,13 @@ namespace AgingPopulationFitness.Server
             return numExercises;
         }
 
-        public Exercise GetExerciseCall(long exerciseId)
+        public async Task<Exercise> GetExerciseCall(long exerciseId)
         {
             Exercise exercise = new Exercise();
 
             try
             {
-                using var con = new NpgsqlConnection(cs);
-                con.Open();
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
 
                 string sql = "SELECT * FROM exercise " +
@@ -108,7 +107,7 @@ namespace AgingPopulationFitness.Server
                         "WHERE exercise.exercise_id = @exercise_id ";
 
 
-                using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
 
                 cmd.Parameters.AddWithValue("exercise_id", exerciseId);
@@ -137,7 +136,7 @@ namespace AgingPopulationFitness.Server
                         exercise.InjuryLocations.Add(new InjuryLocation(currentInjuryLocation.InjuryLocationId, currentInjuryLocation.BodyPart));
                     }
                 }
-                con.Close();
+                connection.Close();
             }
             catch( Exception e){
                 Console.WriteLine(e);
@@ -146,124 +145,110 @@ namespace AgingPopulationFitness.Server
             return exercise;
         }
 
-        public List<Exercise> GetAllExercisesCall(ExerciseFilter exerciseFilter)
+        public async Task<List<Exercise>> GetAllExercisesCall(ExerciseFilter exerciseFilter)
         {
             List<Exercise> exercises = new List<Exercise>();
 
 
 
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
-
-            string sql = "SELECT * FROM exercise";
             
+            try
+            {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
-            sql = "SELECT * FROM exercise " +
-                    "WHERE " +
-                        "exercise.exercise_id NOT IN ( " +
-                            "SELECT exercise_id FROM exercise_injury_location " +
-                            "WHERE injury_location_id = ANY (@injury_list) " +
-                            "GROUP BY exercise_id " +
+                
+
+
+                string sql = "SELECT * FROM exercise " +
+                        "WHERE " +
+                            "exercise.exercise_id NOT IN ( " +
+                                "SELECT exercise_id FROM exercise_injury_location " +
+                                "WHERE injury_location_id = ANY (@injury_list) " +
+                                "GROUP BY exercise_id " +
+                                ") " +
+                            "AND exercise.exercise_id IN ( " +
+                                "SELECT exercise_id FROM exercise_benefit " +
+                                "WHERE benefit_id = ANY (@benefit_list) " +
+                                "GROUP BY exercise_id " +
                             ") " +
-                        "AND exercise.exercise_id IN ( " +
-                            "SELECT exercise_id FROM exercise_benefit " +
-                            "WHERE benefit_id = ANY (@benefit_list) " +
-                            "GROUP BY exercise_id " +
-                        ") " +
-                        "AND exercise.exercise_type = ANY (@type_list) " +
-                        "ORDER BY exercise.exercise_name " +
-                        "LIMIT @exercises_per_page OFFSET @page_number ";
+                            "AND exercise.exercise_type = ANY (@type_list) " +
+                            "ORDER BY exercise.exercise_name " +
+                            "LIMIT @exercises_per_page OFFSET @page_number ";
 
 
-            using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
-            List<int> benefitIdList = new List<int>();
-            for( int i = 0; i < exerciseFilter.BenefitsList.Count; i++)
-            {
-                benefitIdList.Add(exerciseFilter.BenefitsList[i].BenefitId);
-                //Console.WriteLine(exerciseFilter.BenefitsList[i].BenefitName);
-            }
-            List<string> exerciseTypesList = new List<string>();
-            for (int i = 0; i < exerciseFilter.ExerciseTypesList.Count; i++)
-            {
-                exerciseTypesList.Add(exerciseFilter.ExerciseTypesList[i].Type);
-                //Console.WriteLine(exerciseFilter.ExerciseTypesList[i].Type);
-            }
-            List<int> injuryLocationIdList = new List<int>();
-            Console.WriteLine("ExcludeBasedOnInjuries:");
-            Console.WriteLine(exerciseFilter.ExcludeBasedOnInjuries);
-            if (exerciseFilter.ExcludeBasedOnInjuries == true)
-            {
-                for (int i = 0; i < exerciseFilter.InjuryLocations.Count; i++)
+                List<int> benefitIdList = new List<int>();
+                for (int i = 0; i < exerciseFilter.BenefitsList.Count; i++)
                 {
-                    injuryLocationIdList.Add(exerciseFilter.InjuryLocations[i].InjuryLocationId);
-                    Console.WriteLine(exerciseFilter.InjuryLocations[i].BodyPart);
+                    benefitIdList.Add(exerciseFilter.BenefitsList[i].BenefitId);
+                    //Console.WriteLine(exerciseFilter.BenefitsList[i].BenefitName);
                 }
-            }
+                List<string> exerciseTypesList = new List<string>();
+                for (int i = 0; i < exerciseFilter.ExerciseTypesList.Count; i++)
+                {
+                    exerciseTypesList.Add(exerciseFilter.ExerciseTypesList[i].Type);
+                    //Console.WriteLine(exerciseFilter.ExerciseTypesList[i].Type);
+                }
+                List<int> injuryLocationIdList = new List<int>();
+                Console.WriteLine("ExcludeBasedOnInjuries:");
+                Console.WriteLine(exerciseFilter.ExcludeBasedOnInjuries);
+                if (exerciseFilter.ExcludeBasedOnInjuries == true)
+                {
+                    for (int i = 0; i < exerciseFilter.InjuryLocations.Count; i++)
+                    {
+                        injuryLocationIdList.Add(exerciseFilter.InjuryLocations[i].InjuryLocationId);
+                        Console.WriteLine(exerciseFilter.InjuryLocations[i].BodyPart);
+                    }
+                }
 
-            cmd.Parameters.AddWithValue( "benefit_list", benefitIdList.ToArray() ) ;
-            cmd.Parameters.AddWithValue( "type_list", exerciseTypesList.ToArray() ) ;
-            cmd.Parameters.AddWithValue("injury_list", injuryLocationIdList.ToArray());
-            cmd.Parameters.AddWithValue("exercises_per_page", exerciseFilter.ExercisesPerPage);
-            if (exerciseFilter.PageNumber == 0)
+                cmd.Parameters.AddWithValue("benefit_list", benefitIdList.ToArray());
+                cmd.Parameters.AddWithValue("type_list", exerciseTypesList.ToArray());
+                cmd.Parameters.AddWithValue("injury_list", injuryLocationIdList.ToArray());
+                cmd.Parameters.AddWithValue("exercises_per_page", exerciseFilter.ExercisesPerPage);
+                if (exerciseFilter.PageNumber == 0)
+                {
+                    cmd.Parameters.AddWithValue("page_number", 0);
+                }
+                else
+                {
+                    cmd.Parameters.AddWithValue("page_number", (exerciseFilter.PageNumber - 1) * exerciseFilter.ExercisesPerPage);
+                }
+                cmd.Prepare();
+
+
+
+
+                using NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    Exercise anExercise = new Exercise();
+                    anExercise.ExerciseId = rdr.GetInt32(0);
+                    anExercise.ExerciseName = rdr.GetString(1);
+                    anExercise.ExerciseDescription = rdr.GetString(2);
+                    anExercise.ExerciseLink = rdr.GetString(3);
+                    //anExercise.ExerciseMainImage = (byte[])rdr[4]; 
+                    anExercise.ExerciseType = rdr.GetString(5);
+                    anExercise.ExerciseInstructions = rdr.GetString(6);
+
+                    exercises.Add(anExercise);
+                    //Console.WriteLine(anExercise.ExerciseName );
+                }
+                connection.Close();
+            }
+            catch(Exception e)
             {
-                cmd.Parameters.AddWithValue("page_number", 0);
+                Console.WriteLine(e.Message);
             }
-            else
-            {
-                cmd.Parameters.AddWithValue("page_number", (exerciseFilter.PageNumber - 1) * exerciseFilter.ExercisesPerPage);
-            }
-            cmd.Prepare();
-            
-            
-
-
-            using NpgsqlDataReader rdr = cmd.ExecuteReader();
-
-            while (rdr.Read())
-            {
-                Exercise anExercise = new Exercise();
-                anExercise.ExerciseId = rdr.GetInt32(0);
-                anExercise.ExerciseName = rdr.GetString(1);
-                anExercise.ExerciseDescription = rdr.GetString(2);
-                anExercise.ExerciseLink = rdr.GetString(3);
-                //anExercise.ExerciseMainImage = (byte[])rdr[4]; 
-                anExercise.ExerciseType = rdr.GetString(5);
-                anExercise.ExerciseInstructions = rdr.GetString(6);
-
-                exercises.Add(anExercise);
-                //Console.WriteLine(anExercise.ExerciseName );
-            }
-            con.Close();
 
             GetBenefitsAndInjuryLocationsForExercises( exercises);
 
-            //TODO: print all the benefits and injury locatiosn for each exercise for confirmation
-            /*
-            for( int i = 0; i < exercises.Count; i++)
-            {
-                Console.WriteLine(string.Format("{0} Benefits", exercises[i].ExerciseName));
-                for(int j = 0; j < exercises[i].Benefits.Count; j++)
-                {
-                    Console.WriteLine(string.Format("ID: {0} NAME: {1}", exercises[i].Benefits[j].BenefitId, exercises[i].Benefits[j].BenefitName));
-                }
-                Console.WriteLine(string.Format("{0} Injury Locations", exercises[i].ExerciseName));
-                for ( int j = 0; j < exercises[i].InjuryLocations.Count; j++)
-                {
-                    Console.WriteLine(string.Format("ID: {0} NAME: {1}", exercises[i].InjuryLocations[j].InjuryLocationId, exercises[i].InjuryLocations[j].BodyPart));
-                }
-            }
-            */
+            
             return exercises;
         }
 
-        public void GetBenefitsAndInjuryLocationsForExercises(List<Exercise> exercises)
+        public async Task<bool> GetBenefitsAndInjuryLocationsForExercises(List<Exercise> exercises)
         {
             List<long> exercisesIdList = new List<long>();
             for (int i = 0; i < exercises.Count; i++)
@@ -272,10 +257,11 @@ namespace AgingPopulationFitness.Server
                 Console.WriteLine(exercisesIdList[i]);
             }
 
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
+            try
+            {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
-            string sql = "SELECT exercise.exercise_id, exercise.exercise_name, benefit.benefit_id, benefit.benefit_name, benefit.benefit_specificity, injury_location.injury_location_id, injury_location.body_part " +
+                string sql = "SELECT exercise.exercise_id, exercise.exercise_name, benefit.benefit_id, benefit.benefit_name, benefit.benefit_specificity, injury_location.injury_location_id, injury_location.body_part " +
                         "FROM exercise " +
                         "FULL JOIN exercise_benefit ON exercise.exercise_id = exercise_benefit.exercise_id " +
                         "FULL JOIN benefit ON exercise_benefit.benefit_id = benefit.benefit_id " +
@@ -285,120 +271,127 @@ namespace AgingPopulationFitness.Server
                         "ORDER BY exercise.exercise_name ";
 
 
-            using var cmd = new NpgsqlCommand(sql, con);
-            cmd.Parameters.AddWithValue("exercise_id_list", exercisesIdList.ToArray());
-            cmd.Prepare();
+                using var cmd = new NpgsqlCommand(sql, connection);
+                cmd.Parameters.AddWithValue("exercise_id_list", exercisesIdList.ToArray());
+                cmd.Prepare();
 
 
 
 
-            using NpgsqlDataReader rdr = cmd.ExecuteReader();
+                using NpgsqlDataReader rdr = cmd.ExecuteReader();
 
-            while (rdr.Read())
-            {
-                Console.WriteLine(string.Format("Id: {0} Name: {1} benefit_id: {2} benefit_name: {3} benefit_specificity {4} body_part_id: {5} body_part: {6}", rdr.GetInt32(0), rdr.GetString(1), rdr.GetInt32(2), rdr.GetString(3), rdr.GetString(4), rdr.GetInt32(5), rdr.GetString(6)));
-                int currentExerciseId = rdr.GetInt32(0);
-                Benefit currentBenefit = new Benefit(rdr.GetInt32(2), rdr.GetString(3), rdr.GetString(4));
-                InjuryLocation currentInjuryLocation = new InjuryLocation(rdr.GetInt32(5), rdr.GetString(6));
-
-                for (int i = 0; i < exercises.Count; i++)
+                while (rdr.Read())
                 {
-                    if( currentExerciseId == exercises[i].ExerciseId)
+                    Console.WriteLine(string.Format("Id: {0} Name: {1} benefit_id: {2} benefit_name: {3} benefit_specificity {4} body_part_id: {5} body_part: {6}", rdr.GetInt32(0), rdr.GetString(1), rdr.GetInt32(2), rdr.GetString(3), rdr.GetString(4), rdr.GetInt32(5), rdr.GetString(6)));
+                    int currentExerciseId = rdr.GetInt32(0);
+                    Benefit currentBenefit = new Benefit(rdr.GetInt32(2), rdr.GetString(3), rdr.GetString(4));
+                    InjuryLocation currentInjuryLocation = new InjuryLocation(rdr.GetInt32(5), rdr.GetString(6));
+
+                    for (int i = 0; i < exercises.Count; i++)
                     {
-                        if(exercises[i].Benefits.Find(pt => pt.BenefitId == currentBenefit.BenefitId) == null)
+                        if (currentExerciseId == exercises[i].ExerciseId)
                         {
-                            exercises[i].Benefits.Add(new Benefit(currentBenefit.BenefitId, currentBenefit.BenefitName));
-                        }
-                        if (exercises[i].InjuryLocations.Find(pt => pt.InjuryLocationId == currentInjuryLocation.InjuryLocationId) == null)
-                        {
-                            exercises[i].InjuryLocations.Add(new InjuryLocation(currentInjuryLocation.InjuryLocationId, currentInjuryLocation.BodyPart));
+                            if (exercises[i].Benefits.Find(pt => pt.BenefitId == currentBenefit.BenefitId) == null)
+                            {
+                                exercises[i].Benefits.Add(new Benefit(currentBenefit.BenefitId, currentBenefit.BenefitName));
+                            }
+                            if (exercises[i].InjuryLocations.Find(pt => pt.InjuryLocationId == currentInjuryLocation.InjuryLocationId) == null)
+                            {
+                                exercises[i].InjuryLocations.Add(new InjuryLocation(currentInjuryLocation.InjuryLocationId, currentInjuryLocation.BodyPart));
+                            }
                         }
                     }
+
+
                 }
-                
-                
+                connection.Close();
+                return true;
             }
-            con.Close();
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
 
         }
 
 
-        public int GetExercisesCountCall(ExerciseFilter exerciseFilter)
+        public async Task<int> GetExercisesCountCall(ExerciseFilter exerciseFilter)
         {
             
             int count = 0;
 
 
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
-
-            string sql = "SELECT COUNT(*) FROM exercise";
+           
+            try
+            {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
 
-            sql = "SELECT COUNT(*) FROM exercise " +
-                    "WHERE " +
-                        "exercise.exercise_id NOT IN ( " +
-                            "SELECT exercise_id FROM exercise_injury_location " +
-                            "WHERE injury_location_id = ANY (@injury_list) " +
-                            "GROUP BY exercise_id " +
+
+                string sql = "SELECT COUNT(*) FROM exercise " +
+                        "WHERE " +
+                            "exercise.exercise_id NOT IN ( " +
+                                "SELECT exercise_id FROM exercise_injury_location " +
+                                "WHERE injury_location_id = ANY (@injury_list) " +
+                                "GROUP BY exercise_id " +
+                                ") " +
+                            "AND exercise.exercise_id IN ( " +
+                                "SELECT exercise_id FROM exercise_benefit " +
+                                "WHERE benefit_id = ANY (@benefit_list) " +
+                                "GROUP BY exercise_id " +
                             ") " +
-                        "AND exercise.exercise_id IN ( " +
-                            "SELECT exercise_id FROM exercise_benefit " +
-                            "WHERE benefit_id = ANY (@benefit_list) " +
-                            "GROUP BY exercise_id " +
-                        ") " +
-                        "AND exercise.exercise_type = ANY (@type_list)";
+                            "AND exercise.exercise_type = ANY (@type_list)";
 
 
-            using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
-            List<int> benefitIdList = new List<int>();
-            for (int i = 0; i < exerciseFilter.BenefitsList.Count; i++)
-            {
-                benefitIdList.Add(exerciseFilter.BenefitsList[i].BenefitId);
-                //Console.WriteLine(exerciseFilter.BenefitsList[i].BenefitName);
-            }
-            List<string> exerciseTypesList = new List<string>();
-            for (int i = 0; i < exerciseFilter.ExerciseTypesList.Count; i++)
-            {
-                exerciseTypesList.Add(exerciseFilter.ExerciseTypesList[i].Type);
-                //Console.WriteLine(exerciseFilter.ExerciseTypesList[i].Type);
-            }
-            List<int> injuryLocationIdList = new List<int>();
-            Console.WriteLine("ExcludeBasedOnInjuries:");
-            Console.WriteLine(exerciseFilter.ExcludeBasedOnInjuries);
-            if (exerciseFilter.ExcludeBasedOnInjuries == true)
-            {
-                for (int i = 0; i < exerciseFilter.InjuryLocations.Count; i++)
+                List<int> benefitIdList = new List<int>();
+                for (int i = 0; i < exerciseFilter.BenefitsList.Count; i++)
                 {
-                    injuryLocationIdList.Add(exerciseFilter.InjuryLocations[i].InjuryLocationId);
-                    Console.WriteLine(exerciseFilter.InjuryLocations[i].BodyPart);
+                    benefitIdList.Add(exerciseFilter.BenefitsList[i].BenefitId);
+                    //Console.WriteLine(exerciseFilter.BenefitsList[i].BenefitName);
                 }
+                List<string> exerciseTypesList = new List<string>();
+                for (int i = 0; i < exerciseFilter.ExerciseTypesList.Count; i++)
+                {
+                    exerciseTypesList.Add(exerciseFilter.ExerciseTypesList[i].Type);
+                    //Console.WriteLine(exerciseFilter.ExerciseTypesList[i].Type);
+                }
+                List<int> injuryLocationIdList = new List<int>();
+                Console.WriteLine("ExcludeBasedOnInjuries:");
+                Console.WriteLine(exerciseFilter.ExcludeBasedOnInjuries);
+                if (exerciseFilter.ExcludeBasedOnInjuries == true)
+                {
+                    for (int i = 0; i < exerciseFilter.InjuryLocations.Count; i++)
+                    {
+                        injuryLocationIdList.Add(exerciseFilter.InjuryLocations[i].InjuryLocationId);
+                        Console.WriteLine(exerciseFilter.InjuryLocations[i].BodyPart);
+                    }
+                }
+
+                cmd.Parameters.AddWithValue("benefit_list", benefitIdList.ToArray());
+                cmd.Parameters.AddWithValue("type_list", exerciseTypesList.ToArray());
+                cmd.Parameters.AddWithValue("injury_list", injuryLocationIdList.ToArray());
+                cmd.Prepare();
+
+
+
+
+                using NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    count = rdr.GetInt32(0);
+
+                    Console.WriteLine(string.Format("Number of exercises returned: {0}", count));
+                }
+                connection.Close();
             }
-
-            cmd.Parameters.AddWithValue("benefit_list", benefitIdList.ToArray());
-            cmd.Parameters.AddWithValue("type_list", exerciseTypesList.ToArray());
-            cmd.Parameters.AddWithValue("injury_list", injuryLocationIdList.ToArray());
-            cmd.Prepare();
-
-
-
-
-            using NpgsqlDataReader rdr = cmd.ExecuteReader();
-
-            while (rdr.Read())
+            catch( Exception e)
             {
-                count = rdr.GetInt32(0);
-                
-                Console.WriteLine(string.Format( "Number of exercises returned: {0}", count));
+                Console.WriteLine(e);
             }
-            con.Close();
             return count;
         }
 
@@ -435,29 +428,23 @@ namespace AgingPopulationFitness.Server
             return responseTypes;
         }
 
-        public List<ExerciseType> GetTypesCall()
+        public async Task<List<ExerciseType>> GetTypesCall()
         {
             List<ExerciseType> types = new List<ExerciseType>();
 
 
 
 
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
+          
             try
             {
-                using var con = new NpgsqlConnection(cs);
-                con.Open();
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
                 var sql = "SELECT * FROM exercise_type " +
                     "ORDER BY exercise_type ASC";
 
 
-                using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
 
                 using NpgsqlDataReader rdr = cmd.ExecuteReader();
@@ -470,7 +457,7 @@ namespace AgingPopulationFitness.Server
                     //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
                     types.Add(type);
                 }
-                con.Close();
+                connection.Close();
             }
             catch( Exception e)
             {
@@ -479,66 +466,22 @@ namespace AgingPopulationFitness.Server
             return types;
         }
 
-        public List<Benefit> GetBenefitsCall()
+        public async Task<List<Benefit>> GetBenefitsCall()
         {
             List<Benefit> benefits = new List<Benefit>();
 
 
 
 
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
 
-            var sql = "SELECT * FROM benefit";
-
-
-            using var cmd = new NpgsqlCommand(sql, con);
-
-
-            using NpgsqlDataReader rdr = cmd.ExecuteReader();
-
-            while (rdr.Read())
-            {
-                Benefit benefit = new Benefit();
-                benefit.BenefitId = rdr.GetInt32(0);
-                benefit.BenefitName = rdr.GetString(1);
-                benefit.BenefitSpecificity = rdr.GetString(2);
-                //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
-                benefits.Add(benefit);
-            }
-            con.Close();
-            return benefits;
-        }
-
-        public List<Benefit> GetGeneralBenefitsCall()
-        {
-            List<Benefit> benefits = new List<Benefit>();
-
-
-
-
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
             try
             {
-                using var con = new NpgsqlConnection(cs);
-                con.Open();
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
-                var sql = "SELECT * FROM benefit " +
-                    "WHERE benefit.benefit_specificity = 'General'";
+                var sql = "SELECT * FROM benefit";
 
 
-                using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
 
                 using NpgsqlDataReader rdr = cmd.ExecuteReader();
@@ -552,7 +495,44 @@ namespace AgingPopulationFitness.Server
                     //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
                     benefits.Add(benefit);
                 }
-                con.Close();
+                connection.Close();
+            }
+            catch(Exception e){
+                Console.WriteLine(e);
+            }
+            return benefits;
+        }
+
+        public async Task<List<Benefit>> GetGeneralBenefitsCall()
+        {
+            List<Benefit> benefits = new List<Benefit>();
+
+
+
+
+            try
+            {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
+
+                var sql = "SELECT * FROM benefit " +
+                    "WHERE benefit.benefit_specificity = 'General'";
+
+
+                using var cmd = new NpgsqlCommand(sql, connection);
+
+
+                using NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    Benefit benefit = new Benefit();
+                    benefit.BenefitId = rdr.GetInt32(0);
+                    benefit.BenefitName = rdr.GetString(1);
+                    benefit.BenefitSpecificity = rdr.GetString(2);
+                    //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
+                    benefits.Add(benefit);
+                }
+                connection.Close();
             }
             catch(Exception e)
             {
@@ -588,7 +568,7 @@ namespace AgingPopulationFitness.Server
             return success;
         }
 
-        public bool HasAdminPrivileges(Guid? uid)
+        public async Task<bool> HasAdminPrivileges(Guid? uid)
         {
             int count = 0;
 
@@ -597,26 +577,25 @@ namespace AgingPopulationFitness.Server
                 return false;
             }
 
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
+            try {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
-            var sql = "SELECT COUNT(DISTINCT user_uid) " +
+                var sql = "SELECT COUNT(DISTINCT user_uid) " +
                 "FROM admin_privileges " +
                 "WHERE user_uid = @uid";
 
-            using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
-            cmd.Parameters.AddWithValue("uid", uid);
+                cmd.Parameters.AddWithValue("uid", uid);
 
-            try
-            {
+            
                 using NpgsqlDataReader rdr = cmd.ExecuteReader();
 
                 while (rdr.Read())
                 {
                     count = rdr.GetInt32(0);
                 }
-
+                connection.Close();
             }
             catch (Exception e)
             {
@@ -624,42 +603,36 @@ namespace AgingPopulationFitness.Server
             }
             if( count == 1)
             {
-                con.Close();
+                
                 return true;
             }
-            con.Close();
+            
             return false;
         }
 
-        public bool PostSuggestedExerciseHelper(Exercise exercise)
+        public async Task<bool> PostSuggestedExerciseHelper(Exercise exercise)
         {
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
+           
+            try {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
-            var sql = "INSERT INTO exercise ( exercise_name, exercise_description, exercise_link, exercise_main_image, exercise_type, exercise_instructions) VALUES" +
+                var sql = "INSERT INTO exercise ( exercise_name, exercise_description, exercise_link, exercise_main_image, exercise_type, exercise_instructions) VALUES" +
                 "(@exercise_name, @exercise_description, @exercise_link, @exercise_main_image, @exercise_type, @exercise_instructions)";
 
 
-            using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
-            cmd.Parameters.AddWithValue("exercise_name", exercise.ExerciseName);
-            cmd.Parameters.AddWithValue("exercise_description", exercise.ExerciseDescription);
-            cmd.Parameters.AddWithValue("exercise_link", exercise.ExerciseLink);
-            cmd.Parameters.AddWithValue("exercise_main_image", exercise.ExerciseMainImage);
-            cmd.Parameters.AddWithValue("exercise_type", exercise.ExerciseType);
-            cmd.Parameters.AddWithValue("exercise_instructions", exercise.ExerciseInstructions);
-            cmd.Prepare();
+                cmd.Parameters.AddWithValue("exercise_name", exercise.ExerciseName);
+                cmd.Parameters.AddWithValue("exercise_description", exercise.ExerciseDescription);
+                cmd.Parameters.AddWithValue("exercise_link", exercise.ExerciseLink);
+                cmd.Parameters.AddWithValue("exercise_main_image", exercise.ExerciseMainImage);
+                cmd.Parameters.AddWithValue("exercise_type", exercise.ExerciseType);
+                cmd.Parameters.AddWithValue("exercise_instructions", exercise.ExerciseInstructions);
+                cmd.Prepare();
 
-            try
-            {
+            
                 cmd.ExecuteNonQuery();
-                con.Close();
+                connection.Close();
                 AddAllInjuryLocations(exercise);
                 AddAllBenefits(exercise);
                 
@@ -669,31 +642,23 @@ namespace AgingPopulationFitness.Server
             {
                 Console.WriteLine(e);
             }
-            con.Close();
             return false;
 
         }
 
-        public bool PostSuggestedExerciseAsSuggestionHelper(Exercise exercise)
+        public async Task<bool> PostSuggestedExerciseAsSuggestionHelper(Exercise exercise)
         {
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            
+       
 
             try
             {
-                con.Open();
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
                 var sql = "INSERT INTO suggested_exercise ( suggested_exercise_name, suggested_exercise_description, suggested_exercise_link, suggested_exercise_main_image, suggested_exercise_type, suggested_exercise_instructions) VALUES" +
                     "(@exercise_name, @exercise_description, @exercise_link, @exercise_main_image, @exercise_type, @exercise_instructions)";
 
 
-                using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
                 cmd.Parameters.AddWithValue("exercise_name", exercise.ExerciseName);
                 cmd.Parameters.AddWithValue("exercise_description", exercise.ExerciseDescription);
@@ -704,7 +669,7 @@ namespace AgingPopulationFitness.Server
                 cmd.Prepare();
 
                 cmd.ExecuteNonQuery();
-                con.Close();
+                connection.Close();
 
                 return true;
             }
@@ -712,39 +677,32 @@ namespace AgingPopulationFitness.Server
             {
                 Console.WriteLine(e);
             }
-            con.Close();
             return false;
 
         }
 
-        public bool AddAllInjuryLocations(Exercise exercise)
+        public async Task<bool> AddAllInjuryLocations(Exercise exercise)
         {
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
+          
+            try {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
-            var sql = "SELECT exercise_id FROM exercise WHERE exercise_name = @exercise_name AND exercise_description = @exercise_description AND exercise_instructions = @exercise_instructions";
+                var sql = "SELECT exercise_id FROM exercise WHERE exercise_name = @exercise_name AND exercise_description = @exercise_description AND exercise_instructions = @exercise_instructions";
 
-            using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
-            cmd.Parameters.AddWithValue("exercise_name", exercise.ExerciseName);
-            cmd.Parameters.AddWithValue("exercise_description", exercise.ExerciseDescription);
-            cmd.Parameters.AddWithValue("exercise_instructions", exercise.ExerciseInstructions);
+                cmd.Parameters.AddWithValue("exercise_name", exercise.ExerciseName);
+                cmd.Parameters.AddWithValue("exercise_description", exercise.ExerciseDescription);
+                cmd.Parameters.AddWithValue("exercise_instructions", exercise.ExerciseInstructions);
 
-            try
-            {
+            
                 using NpgsqlDataReader rdr = cmd.ExecuteReader();
 
                 while (rdr.Read())
                 {
                     exercise.ExerciseId = rdr.GetInt32(0);
                 }
-                con.Close();
+                connection.Close();
                 for (int i = 0; i < exercise.InjuryLocations.Count; i++)
                 {
                     AddOneInjuryLocation(exercise.ExerciseId, exercise.InjuryLocations[i].InjuryLocationId);
@@ -756,67 +714,64 @@ namespace AgingPopulationFitness.Server
             {
                 Console.WriteLine(e);
             }
-            con.Close();
+            
             return false;
         }
 
-        public void AddOneInjuryLocation(long? exerciseId, long injuryLocationId)
+        public async Task<bool> AddOneInjuryLocation(long? exerciseId, long injuryLocationId)
         {
             if ((exerciseId == null) || (injuryLocationId == null))
             {
-                return;
+                return false;
             }
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
-
-            var sql = "INSERT INTO exercise_injury_location ( exercise_id, injury_location_id) VALUES" +
-                "(@exercise_id, @injury_location_id)";
-
-            using var cmd = new NpgsqlCommand(sql, con);
-
-            cmd.Parameters.AddWithValue("exercise_id", exerciseId);
-            cmd.Parameters.AddWithValue("injury_location_id", injuryLocationId);
-            
-
-            cmd.ExecuteNonQuery();
-
-            con.Close();
-        }
-
-        public bool AddAllBenefits(Exercise exercise)
-        {
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
-
-            var sql = "SELECT exercise_id FROM exercise WHERE exercise_name = @exercise_name AND exercise_description = @exercise_description AND exercise_instructions = @exercise_instructions";
-
-            using var cmd = new NpgsqlCommand(sql, con);
-
-            cmd.Parameters.AddWithValue("exercise_name", exercise.ExerciseName);
-            cmd.Parameters.AddWithValue("exercise_description", exercise.ExerciseDescription);
-            cmd.Parameters.AddWithValue("exercise_instructions", exercise.ExerciseInstructions);
-
+           
             try
             {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
+
+                var sql = "INSERT INTO exercise_injury_location ( exercise_id, injury_location_id) VALUES" +
+                "(@exercise_id, @injury_location_id)";
+
+                using var cmd = new NpgsqlCommand(sql, connection);
+
+                cmd.Parameters.AddWithValue("exercise_id", exerciseId);
+                cmd.Parameters.AddWithValue("injury_location_id", injuryLocationId);
+
+
+                cmd.ExecuteNonQuery();
+
+                connection.Close();
+                return true; ;
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+        }
+
+        public async Task<bool> AddAllBenefits(Exercise exercise)
+        {
+         
+            try {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
+
+                var sql = "SELECT exercise_id FROM exercise WHERE exercise_name = @exercise_name AND exercise_description = @exercise_description AND exercise_instructions = @exercise_instructions";
+
+                using var cmd = new NpgsqlCommand(sql, connection);
+
+                cmd.Parameters.AddWithValue("exercise_name", exercise.ExerciseName);
+                cmd.Parameters.AddWithValue("exercise_description", exercise.ExerciseDescription);
+                cmd.Parameters.AddWithValue("exercise_instructions", exercise.ExerciseInstructions);
+
+            
                 using NpgsqlDataReader rdr = cmd.ExecuteReader();
 
                 while (rdr.Read())
                 {
                     exercise.ExerciseId = rdr.GetInt32(0);
                 }
-                con.Close();
+                connection.Close();
                 for (int i = 0; i < exercise.Benefits.Count; i++)
                 {
                     AddOneBenefit(exercise.ExerciseId, exercise.Benefits[i].BenefitId);
@@ -827,37 +782,41 @@ namespace AgingPopulationFitness.Server
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                return false;
             }
-            con.Close();
-            return false;
+            
+            
         }
 
-        public void AddOneBenefit(long? exerciseId, long benefitId)
+        public async Task<bool> AddOneBenefit(long? exerciseId, long benefitId)
         {
             if ((exerciseId == null) || (benefitId == null))
             {
-                return;
+                return false;
             }
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
+          
+            try
+            {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
-            var sql = "INSERT INTO exercise_benefit ( exercise_id, benefit_id) VALUES" +
+                var sql = "INSERT INTO exercise_benefit ( exercise_id, benefit_id) VALUES" +
                 "(@exercise_id, @benefit_id)";
 
-            using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
-            cmd.Parameters.AddWithValue("exercise_id", exerciseId);
-            cmd.Parameters.AddWithValue("benefit_id", benefitId);
-            
+                cmd.Parameters.AddWithValue("exercise_id", exerciseId);
+                cmd.Parameters.AddWithValue("benefit_id", benefitId);
 
-            cmd.ExecuteNonQuery();
-            con.Close();
+
+                cmd.ExecuteNonQuery();
+                connection.Close();
+                return true;
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
         }
 
 

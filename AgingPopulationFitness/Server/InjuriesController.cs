@@ -1,6 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -92,15 +93,10 @@ namespace AgingPopulationFitness.Server
 
         }
 
-        public List<InjuryLocation> GetUsersInjuryLocationsCall(Guid userUid)
+        public async Task<List<InjuryLocation>> GetUsersInjuryLocationsCall(Guid userUid)
         {
             List<InjuryLocation> userInjuryLocations = new List<InjuryLocation>();
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
+            
             
             
 
@@ -108,8 +104,7 @@ namespace AgingPopulationFitness.Server
 
             try
             {
-                using var con = new NpgsqlConnection(cs);
-                con.Open();
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
                 var sql = "SELECT injury_location.injury_location_id, injury_location.body_part FROM user_injury " +
                             "FULL JOIN user_injury_injury_location " +
@@ -120,7 +115,7 @@ namespace AgingPopulationFitness.Server
                             "GROUP BY injury_location.body_part, injury_location.injury_location_id " +
                             "ORDER BY injury_location.body_part";
 
-                using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
                 cmd.Parameters.AddWithValue("UserUid", userUid);
 
@@ -135,7 +130,7 @@ namespace AgingPopulationFitness.Server
                 }
 
 
-                con.Close();
+                connection.Close();
             }
             catch (Exception e)
             {
@@ -146,37 +141,30 @@ namespace AgingPopulationFitness.Server
 
         }
 
-        public List<UserInjury> GetUsersInjuriesCall( Guid userUid)
+        public async Task<List<UserInjury>> GetUsersInjuriesCall( Guid userUid)
         {
             List<UserInjury> userInjuries = new List<UserInjury>();
 
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
             
-            var sql = "SELECT user_injury.user_injury_id, user_uid, user_injury_name, user_injury_description, user_injury_severity, user_injury_date, injury_location.injury_location_id, body_part " +
+            try {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
+
+                var sql = "SELECT user_injury.user_injury_id, user_uid, user_injury_name, user_injury_description, user_injury_severity, user_injury_date, injury_location.injury_location_id, body_part " +
                 "FROM user_injury " +
                 "FULL JOIN user_injury_injury_location ON user_injury.user_injury_id = user_injury_injury_location.user_injury_id " +
                 "FULL JOIN injury_location ON user_injury_injury_location.injury_location_id = injury_location.injury_location_id " +
                 "WHERE user_injury.user_uid = @UserUid " +
                 "ORDER BY  user_injury_date, user_injury.user_injury_id, injury_location.injury_location_id";
 
-            using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
             
-            //using var cmd = dataSource.CreateCommand(sql);
 
-            cmd.Parameters.AddWithValue("UserUid", userUid);
-
+                cmd.Parameters.AddWithValue("UserUid", userUid);
 
 
-            try
-            {
+
+            
                 using NpgsqlDataReader rdr = cmd.ExecuteReader();
 
                 
@@ -226,14 +214,14 @@ namespace AgingPopulationFitness.Server
                     }
                 }
 
-                
-                
+
+                connection.Close();
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
-            con.Close();
+            
             return userInjuries;
 
         }
@@ -294,7 +282,7 @@ namespace AgingPopulationFitness.Server
             return success;
         }
 
-        public bool DeleteUserInjuryInjuryLocationsHelper(UserInjury userInjury)
+        public async Task<bool> DeleteUserInjuryInjuryLocationsHelper(UserInjury userInjury)
         {
             if (userInjury == null)
             {
@@ -309,40 +297,35 @@ namespace AgingPopulationFitness.Server
                 return false;
             }
 
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
+            
+            try {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
-            var sql = "DELETE FROM user_injury_injury_location " +
+                var sql = "DELETE FROM user_injury_injury_location " +
                 "WHERE user_injury_id = @user_injury_id ";
 
 
-            using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
-            cmd.Parameters.AddWithValue("user_injury_id", userInjury.InjuryId);
-            cmd.Prepare();
+                cmd.Parameters.AddWithValue("user_injury_id", userInjury.InjuryId);
+                cmd.Prepare();
 
-            try
-            {
+            
                 cmd.ExecuteNonQuery();
-                con.Close();
+                connection.Close();
                 return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                return false;
             }
-            con.Close();
-            return false;
+            
+            
 
         }
 
-        public bool UpdateUserInjuryHelper(UserInjury userInjury)
+        public async Task<bool> UpdateUserInjuryHelper(UserInjury userInjury)
         {
             if (userInjury == null)
             {
@@ -357,16 +340,11 @@ namespace AgingPopulationFitness.Server
                 return false;
             }
 
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
+            
+            try {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
-            var sql = "UPDATE user_injury " +
+                var sql = "UPDATE user_injury " +
                 "SET user_injury_name = @user_injury_name, " +
                 "user_injury_description = @user_injury_description, " +
                 "user_injury_severity = @user_injury_severity, " +
@@ -374,32 +352,32 @@ namespace AgingPopulationFitness.Server
                 "WHERE user_uid = @user_uid AND user_injury_id = @injury_id";
 
 
-            using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
-            cmd.Parameters.AddWithValue("injury_id", userInjury.InjuryId);
-            cmd.Parameters.AddWithValue("user_uid", userInjury.UserId);
-            cmd.Parameters.AddWithValue("user_injury_name", userInjury.InjuryName);
-            cmd.Parameters.AddWithValue("user_injury_description", userInjury.InjuryDescription);
-            cmd.Parameters.AddWithValue("user_injury_severity", userInjury.InjurySeverity);
-            cmd.Parameters.AddWithValue("user_injury_date", userInjury.InjuryDate);
-            cmd.Prepare();
+                cmd.Parameters.AddWithValue("injury_id", userInjury.InjuryId);
+                cmd.Parameters.AddWithValue("user_uid", userInjury.UserId);
+                cmd.Parameters.AddWithValue("user_injury_name", userInjury.InjuryName);
+                cmd.Parameters.AddWithValue("user_injury_description", userInjury.InjuryDescription);
+                cmd.Parameters.AddWithValue("user_injury_severity", userInjury.InjurySeverity);
+                cmd.Parameters.AddWithValue("user_injury_date", userInjury.InjuryDate);
+                cmd.Prepare();
 
-            try
-            {
+            
                 cmd.ExecuteNonQuery();
-                con.Close();
+                connection.Close();
                 return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                return false;
             }
-            con.Close();
+            
             return false;
 
         }
 
-        public bool DeleteUserInjuryHelper(UserInjury userInjury)
+        public async Task<bool> DeleteUserInjuryHelper(UserInjury userInjury)
         {
             if (userInjury == null)
             {
@@ -414,67 +392,57 @@ namespace AgingPopulationFitness.Server
                 return false;
             }
 
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
+           
+            try {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
-            var sql = "DELETE FROM user_injury " +
+                var sql = "DELETE FROM user_injury " +
                 "WHERE user_uid = @user_uid AND user_injury_id = @injury_id";
 
 
-            using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
-            cmd.Parameters.AddWithValue("injury_id", userInjury.InjuryId);
-            cmd.Parameters.AddWithValue("user_uid", userInjury.UserId);
-            cmd.Prepare();
+                cmd.Parameters.AddWithValue("injury_id", userInjury.InjuryId);
+                cmd.Parameters.AddWithValue("user_uid", userInjury.UserId);
+                cmd.Prepare();
 
-            try
-            {
+            
                 cmd.ExecuteNonQuery();
-                con.Close();
+                connection.Close();
                 return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                return false;
             }
-            con.Close();
-            return false;
+            
+            
 
         }
 
-        public bool PostUserInjuryHelper(UserInjury userInjury)
+        public async Task<bool> PostUserInjuryHelper(UserInjury userInjury)
         {
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
+            
+            try {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
-            var sql = "INSERT INTO user_injury ( user_uid, user_injury_name, user_injury_description, user_injury_severity, user_injury_date) VALUES" +
+                var sql = "INSERT INTO user_injury ( user_uid, user_injury_name, user_injury_description, user_injury_severity, user_injury_date) VALUES" +
                 "(@user_uid, @user_injury_name, @user_injury_description, @user_injury_severity, @user_injury_date)";
 
 
-            using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
-            cmd.Parameters.AddWithValue("user_uid", userInjury.UserId);
-            cmd.Parameters.AddWithValue("user_injury_name", userInjury.InjuryName);
-            cmd.Parameters.AddWithValue("user_injury_description", userInjury.InjuryDescription);
-            cmd.Parameters.AddWithValue("user_injury_severity", userInjury.InjurySeverity);
-            cmd.Parameters.AddWithValue("user_injury_date", userInjury.InjuryDate);
-            cmd.Prepare();
+                cmd.Parameters.AddWithValue("user_uid", userInjury.UserId);
+                cmd.Parameters.AddWithValue("user_injury_name", userInjury.InjuryName);
+                cmd.Parameters.AddWithValue("user_injury_description", userInjury.InjuryDescription);
+                cmd.Parameters.AddWithValue("user_injury_severity", userInjury.InjurySeverity);
+                cmd.Parameters.AddWithValue("user_injury_date", userInjury.InjuryDate);
+                cmd.Prepare();
 
-            try {
+            
                 cmd.ExecuteNonQuery();
-                con.Close();
+                connection.Close();
                 AddAllInjuryLocations(userInjury);
                 
                 return true;
@@ -482,39 +450,34 @@ namespace AgingPopulationFitness.Server
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                return false;
             }
-            con.Close();
-            return false;
+            
+            
             
         }
 
-        public bool AddAllInjuryLocations( UserInjury userInjury)
+        public async Task<bool> AddAllInjuryLocations( UserInjury userInjury)
         {
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
+            
+            try {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
-            var sql = "SELECT user_injury_id FROM user_injury WHERE user_uid = @user_uid AND user_injury_name = @user_injury_name";
+                var sql = "SELECT user_injury_id FROM user_injury WHERE user_uid = @user_uid AND user_injury_name = @user_injury_name";
 
-            using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
-            cmd.Parameters.AddWithValue("user_uid", userInjury.UserId);
-            cmd.Parameters.AddWithValue("user_injury_name", userInjury.InjuryName);
+                cmd.Parameters.AddWithValue("user_uid", userInjury.UserId);
+                cmd.Parameters.AddWithValue("user_injury_name", userInjury.InjuryName);
 
-            try
-            {
+            
                 using NpgsqlDataReader rdr = cmd.ExecuteReader();
 
                 while (rdr.Read())
                 {
                     userInjury.InjuryId = rdr.GetInt32(0);
                 }
-                con.Close();
+                connection.Close();
                 for ( int i = 0; i < userInjury.InjuryLocations.Count; i++)
                 {
                     AddOneInjuryLocation( userInjury.InjuryId, userInjury.InjuryLocations[i].InjuryLocationId);
@@ -525,54 +488,57 @@ namespace AgingPopulationFitness.Server
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                return false;
             }
-            con.Close();
-            return false;
+            
+            
         }
 
-        public void AddOneInjuryLocation( long? userInjuryId, long injuryLocationId)
+        public async Task<bool> AddOneInjuryLocation( long? userInjuryId, long injuryLocationId)
         {
             if( (userInjuryId == null) || (injuryLocationId == null))
             {
-                return;
+                return false;
             }
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
+            
+            try
+            {
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
-            var sql = "INSERT INTO user_injury_injury_location ( user_injury_id, injury_location_id) VALUES" +
+                var sql = "INSERT INTO user_injury_injury_location ( user_injury_id, injury_location_id) VALUES" +
                 "(@user_injury_id, @injury_location_id)";
 
-            using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
-            cmd.Parameters.AddWithValue("user_injury_id", userInjuryId);
-            cmd.Parameters.AddWithValue("injury_location_id", injuryLocationId);
-            //Console.WriteLine("adding injury loc: " + userInjuryId + " " + injuryLocationId);
+                cmd.Parameters.AddWithValue("user_injury_id", userInjuryId);
+                cmd.Parameters.AddWithValue("injury_location_id", injuryLocationId);
+                //Console.WriteLine("adding injury loc: " + userInjuryId + " " + injuryLocationId);
 
-            cmd.ExecuteNonQuery();
-            con.Close();
+                cmd.ExecuteNonQuery();
+                connection.Close();
+                return true;
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
         }
 
-        public List<InjuryLocation> GetInjuriesCall()
+        public async Task<List<InjuryLocation>> GetInjuriesCall()
         {
             List<InjuryLocation> injuryLocations = new List<InjuryLocation>();
 
 
             try
             {
-                using var con = new NpgsqlConnection(cs);
-                con.Open();
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
                 var sql = "SELECT * FROM injury_location " +
                             "ORDER BY injury_location.body_part";
 
 
-                using var cmd = new NpgsqlCommand(sql, con);
+                using var cmd = new NpgsqlCommand(sql, connection);
 
 
                 using NpgsqlDataReader rdr = cmd.ExecuteReader();
@@ -585,7 +551,7 @@ namespace AgingPopulationFitness.Server
                     //Console.WriteLine(rdr.GetInt32(0) + rdr.GetString(1));
                     injuryLocations.Add(injuryLocation);
                 }
-                con.Close();
+                connection.Close();
             }
             catch( Exception e)
             {
@@ -606,46 +572,47 @@ namespace AgingPopulationFitness.Server
         }
         */
 
-        public UserProfile VerifyUserCall(UserProfile userProfile)
+        public async Task<UserProfile> VerifyUserCall(UserProfile userProfile)
         {
             List<UserProfile> userProfileList = new List<UserProfile>();
 
 
 
-            /*
-            var cs = "host=" + DatabaseCredentials.Host + ";" +
-                "Username=" + DatabaseCredentials.Username + ";" +
-                "Password=" + DatabaseCredentials.Password + ";" +
-                "Database=" + DatabaseCredentials.Database + "";
-            */
-            using var con = new NpgsqlConnection(cs);
-            con.Open();
-
-            var sql = "SELECT * FROM user_profile WHERE username = @username AND user_password = crypt( @user_password, user_password )";
-
-
-            using var cmd = new NpgsqlCommand(sql, con);
-
-            cmd.Parameters.AddWithValue("username", userProfile.Username);
-            cmd.Parameters.AddWithValue("user_password", userProfile.Password);
-            cmd.Prepare();
-
-            using NpgsqlDataReader rdr = cmd.ExecuteReader();
-
-            while (rdr.Read())
+           
+            try
             {
-                UserProfile newUserProfile = new UserProfile();
-                newUserProfile.UserId = rdr.GetGuid(0);
-                newUserProfile.Username = rdr.GetString(1);
-                newUserProfile.PrintUserProfile();
-                userProfileList.Add(newUserProfile);
+                NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
+
+                var sql = "SELECT * FROM user_profile WHERE username = @username AND user_password = crypt( @user_password, user_password )";
+
+
+                using var cmd = new NpgsqlCommand(sql, connection);
+
+                cmd.Parameters.AddWithValue("username", userProfile.Username);
+                cmd.Parameters.AddWithValue("user_password", userProfile.Password);
+                cmd.Prepare();
+
+                using NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    UserProfile newUserProfile = new UserProfile();
+                    newUserProfile.UserId = rdr.GetGuid(0);
+                    newUserProfile.Username = rdr.GetString(1);
+                    newUserProfile.PrintUserProfile();
+                    userProfileList.Add(newUserProfile);
+                }
+                if (userProfileList.Count() == 1)
+                {
+                    connection.Close();
+                    return userProfileList[0];
+                }
+                connection.Close();
             }
-            if (userProfileList.Count() == 1)
-            {
-                con.Close();
-                return userProfileList[0];
+            catch( Exception e) {
+                Console.WriteLine(e);
+
             }
-            con.Close();
             return userProfile;
         }
 

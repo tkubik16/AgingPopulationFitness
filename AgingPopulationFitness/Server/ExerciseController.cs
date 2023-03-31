@@ -121,11 +121,11 @@ namespace AgingPopulationFitness.Server
                     exercise.ExerciseDescription = rdr.GetString(2);
                     exercise.ExerciseLink = rdr.GetString(3);
                     //exercise.ExerciseMainImage = (byte[])rdr[4]; 
-                    exercise.ExerciseType = rdr.GetString(5);
-                    exercise.ExerciseInstructions = rdr.GetString(6);
+                    exercise.ExerciseType = rdr.GetString(4);
+                    exercise.ExerciseInstructions = rdr.GetString(5);
 
-                    Benefit currentBenefit = new Benefit(rdr.GetInt32(9), rdr.GetString(10), rdr.GetString(11));
-                    InjuryLocation currentInjuryLocation = new InjuryLocation(rdr.GetInt32(14), rdr.GetString(15));
+                    Benefit currentBenefit = new Benefit(rdr.GetInt32(8), rdr.GetString(9), rdr.GetString(10));
+                    InjuryLocation currentInjuryLocation = new InjuryLocation(rdr.GetInt32(13), rdr.GetString(14));
 
                     if (exercise.Benefits.Find(pt => pt.BenefitId == currentBenefit.BenefitId) == null)
                     {
@@ -229,8 +229,8 @@ namespace AgingPopulationFitness.Server
                     anExercise.ExerciseDescription = rdr.GetString(2);
                     anExercise.ExerciseLink = rdr.GetString(3);
                     //anExercise.ExerciseMainImage = (byte[])rdr[4]; 
-                    anExercise.ExerciseType = rdr.GetString(5);
-                    anExercise.ExerciseInstructions = rdr.GetString(6);
+                    anExercise.ExerciseType = rdr.GetString(4);
+                    anExercise.ExerciseInstructions = rdr.GetString(5);
 
                     exercises.Add(anExercise);
                     //Console.WriteLine(anExercise.ExerciseName );
@@ -478,7 +478,8 @@ namespace AgingPopulationFitness.Server
             {
                 NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
-                var sql = "SELECT * FROM benefit";
+                var sql = "SELECT * FROM benefit " +
+                    "ORDER BY benefit.benefit_specificity, benefit.benefit_name";
 
 
                 using var cmd = new NpgsqlCommand(sql, connection);
@@ -515,7 +516,8 @@ namespace AgingPopulationFitness.Server
                 NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
                 var sql = "SELECT * FROM benefit " +
-                    "WHERE benefit.benefit_specificity = 'General'";
+                    "WHERE benefit.benefit_specificity = 'General' " +
+                    "ORDER BY benefit.benefit_name";
 
 
                 using var cmd = new NpgsqlCommand(sql, connection);
@@ -616,8 +618,8 @@ namespace AgingPopulationFitness.Server
             try {
                 NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
-                var sql = "INSERT INTO exercise ( exercise_name, exercise_description, exercise_link, exercise_main_image, exercise_type, exercise_instructions) VALUES" +
-                "(@exercise_name, @exercise_description, @exercise_link, @exercise_main_image, @exercise_type, @exercise_instructions)";
+                var sql = "INSERT INTO exercise ( exercise_name, exercise_description, exercise_link, exercise_type, exercise_instructions) VALUES" +
+                "(@exercise_name, @exercise_description, @exercise_link, @exercise_type, @exercise_instructions)";
 
 
                 using var cmd = new NpgsqlCommand(sql, connection);
@@ -625,7 +627,7 @@ namespace AgingPopulationFitness.Server
                 cmd.Parameters.AddWithValue("exercise_name", exercise.ExerciseName);
                 cmd.Parameters.AddWithValue("exercise_description", exercise.ExerciseDescription);
                 cmd.Parameters.AddWithValue("exercise_link", exercise.ExerciseLink);
-                cmd.Parameters.AddWithValue("exercise_main_image", exercise.ExerciseMainImage);
+                
                 cmd.Parameters.AddWithValue("exercise_type", exercise.ExerciseType);
                 cmd.Parameters.AddWithValue("exercise_instructions", exercise.ExerciseInstructions);
                 cmd.Prepare();
@@ -654,8 +656,8 @@ namespace AgingPopulationFitness.Server
             {
                 NpgsqlConnection connection = await PostgresDatabaseDataSource.Instance.GetConnection();
 
-                var sql = "INSERT INTO suggested_exercise ( suggested_exercise_name, suggested_exercise_description, suggested_exercise_link, suggested_exercise_main_image, suggested_exercise_type, suggested_exercise_instructions) VALUES" +
-                    "(@exercise_name, @exercise_description, @exercise_link, @exercise_main_image, @exercise_type, @exercise_instructions)";
+                var sql = "INSERT INTO suggested_exercise ( suggested_exercise_name, suggested_exercise_description, suggested_exercise_link, suggested_exercise_type, suggested_exercise_instructions) VALUES" +
+                    "(@exercise_name, @exercise_description, @exercise_link, @exercise_type, @exercise_instructions)";
 
 
                 using var cmd = new NpgsqlCommand(sql, connection);
@@ -663,7 +665,7 @@ namespace AgingPopulationFitness.Server
                 cmd.Parameters.AddWithValue("exercise_name", exercise.ExerciseName);
                 cmd.Parameters.AddWithValue("exercise_description", exercise.ExerciseDescription);
                 cmd.Parameters.AddWithValue("exercise_link", exercise.ExerciseLink);
-                cmd.Parameters.AddWithValue("exercise_main_image", exercise.ExerciseMainImage);
+                
                 cmd.Parameters.AddWithValue("exercise_type", exercise.ExerciseType);
                 cmd.Parameters.AddWithValue("exercise_instructions", exercise.ExerciseInstructions);
                 cmd.Prepare();

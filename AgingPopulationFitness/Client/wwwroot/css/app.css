@@ -406,6 +406,8 @@ h1 {
     background-color: var(--clr-neutral);
 }
 
+
+
     .loading-progress circle {
         fill: none;
         stroke: #e0e0e0;
@@ -897,6 +899,7 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     width: 100%;
 
 }
@@ -905,6 +908,7 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
+
     width: 100%;
 }
 
@@ -914,11 +918,7 @@ h1 {
     align-items: center;
     width: fit-content;
     height: fit-content;
-    background-color: var(--clr-section-bg);
-    border-radius: 0.25rem;
-    outline-style: groove;
-    outline-width: 1px;
-    outline-color: var(--clr-section-bg-outline);
+    
     padding: 1rem;
     margin-bottom: 1rem;
 }
@@ -1088,9 +1088,8 @@ h1 {
 @media screen and (min-width: 641px) {
 
     .landing-text-section {
-        width: 60%;
-        margin-right: 0rem;
-        margin-left: auto;
+        width: 100%;
+        
 
     }
 
@@ -1103,7 +1102,7 @@ h1 {
 
     .landing-text {
         margin-bottom: 0;
-        width: 66%;
+        width: 65ch;
     }
 
     .landing-footer {

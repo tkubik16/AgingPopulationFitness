@@ -6,7 +6,7 @@ This is a personal project which leverages a database which I designed to assist
 
 As seen above is the ERD for the database used in the project. This is a postgreSQL database.
 
-<h1>This project uses the following</h1>
+<h2>This project was created using the following:</h2>
 <ul>
   <li>Blazor</li>
   <li>ASP.NET Core</li>
@@ -16,5 +16,7 @@ As seen above is the ERD for the database used in the project. This is a postgre
   <li>HTML</li>
   <li>CSS</li>
   <li>Javascript</li>
+  <li>Database Design</li>
+  <li>Visual Studio</li>
 </ul>
   

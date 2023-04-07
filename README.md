@@ -20,3 +20,4 @@ As seen above is the ERD for the database used in the project. This is a postgre
   <li>Visual Studio</li>
 </ul>
   
+<h3><a href="thomas-kubik.com" target="_blank" >My Portfolio Website</a></h3>

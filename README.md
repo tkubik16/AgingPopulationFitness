@@ -21,4 +21,4 @@ As seen above is the ERD for the database used in the project. This is a postgre
   <li>Visual Studio</li>
 </ul>
   
-<h3><a href="thomas-kubik.com" >My Portfolio Website</a></h3>
+<h3><a href="http://thomas-kubik.com" >My Portfolio Website</a></h3>

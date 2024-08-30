@@ -20,7 +20,7 @@ As seen above is the ERD for the database used in the project. This is a postgre
   <li>Visual Studio</li>
 </ul>
 
-<img src="https://drive.google.com/uc?export=view&id=1_uUNqPs2BKJqpePZKwOm4oVv62ChNjQJ" alt="Register" title="Register">
+<img src="https://drive.google.com/uc?export=view&id=1mauZNAzUGB0Bx6xZjIrOctpL7MAE2Eg9" alt="Register" title="Register">
 
 <img src="https://drive.google.com/uc?export=view&id=" alt="Login" title="Login">
 
